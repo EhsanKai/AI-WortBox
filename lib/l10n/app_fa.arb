@@ -1,0 +1,130 @@
+{
+  "@@locale": "fa",
+  "appTitle": "AI WortBox",
+  "appTagline": "از صفحهٔ کتاب تا حافظهٔ ماندگار",
+  "navToday": "مرور امروز",
+  "navMyWords": "لغات من",
+  "navAdd": "افزودن لغت",
+  "navStatistics": "آمار",
+  "navSettings": "تنظیمات",
+  "dashboardDecks": "دسته‌ها",
+  "dashboardWords": "لغات",
+  "dashboardReviewPending": "مرور روزانه با الگوریتم FSRS در نسخه‌های بعدی فعال می‌شود.",
+  "dashboardYourDecks": "دسته‌های شما",
+  "emptyDecksTitle": "هنوز دسته‌ای نساخته‌اید",
+  "emptyDecksBody": "برای شروع، یک دستهٔ لغت بسازید. هر دسته زبان‌ها و محدودیت روزانهٔ خودش را دارد.",
+  "actionCreateDeck": "ساخت دستهٔ جدید",
+  "actionCancel": "انصراف",
+  "actionRetry": "تلاش دوباره",
+  "deckWordCount": "{count, plural, =0{بدون لغت} other{{count} لغت}}",
+  "@deckWordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "deckLanguagePair": "{source} ← {definition}",
+  "@deckLanguagePair": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "definition": {
+        "type": "String"
+      }
+    }
+  },
+  "deckDailyLimit": "{count, plural, =0{بدون کارت جدید} other{حداکثر {count} کارت جدید در روز}}",
+  "@deckDailyLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "deckCreatedOn": "ساخته‌شده در {date}",
+  "@deckCreatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "deckNotFound": "این دسته پیدا نشد.",
+  "deckEmptyBody": "این دسته هنوز لغتی ندارد. افزودن لغت در مرحلهٔ بعد فعال می‌شود.",
+  "createDeckTitle": "دستهٔ جدید",
+  "createDeckNameLabel": "نام دسته",
+  "createDeckNameHint": "مثلاً Der Vorleser یا لغات A1",
+  "createDeckLanguagesLabel": "زبان یادگیری و زبان معنی",
+  "createDeckDailyLimitLabel": "تعداد کارت جدید در روز",
+  "createDeckDailyLimitHelper": "از {min} تا {max}؛ صفر یعنی موقتاً کارت جدیدی نشان داده نشود.",
+  "@createDeckDailyLimitHelper": {
+    "placeholders": {
+      "min": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "createDeckSubmit": "ساختن",
+  "deckCreatedMessage": "دستهٔ «{name}» ساخته شد.",
+  "@deckCreatedMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeckNameEmpty": "نام دسته را وارد کنید.",
+  "errorDeckNameTooLong": "نام دسته حداکثر {max} نویسه می‌تواند باشد.",
+  "@errorDeckNameTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "errorDeckNameDuplicate": "دسته‌ای با همین نام وجود دارد.",
+  "errorDailyLimitRange": "عددی بین {min} و {max} وارد کنید.",
+  "@errorDailyLimitRange": {
+    "placeholders": {
+      "min": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "errorInvalidNumber": "یک عدد صحیح وارد کنید.",
+  "errorUnsupportedLanguage": "این زبان هنوز پشتیبانی نمی‌شود.",
+  "errorIdenticalLanguages": "زبان یادگیری و زبان معنی باید متفاوت باشند.",
+  "errorStorage": "ذخیره‌سازی روی دستگاه با خطا روبه‌رو شد. دوباره تلاش کنید.",
+  "errorGeneric": "مشکلی پیش آمد. دوباره تلاش کنید.",
+  "addSubtitle": "لغت‌ها را از کجا می‌آورید؟",
+  "addImportCsv": "وارد کردن فایل CSV",
+  "addImportCsvDescription": "فهرست لغت‌هایتان را از یک فایل CSV وارد کنید.",
+  "addManual": "افزودن دستی",
+  "addManualDescription": "یک لغت یا عبارت آلمانی و معنی آن را بنویسید.",
+  "addScan": "اسکن صفحهٔ کتاب",
+  "addScanDescription": "از صفحهٔ کتاب عکس بگیرید و لغت‌های دلخواه را انتخاب کنید.",
+  "comingSoon": "به‌زودی",
+  "statisticsEmpty": "آمار یادگیری پس از شروع مرورها نمایش داده می‌شود.",
+  "settingsLanguages": "زبان‌های پیش‌فرض",
+  "settingsSourceLanguage": "زبان یادگیری",
+  "settingsDefinitionLanguage": "زبان معنی",
+  "settingsPrivacy": "حریم خصوصی و ذخیره‌سازی",
+  "settingsPrivacyBody": "همهٔ داده‌ها فقط روی همین دستگاه ذخیره می‌شوند و نیازی به ثبت‌نام نیست.",
+  "settingsAbout": "درباره"
+}
