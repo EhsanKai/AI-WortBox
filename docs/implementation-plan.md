@@ -3,7 +3,7 @@
 The project is delivered in five phases. Each phase ends with a report and
 waits for explicit approval before the next one starts.
 
-## Phase 1 — Foundation and local persistence ✅ (awaiting approval)
+## Phase 1 — Foundation and local persistence ✅ (approved, commit 73fa370)
 
 - Flutter project for iOS and Android (`com.aiwortbox.ai_wortbox`).
 - Riverpod (state), GoRouter (navigation, five-tab shell), Material 3 theme
@@ -19,16 +19,21 @@ waits for explicit approval before the next one starts.
 - Deck creation and listing, deck detail view.
 - Unit, database, schema and widget tests.
 
-## Phase 2 — Vocabulary management and CSV import
+## Phase 2 — Vocabulary management and CSV import ✅ (awaiting approval)
 
-- `DriftVocabularyRepository`; create/edit/view/delete entries with multiple
-  meanings, examples and notes; field validation.
-- Duplicate detection via `normalized` (never merges distinct meanings).
-- CSV import: file picker, UTF-8/BOM, delimiter detection, header recognition
-  (`word`, `term`, `german`, `meaning`, `translation`, `persian`, `example`),
-  column mapping, preview, row-level errors, duplicate options, transactional
-  commit. Entries with meanings are marked so they skip AI enrichment.
-- Likely dependencies: `file_picker`, `csv`.
+- `DriftVocabularyRepository` (create/update/merge/delete/import, reactive
+  queries with meanings). No schema change (still v1).
+- `VocabularyDraft` (cleaning + validation), duplicate detection
+  (`checkDuplicate`), deterministic import planning (`planImport`,
+  `DuplicateStrategy`), non-destructive `mergeDrafts`.
+- Screens: deck detail with searchable word list, entry detail, entry form
+  (create/edit, duplicate dialog, "save & add next"), CSV import flow, Add tab
+  actions for CSV and manual entry.
+- CSV pipeline: own RFC 4180 parser with encoding/delimiter handling
+  (`CsvParser`), header recognition and mapping (`HeaderRecognizer`,
+  `ColumnMapping`), row analysis (`analyzeCsvImport`), `file_picker` adapter.
+- Dependency added: `file_picker` 13.1.0. No CSV package (see D11).
+- 11 CSV fixtures in `test/fixtures/csv/`, 86 new tests.
 
 ## Phase 3 — Book scanning and word selection
 

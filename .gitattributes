@@ -1,0 +1,2 @@
+# CSV fixtures test exact bytes (BOM, CRLF, UTF-16, Latin-1): never convert.
+test/fixtures/** -text

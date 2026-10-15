@@ -8,7 +8,7 @@ void main() {
     });
 
     test('composes decomposed German umlauts', () {
-      expect(TextNormalizer.cleanName('Mädchen'), 'Mädchen');
+      expect(TextNormalizer.cleanName('Ma\u0308dchen'), 'Mädchen');
     });
 
     test('unifies Arabic yeh and kaf with Persian letters', () {

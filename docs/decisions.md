@@ -66,3 +66,41 @@ CHECK constraint.
 
 Records use app-generated UUID v4 string keys (stable, merge-friendly for any
 future sync). Tests use `NativeDatabase.memory()` and deterministic ids.
+
+## D11 — Own CSV parser instead of `package:csv` (2026-10-15)
+
+`csv` 8.0.0 is maintained, but it tolerates malformed input silently, does not
+report line numbers or unterminated quotes, and converts values to numbers by
+default. Row-level error reporting needs all three. A ~200-line RFC 4180
+parser (`CsvParser`) handles quotes, escapes, multi-line cells, CR/LF/CRLF,
+BOM/UTF-16, delimiter detection and `sep=` hints, with tests for each.
+
+## D12 — `file_picker` with `FileType.any` (2026-10-15)
+
+`file_picker` 13.1.0 (160/160 pub points, Flutter ≥ 3.38). Extension filters
+can hide CSV files on some Android document providers that report unusual
+MIME types, so any file can be chosen; content is validated by the parser
+(non-Unicode and binary files are rejected with a clear message).
+
+## D13 — Meanings are optional; status reflects presence (2026-10-15)
+
+Words collected without a translation (e.g. from scans in Phase 3) must be
+storable. An entry without meanings is `missing`; with meanings it is `ready`.
+Imported or typed translations therefore never trigger AI enrichment.
+
+## D14 — Only Unicode encodings are accepted (2026-10-15)
+
+Non-UTF input (e.g. Windows-1256 or Latin-1) is rejected instead of guessed,
+because a wrong guess silently corrupts Persian text. The error message tells
+the user to save the file as UTF-8.
+
+## D15 — Meaning separators inside a cell (2026-10-15)
+
+`;`, `؛`, `|` and line breaks split a cell into several meanings. Commas do
+not, because `,` and `،` occur inside Persian and German phrases.
+
+## D16 — Flashcards are created in Phase 5 (2026-10-15)
+
+Phase 2 stores vocabulary only. Cards (and their FSRS state) will be created
+for entries when the review feature is implemented, including for entries
+saved before then.

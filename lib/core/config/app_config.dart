@@ -23,6 +23,16 @@ abstract final class AppConfig {
 
   static const int maxDeckNameLength = 80;
 
+  // Vocabulary entry limits (characters).
+  static const int maxOriginalLength = 200;
+  static const int maxMeaningLength = 300;
+  static const int maxMeaningsPerEntry = 20;
+  static const int maxTextFieldLength = 2000;
+
+  // CSV import limits.
+  static const int maxCsvBytes = 5 * 1024 * 1024;
+  static const int maxCsvRows = 10000;
+
   /// File name (without extension) of the local SQLite database.
   static const String databaseName = 'ai_wortbox';
 }

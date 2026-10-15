@@ -32,6 +32,8 @@ Riverpod providers in `lib/app/providers.dart` wire the object graph:
 - `clockProvider` — `Clock` (`SystemClock`; `FixedClock` in tests)
 - `idGeneratorProvider` — UUID v4 ids (`SequentialIdGenerator` in tests)
 - `deckRepositoryProvider` — `DriftDeckRepository`
+- `vocabularyRepositoryProvider` — `DriftVocabularyRepository`
+- `csvFileSourceProvider` — `FilePickerCsvFileSource` (fake in tests)
 
 Feature providers (e.g. `deckSummariesProvider`) expose Drift `watch` streams,
 so the UI updates automatically after writes. Tests override the root
@@ -39,9 +41,20 @@ providers with an in-memory database and deterministic clock/ids.
 
 ## Navigation
 
-GoRouter with a `StatefulShellRoute.indexedStack` and five branches:
-`/today`, `/words` (+ `/words/decks/:deckId`), `/add`, `/statistics`,
-`/settings`. Each tab keeps its own navigation stack.
+GoRouter with a `StatefulShellRoute.indexedStack` and five branches. Each tab
+keeps its own navigation stack.
+
+| Path | Screen |
+| --- | --- |
+| `/today` | Dashboard |
+| `/words` | Deck list |
+| `/words/decks/:deckId` | Deck word list (search, add, import) |
+| `/words/decks/:deckId/import` | CSV import into this deck |
+| `/words/decks/:deckId/entries/new` | New word |
+| `/words/decks/:deckId/entries/:entryId` | Word details |
+| `/words/decks/:deckId/entries/:entryId/edit` | Edit word |
+| `/add`, `/add/manual?deckId=`, `/add/csv?deckId=` | Add tab and its flows |
+| `/statistics`, `/settings` | Statistics, settings |
 
 ## Database
 
@@ -71,6 +84,53 @@ never writes to `flashcards`, so progress is never reset by a definition edit
 
 The exported v1 schema is checked by `test/drift/app_database/schema_test.dart`.
 
+## Vocabulary
+
+- `VocabularyDraft` is the editable content of an entry. `cleaned()` trims
+  and collapses whitespace, drops blank and repeated meanings, and keeps the
+  original spelling; `validate()` checks required word and length limits.
+  Meanings are optional.
+- `enrichmentStatus`: `ready` when an entry has at least one meaning (from
+  the user, a CSV file or later AI), `missing` when it has none. Only
+  `missing`/`failed` entries will be candidates for AI enrichment (Phase 4),
+  so imported translations never trigger unnecessary requests.
+- `userEditedAt` is set when the user creates or edits an entry in the form
+  (and on an explicit "add meanings" merge). CSV imports do not set it.
+  Phase 4 must not overwrite such content without confirmation.
+- Repositories never write to `flashcards` when content changes. Deleting an
+  entry deletes its cards (cascade); the UI warns about this.
+
+### Duplicates
+
+Duplicates are detected per deck by `normalized` (case-insensitive, edge
+punctuation removed, umlauts composed). A duplicate is *redundant* when its
+meanings are a subset of an existing entry's meanings (compared with
+`TextNormalizer.meaningKey`, which also unifies Persian letter variants and
+ignores diacritics). A word with *different* meanings is never merged
+automatically:
+
+- Manual entry: a dialog offers cancel / open existing (redundant) or cancel /
+  add meanings to existing / save as a separate word (different meanings).
+- CSV import: `planImport` applies the chosen `DuplicateStrategy` (`skip`,
+  `mergeMeanings`, `keepSeparate`) in file order, treating earlier rows like
+  existing entries. Redundant rows are always skipped. Merges only append
+  meanings and fill empty fields.
+
+## CSV import pipeline
+
+```
+bytes ─ CsvParser.decode ─ detectDelimiter / sep= ─ CsvParser.parse ─▶ CsvTable
+CsvTable ─ HeaderRecognizer.suggest ─▶ ColumnMapping (user-adjustable)
+(CsvTable, ColumnMapping, existing entries, strategy) ─ analyzeCsvImport ─▶ preview
+preview.candidates ─ VocabularyRepository.importEntries (one transaction)
+```
+
+All steps except the file picker and the final write are pure Dart and unit
+tested. `importEntries` re-plans inside the transaction against the current
+database state, so the result does not depend on a stale preview. Any failure
+rolls back the whole import. Files above 256 KB are parsed on a background
+isolate.
+
 ## Languages and localization
 
 - `AppConfig` centralizes the product name, tagline and default language pair
@@ -80,7 +140,8 @@ The exported v1 schema is checked by `test/drift/app_database/schema_test.dart`.
 - UI strings come from `lib/l10n/app_fa.arb` (template) and `app_en.arb`. The
   app currently runs with the Persian locale (RTL).
 - `AutoDirectionText` sets text direction from content, so German strings
-  render correctly inside the RTL UI.
+  render correctly inside the RTL UI. Input fields set their direction by
+  language: German fields LTR, Persian fields RTL.
 
 ## Error handling
 

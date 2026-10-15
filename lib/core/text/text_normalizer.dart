@@ -15,12 +15,12 @@ abstract final class TextNormalizer {
   // forms that occur in German text (base letter + U+0308 COMBINING
   // DIAERESIS) so that "ä" typed two different ways compares equal.
   static const _germanComposition = {
-    'ä': 'ä',
-    'ö': 'ö',
-    'ü': 'ü',
-    'Ä': 'Ä',
-    'Ö': 'Ö',
-    'Ü': 'Ü',
+    'a\u0308': 'ä',
+    'o\u0308': 'ö',
+    'u\u0308': 'ü',
+    'A\u0308': 'Ä',
+    'O\u0308': 'Ö',
+    'U\u0308': 'Ü',
   };
 
   // Persian text often contains Arabic code points that look identical.
@@ -52,6 +52,23 @@ abstract final class TextNormalizer {
 
   /// Case-insensitive comparison key for names.
   static String nameKey(String input) => cleanName(input).toLowerCase();
+
+  // Arabic diacritics (harakat), superscript alef and tatweel do not change
+  // the meaning of Persian text for comparison purposes.
+  static final _persianMarks = RegExp('[\u064B-\u065F\u0670\u0640]');
+
+  static final _meaningEdgePunctuation = RegExp(
+    r'^[\s.,;:!?"«»()\[\]{}…،؛؟]+|[\s.,;:!?"«»()\[\]{}…،؛؟]+$',
+  );
+
+  /// Comparison key for meanings in the definition language: composed and
+  /// unified letters, diacritics/tatweel removed, edge punctuation removed,
+  /// whitespace collapsed, lower-cased.
+  static String meaningKey(String input) => collapseWhitespace(
+    composeCharacters(input)
+        .replaceAll(_persianMarks, '')
+        .replaceAll(_meaningEdgePunctuation, ''),
+  ).toLowerCase();
 
   /// Comparison key for vocabulary items: composed characters, collapsed
   /// whitespace, edge punctuation removed, lower-cased. Does not lemmatize.

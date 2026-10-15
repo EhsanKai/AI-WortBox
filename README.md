@@ -15,29 +15,55 @@ them with FSRS spaced repetition.
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Foundation, navigation, Drift database, decks | **Done (approved)** |
-| 2 | Manual vocabulary entry, CSV import | Not started |
+| 2 | Manual vocabulary entry, CSV import | **Done (awaiting approval)** |
 | 3 | Book scanning (OCR) and word selection | Not started |
 | 4 | OpenRouter AI enrichment via secure backend | Not started |
 | 5 | FSRS review, statistics, release readiness | Not started |
 
 See [docs/implementation-plan.md](docs/implementation-plan.md).
 
-## What works today (Phase 1)
+## What works today (Phases 1–2)
 
 - Persian, right-to-left UI with five tabs: Today (مرور امروز), My Words
   (لغات من), Add Vocabulary (افزودن لغت), Statistics (آمار), Settings (تنظیمات).
 - Creating and listing decks; decks default to German → Persian and persist
   in a local SQLite database.
-- Complete v1 database schema for decks, vocabulary entries, meanings and
-  flashcards/review state (feature logic for the last three follows in later
-  phases).
+- Vocabulary entries: create, view, edit, delete and search; multiple Persian
+  meanings, German example + Persian translation, grammar, part of speech,
+  base form and notes. German fields are left-to-right, Persian fields
+  right-to-left. Works fully offline.
+- Duplicate detection per deck that never merges different meanings without
+  asking.
+- CSV import: file picker, UTF-8 / UTF-8 BOM / UTF-16 (BOM), automatic or
+  manual delimiter (`,` `;` tab `|`), header recognition (English, German,
+  Persian), column mapping, language confirmation, row-level errors with line
+  numbers, three duplicate strategies, preview, and an all-or-nothing
+  transactional import.
+- Review state (flashcards) is never modified by editing vocabulary.
 
 ## Platform build status
 
 iOS and Android builds are **not yet verified**. The development machine used
 so far has no Android SDK and no full Xcode installation, so
 `flutter build apk` and `flutter build ios` could not run. Verification so far
-is limited to formatting, static analysis and host-side automated tests.
+is limited to formatting, static analysis and host-side automated tests
+(including widget tests of the full UI flows). The native file picker
+(`file_picker`) in particular has not been exercised on a device.
+
+## CSV format
+
+UTF-8 (with or without BOM) or UTF-16 with BOM; delimiter `,` `;` tab or `|`.
+A header row is optional. Recognized headers include `word`, `term`,
+`german`, `meaning`, `translation`, `persian`, `example`, `example
+translation`, `grammar`, `notes` (plus German and Persian equivalents such as
+`Wort`, `Bedeutung`, `لغت`, `معنی`). Several meanings in one cell can be
+separated with `;`, `؛` or `|`. Limits: 5 MB and 10,000 rows per file.
+
+```csv
+word,meaning,example,example translation
+Haus,خانه,Das Haus ist groß.,خانه بزرگ است.
+aufgeben,"تسلیم شدن؛ ترک کردن",Er gibt nie auf.,او هرگز تسلیم نمی‌شود.
+```
 
 ## Requirements
 

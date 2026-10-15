@@ -224,12 +224,6 @@ abstract class AppLocalizations {
   /// **'این دسته پیدا نشد.'**
   String get deckNotFound;
 
-  /// No description provided for @deckEmptyBody.
-  ///
-  /// In fa, this message translates to:
-  /// **'این دسته هنوز لغتی ندارد. افزودن لغت در مرحلهٔ بعد فعال می‌شود.'**
-  String get deckEmptyBody;
-
   /// No description provided for @createDeckTitle.
   ///
   /// In fa, this message translates to:
@@ -421,6 +415,852 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'درباره'**
   String get settingsAbout;
+
+  /// No description provided for @deckAddWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن لغت'**
+  String get deckAddWord;
+
+  /// No description provided for @deckImportCsv.
+  ///
+  /// In fa, this message translates to:
+  /// **'وارد کردن CSV'**
+  String get deckImportCsv;
+
+  /// No description provided for @deckNoEntriesTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'این دسته هنوز لغتی ندارد'**
+  String get deckNoEntriesTitle;
+
+  /// No description provided for @deckNoEntriesBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌ها را دستی اضافه کنید یا از یک فایل CSV وارد کنید.'**
+  String get deckNoEntriesBody;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'جستجو در لغت‌ها و معنی‌ها'**
+  String get searchHint;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغتی با این عبارت پیدا نشد.'**
+  String get searchNoResults;
+
+  /// No description provided for @entryNoMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'بدون معنی'**
+  String get entryNoMeaning;
+
+  /// No description provided for @entryMeanings.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی‌ها'**
+  String get entryMeanings;
+
+  /// No description provided for @entryExample.
+  ///
+  /// In fa, this message translates to:
+  /// **'مثال'**
+  String get entryExample;
+
+  /// No description provided for @entryGrammar.
+  ///
+  /// In fa, this message translates to:
+  /// **'دستور زبان'**
+  String get entryGrammar;
+
+  /// No description provided for @entryLemma.
+  ///
+  /// In fa, this message translates to:
+  /// **'شکل پایه'**
+  String get entryLemma;
+
+  /// No description provided for @entryPartOfSpeech.
+  ///
+  /// In fa, this message translates to:
+  /// **'نوع کلمه'**
+  String get entryPartOfSpeech;
+
+  /// No description provided for @entryNotes.
+  ///
+  /// In fa, this message translates to:
+  /// **'یادداشت'**
+  String get entryNotes;
+
+  /// No description provided for @entrySource.
+  ///
+  /// In fa, this message translates to:
+  /// **'منبع'**
+  String get entrySource;
+
+  /// No description provided for @sourceManual.
+  ///
+  /// In fa, this message translates to:
+  /// **'ورود دستی'**
+  String get sourceManual;
+
+  /// No description provided for @sourceCsv.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل CSV'**
+  String get sourceCsv;
+
+  /// No description provided for @sourceImage.
+  ///
+  /// In fa, this message translates to:
+  /// **'اسکن کتاب'**
+  String get sourceImage;
+
+  /// No description provided for @entryStatus.
+  ///
+  /// In fa, this message translates to:
+  /// **'وضعیت معنی'**
+  String get entryStatus;
+
+  /// No description provided for @entryStatusMissing.
+  ///
+  /// In fa, this message translates to:
+  /// **'منتظر معنی'**
+  String get entryStatusMissing;
+
+  /// No description provided for @entryStatusPending.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال تکمیل'**
+  String get entryStatusPending;
+
+  /// No description provided for @entryStatusReady.
+  ///
+  /// In fa, this message translates to:
+  /// **'آماده'**
+  String get entryStatusReady;
+
+  /// No description provided for @entryStatusFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'تکمیل ناموفق بود'**
+  String get entryStatusFailed;
+
+  /// No description provided for @entryUpdatedOn.
+  ///
+  /// In fa, this message translates to:
+  /// **'آخرین تغییر: {date}'**
+  String entryUpdatedOn(DateTime date);
+
+  /// No description provided for @entryNotFound.
+  ///
+  /// In fa, this message translates to:
+  /// **'این لغت پیدا نشد.'**
+  String get entryNotFound;
+
+  /// No description provided for @actionEdit.
+  ///
+  /// In fa, this message translates to:
+  /// **'ویرایش'**
+  String get actionEdit;
+
+  /// No description provided for @actionDelete.
+  ///
+  /// In fa, this message translates to:
+  /// **'حذف'**
+  String get actionDelete;
+
+  /// No description provided for @actionSave.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره'**
+  String get actionSave;
+
+  /// No description provided for @actionSaveAndAddAnother.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره و لغت بعدی'**
+  String get actionSaveAndAddAnother;
+
+  /// No description provided for @deleteEntryTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'«{word}» حذف شود؟'**
+  String deleteEntryTitle(String word);
+
+  /// No description provided for @deleteEntryBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'این لغت، معنی‌ها و سابقهٔ مرور آن برای همیشه حذف می‌شوند.'**
+  String get deleteEntryBody;
+
+  /// No description provided for @entryDeletedMessage.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت حذف شد.'**
+  String get entryDeletedMessage;
+
+  /// No description provided for @formNewEntryTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت جدید'**
+  String get formNewEntryTitle;
+
+  /// No description provided for @formEditEntryTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'ویرایش لغت'**
+  String get formEditEntryTitle;
+
+  /// No description provided for @formDeckLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'دسته'**
+  String get formDeckLabel;
+
+  /// No description provided for @formWordLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت یا عبارت آلمانی'**
+  String get formWordLabel;
+
+  /// No description provided for @formWordHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'مثلاً sich Mühe geben'**
+  String get formWordHint;
+
+  /// No description provided for @formMeaningLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی {index}'**
+  String formMeaningLabel(int index);
+
+  /// No description provided for @formAddMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن معنی دیگر'**
+  String get formAddMeaning;
+
+  /// No description provided for @formRemoveMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'حذف این معنی'**
+  String get formRemoveMeaning;
+
+  /// No description provided for @formMeaningsHelper.
+  ///
+  /// In fa, this message translates to:
+  /// **'اگر معنی را هنوز نمی‌دانید، خالی بگذارید؛ بعداً قابل تکمیل است.'**
+  String get formMeaningsHelper;
+
+  /// No description provided for @formMoreDetails.
+  ///
+  /// In fa, this message translates to:
+  /// **'جزئیات بیشتر'**
+  String get formMoreDetails;
+
+  /// No description provided for @formExampleLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'جملهٔ مثال آلمانی'**
+  String get formExampleLabel;
+
+  /// No description provided for @formExampleTranslationLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'ترجمهٔ فارسی مثال'**
+  String get formExampleTranslationLabel;
+
+  /// No description provided for @formGrammarLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'اطلاعات دستوری'**
+  String get formGrammarLabel;
+
+  /// No description provided for @formGrammarHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'مثلاً der Tisch, -e'**
+  String get formGrammarHint;
+
+  /// No description provided for @formLemmaLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'شکل پایه'**
+  String get formLemmaLabel;
+
+  /// No description provided for @formPartOfSpeechLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'نوع کلمه'**
+  String get formPartOfSpeechLabel;
+
+  /// No description provided for @formPartOfSpeechHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'مثلاً Nomen یا Verb'**
+  String get formPartOfSpeechHint;
+
+  /// No description provided for @formNotesLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'یادداشت'**
+  String get formNotesLabel;
+
+  /// No description provided for @formNoDecks.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای افزودن لغت ابتدا یک دسته بسازید.'**
+  String get formNoDecks;
+
+  /// No description provided for @entrySavedMessage.
+  ///
+  /// In fa, this message translates to:
+  /// **'«{word}» ذخیره شد.'**
+  String entrySavedMessage(String word);
+
+  /// No description provided for @entryMergedMessage.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی‌های جدید به «{word}» اضافه شد.'**
+  String entryMergedMessage(String word);
+
+  /// No description provided for @errorWordEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت آلمانی را وارد کنید.'**
+  String get errorWordEmpty;
+
+  /// No description provided for @errorTooLong.
+  ///
+  /// In fa, this message translates to:
+  /// **'حداکثر {max} نویسه مجاز است.'**
+  String errorTooLong(int max);
+
+  /// No description provided for @errorTooManyMeanings.
+  ///
+  /// In fa, this message translates to:
+  /// **'حداکثر {max} معنی مجاز است.'**
+  String errorTooManyMeanings(int max);
+
+  /// No description provided for @errorDeckNotFound.
+  ///
+  /// In fa, this message translates to:
+  /// **'دستهٔ انتخاب‌شده دیگر وجود ندارد.'**
+  String get errorDeckNotFound;
+
+  /// No description provided for @errorEntryNotFound.
+  ///
+  /// In fa, this message translates to:
+  /// **'این لغت دیگر وجود ندارد.'**
+  String get errorEntryNotFound;
+
+  /// No description provided for @duplicateRedundantTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'این لغت قبلاً ذخیره شده'**
+  String get duplicateRedundantTitle;
+
+  /// No description provided for @duplicateRedundantBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'«{word}» با همین معنی در این دسته وجود دارد.'**
+  String duplicateRedundantBody(String word);
+
+  /// No description provided for @duplicateDifferentTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'این لغت با معنی دیگری وجود دارد'**
+  String get duplicateDifferentTitle;
+
+  /// No description provided for @duplicateDifferentBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'«{word}» در این دسته با این معنی‌ها ذخیره شده است:'**
+  String duplicateDifferentBody(String word);
+
+  /// No description provided for @duplicateOpenExisting.
+  ///
+  /// In fa, this message translates to:
+  /// **'نمایش لغت موجود'**
+  String get duplicateOpenExisting;
+
+  /// No description provided for @duplicateAddMeanings.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن معنی‌ها به لغت موجود'**
+  String get duplicateAddMeanings;
+
+  /// No description provided for @duplicateSaveSeparate.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره به‌عنوان لغت جداگانه'**
+  String get duplicateSaveSeparate;
+
+  /// No description provided for @duplicateSaveAnyway.
+  ///
+  /// In fa, this message translates to:
+  /// **'در هر صورت ذخیره شود'**
+  String get duplicateSaveAnyway;
+
+  /// No description provided for @csvIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایلی با ستون‌هایی مانند word و meaning انتخاب کنید. پیش از ذخیره، همه‌چیز را بررسی می‌کنید.'**
+  String get csvIntro;
+
+  /// No description provided for @csvSectionDeck.
+  ///
+  /// In fa, this message translates to:
+  /// **'دستهٔ مقصد'**
+  String get csvSectionDeck;
+
+  /// No description provided for @csvSectionFile.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل'**
+  String get csvSectionFile;
+
+  /// No description provided for @csvSectionColumns.
+  ///
+  /// In fa, this message translates to:
+  /// **'ستون‌ها'**
+  String get csvSectionColumns;
+
+  /// No description provided for @csvSectionLanguages.
+  ///
+  /// In fa, this message translates to:
+  /// **'زبان‌ها'**
+  String get csvSectionLanguages;
+
+  /// No description provided for @csvSectionDuplicates.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌های تکراری'**
+  String get csvSectionDuplicates;
+
+  /// No description provided for @csvSectionPreview.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیش‌نمایش'**
+  String get csvSectionPreview;
+
+  /// No description provided for @csvChooseFile.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب فایل CSV'**
+  String get csvChooseFile;
+
+  /// No description provided for @csvChooseAnother.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب فایل دیگر'**
+  String get csvChooseAnother;
+
+  /// No description provided for @csvRecordCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} ردیف}}'**
+  String csvRecordCount(int count);
+
+  /// No description provided for @csvEncoding.
+  ///
+  /// In fa, this message translates to:
+  /// **'کدگذاری: {name}'**
+  String csvEncoding(String name);
+
+  /// No description provided for @csvDelimiterLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'جداکننده'**
+  String get csvDelimiterLabel;
+
+  /// No description provided for @csvDelimiterAuto.
+  ///
+  /// In fa, this message translates to:
+  /// **'تشخیص خودکار'**
+  String get csvDelimiterAuto;
+
+  /// No description provided for @csvDelimiterComma.
+  ///
+  /// In fa, this message translates to:
+  /// **'ویرگول ( , )'**
+  String get csvDelimiterComma;
+
+  /// No description provided for @csvDelimiterSemicolon.
+  ///
+  /// In fa, this message translates to:
+  /// **'نقطه‌ویرگول ( ; )'**
+  String get csvDelimiterSemicolon;
+
+  /// No description provided for @csvDelimiterTab.
+  ///
+  /// In fa, this message translates to:
+  /// **'تب'**
+  String get csvDelimiterTab;
+
+  /// No description provided for @csvDelimiterPipe.
+  ///
+  /// In fa, this message translates to:
+  /// **'خط عمودی ( | )'**
+  String get csvDelimiterPipe;
+
+  /// No description provided for @csvHasHeader.
+  ///
+  /// In fa, this message translates to:
+  /// **'ردیف اول شامل نام ستون‌هاست'**
+  String get csvHasHeader;
+
+  /// No description provided for @csvColumnLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'ستون {index}'**
+  String csvColumnLabel(int index);
+
+  /// No description provided for @csvFieldIgnore.
+  ///
+  /// In fa, this message translates to:
+  /// **'نادیده گرفته شود'**
+  String get csvFieldIgnore;
+
+  /// No description provided for @csvFieldOriginal.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت آلمانی'**
+  String get csvFieldOriginal;
+
+  /// No description provided for @csvFieldMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی فارسی'**
+  String get csvFieldMeaning;
+
+  /// No description provided for @csvFieldLemma.
+  ///
+  /// In fa, this message translates to:
+  /// **'شکل پایه'**
+  String get csvFieldLemma;
+
+  /// No description provided for @csvFieldPartOfSpeech.
+  ///
+  /// In fa, this message translates to:
+  /// **'نوع کلمه'**
+  String get csvFieldPartOfSpeech;
+
+  /// No description provided for @csvFieldExample.
+  ///
+  /// In fa, this message translates to:
+  /// **'جملهٔ مثال'**
+  String get csvFieldExample;
+
+  /// No description provided for @csvFieldExampleTranslation.
+  ///
+  /// In fa, this message translates to:
+  /// **'ترجمهٔ مثال'**
+  String get csvFieldExampleTranslation;
+
+  /// No description provided for @csvFieldGrammar.
+  ///
+  /// In fa, this message translates to:
+  /// **'اطلاعات دستوری'**
+  String get csvFieldGrammar;
+
+  /// No description provided for @csvFieldNotes.
+  ///
+  /// In fa, this message translates to:
+  /// **'یادداشت'**
+  String get csvFieldNotes;
+
+  /// No description provided for @csvMappingNeedsWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'یک ستون را به «لغت آلمانی» اختصاص دهید.'**
+  String get csvMappingNeedsWord;
+
+  /// No description provided for @csvMeaningSplitHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'چند معنی در یک خانه را می‌توان با ؛ یا | جدا کرد.'**
+  String get csvMeaningSplitHint;
+
+  /// No description provided for @csvLanguagesConfirm.
+  ///
+  /// In fa, this message translates to:
+  /// **'تأیید می‌کنم که لغت‌ها به زبان {source} و معنی‌ها به زبان {definition} هستند.'**
+  String csvLanguagesConfirm(String source, String definition);
+
+  /// No description provided for @csvLanguagesSwapped.
+  ///
+  /// In fa, this message translates to:
+  /// **'به نظر می‌رسد ستون لغت فارسی و ستون معنی آلمانی است.'**
+  String get csvLanguagesSwapped;
+
+  /// No description provided for @csvSwapColumns.
+  ///
+  /// In fa, this message translates to:
+  /// **'جابه‌جا کردن ستون‌ها'**
+  String get csvSwapColumns;
+
+  /// No description provided for @csvStrategySkip.
+  ///
+  /// In fa, this message translates to:
+  /// **'رد کردن لغت‌های موجود'**
+  String get csvStrategySkip;
+
+  /// No description provided for @csvStrategySkipDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'اگر لغت در دسته یا در ردیف‌های قبلی فایل باشد، وارد نمی‌شود.'**
+  String get csvStrategySkipDescription;
+
+  /// No description provided for @csvStrategyMerge.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن معنی‌های تازه به لغت موجود'**
+  String get csvStrategyMerge;
+
+  /// No description provided for @csvStrategyMergeDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط معنی‌ها و خانه‌های خالی اضافه می‌شوند؛ چیزی بازنویسی نمی‌شود.'**
+  String get csvStrategyMergeDescription;
+
+  /// No description provided for @csvStrategySeparate.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت جداگانه برای معنی متفاوت'**
+  String get csvStrategySeparate;
+
+  /// No description provided for @csvStrategySeparateDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'اگر معنی متفاوت باشد، لغت جداگانه‌ای ساخته می‌شود.'**
+  String get csvStrategySeparateDescription;
+
+  /// No description provided for @csvStrategyNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'ردیف‌هایی که معنی تازه‌ای ندارند همیشه رد می‌شوند.'**
+  String get csvStrategyNote;
+
+  /// No description provided for @csvCountNew.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} جدید'**
+  String csvCountNew(int count);
+
+  /// No description provided for @csvCountMerge.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} ادغام'**
+  String csvCountMerge(int count);
+
+  /// No description provided for @csvCountSkip.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} تکراری'**
+  String csvCountSkip(int count);
+
+  /// No description provided for @csvCountError.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} خطا'**
+  String csvCountError(int count);
+
+  /// No description provided for @csvRowLine.
+  ///
+  /// In fa, this message translates to:
+  /// **'خط {line}'**
+  String csvRowLine(int line);
+
+  /// No description provided for @csvRowNew.
+  ///
+  /// In fa, this message translates to:
+  /// **'جدید'**
+  String get csvRowNew;
+
+  /// No description provided for @csvRowMerge.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن معنی به لغت موجود'**
+  String get csvRowMerge;
+
+  /// No description provided for @csvRowMergeInFile.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن معنی به خط {line}'**
+  String csvRowMergeInFile(int line);
+
+  /// No description provided for @csvRowRedundant.
+  ///
+  /// In fa, this message translates to:
+  /// **'تکراری — رد می‌شود'**
+  String get csvRowRedundant;
+
+  /// No description provided for @csvRowRedundantInFile.
+  ///
+  /// In fa, this message translates to:
+  /// **'تکرار خط {line} — رد می‌شود'**
+  String csvRowRedundantInFile(int line);
+
+  /// No description provided for @csvRowExists.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت موجود — رد می‌شود'**
+  String get csvRowExists;
+
+  /// No description provided for @csvRowExistsInFile.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت در خط {line} آمده — رد می‌شود'**
+  String csvRowExistsInFile(int line);
+
+  /// No description provided for @csvRowIssueMissingWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت آلمانی خالی است'**
+  String get csvRowIssueMissingWord;
+
+  /// No description provided for @csvRowIssueWordTooLong.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت بیش از حد طولانی است'**
+  String get csvRowIssueWordTooLong;
+
+  /// No description provided for @csvRowIssueMeaningTooLong.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی بیش از حد طولانی است'**
+  String get csvRowIssueMeaningTooLong;
+
+  /// No description provided for @csvRowIssueTooManyMeanings.
+  ///
+  /// In fa, this message translates to:
+  /// **'تعداد معنی‌ها بیش از حد است'**
+  String get csvRowIssueTooManyMeanings;
+
+  /// No description provided for @csvRowIssueFieldTooLong.
+  ///
+  /// In fa, this message translates to:
+  /// **'یکی از خانه‌ها بیش از حد طولانی است'**
+  String get csvRowIssueFieldTooLong;
+
+  /// No description provided for @csvErrorsTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} ردیف خطا دارد و وارد نمی‌شود}}'**
+  String csvErrorsTitle(int count);
+
+  /// No description provided for @csvMoreRows.
+  ///
+  /// In fa, this message translates to:
+  /// **'و {count} ردیف دیگر'**
+  String csvMoreRows(int count);
+
+  /// No description provided for @csvImportButton.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{وارد کردن {count} ردیف}}'**
+  String csvImportButton(int count);
+
+  /// No description provided for @csvNothingToImport.
+  ///
+  /// In fa, this message translates to:
+  /// **'ردیفی برای وارد کردن وجود ندارد.'**
+  String get csvNothingToImport;
+
+  /// No description provided for @csvImportDone.
+  ///
+  /// In fa, this message translates to:
+  /// **'وارد کردن انجام شد'**
+  String get csvImportDone;
+
+  /// No description provided for @csvResultCreated.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} لغت جدید ساخته شد'**
+  String csvResultCreated(int count);
+
+  /// No description provided for @csvResultMerged.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} ردیف به لغت‌های موجود اضافه شد'**
+  String csvResultMerged(int count);
+
+  /// No description provided for @csvResultSkipped.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} ردیف تکراری رد شد'**
+  String csvResultSkipped(int count);
+
+  /// No description provided for @csvResultErrors.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} ردیف به دلیل خطا وارد نشد'**
+  String csvResultErrors(int count);
+
+  /// No description provided for @csvViewDeck.
+  ///
+  /// In fa, this message translates to:
+  /// **'مشاهدهٔ دسته'**
+  String get csvViewDeck;
+
+  /// No description provided for @csvImportAnother.
+  ///
+  /// In fa, this message translates to:
+  /// **'وارد کردن فایل دیگر'**
+  String get csvImportAnother;
+
+  /// No description provided for @csvImportFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'وارد کردن انجام نشد و هیچ تغییری ذخیره نشد. دوباره تلاش کنید.'**
+  String get csvImportFailed;
+
+  /// No description provided for @csvFormatEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل خالی است.'**
+  String get csvFormatEmpty;
+
+  /// No description provided for @csvFormatTooLarge.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل بزرگ‌تر از {max} مگابایت است.'**
+  String csvFormatTooLarge(int max);
+
+  /// No description provided for @csvFormatTooManyRows.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل بیش از {max} ردیف دارد.'**
+  String csvFormatTooManyRows(int max);
+
+  /// No description provided for @csvFormatEncoding.
+  ///
+  /// In fa, this message translates to:
+  /// **'کدگذاری فایل پشتیبانی نمی‌شود. فایل را با کدگذاری UTF-8 ذخیره کنید.'**
+  String get csvFormatEncoding;
+
+  /// No description provided for @csvFormatUnterminatedQuote.
+  ///
+  /// In fa, this message translates to:
+  /// **'علامت نقل‌قول در خط {line} بسته نشده است.'**
+  String csvFormatUnterminatedQuote(int line);
+
+  /// No description provided for @csvFormatNoDataRows.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل هیچ ردیف داده‌ای ندارد.'**
+  String get csvFormatNoDataRows;
+
+  /// No description provided for @csvFileReadFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل خوانده نشد. دوباره تلاش کنید.'**
+  String get csvFileReadFailed;
 }
 
 class _AppLocalizationsDelegate

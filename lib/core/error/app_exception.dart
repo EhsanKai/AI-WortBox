@@ -47,3 +47,45 @@ final class StorageException extends AppException {
   @override
   String toString() => 'StorageException($operation): $cause';
 }
+
+/// Reasons a vocabulary entry cannot be saved.
+enum VocabularyValidationError {
+  originalEmpty,
+  originalTooLong,
+  meaningTooLong,
+  tooManyMeanings,
+  fieldTooLong,
+  deckNotFound,
+}
+
+final class VocabularyValidationException extends AppException {
+  const VocabularyValidationException(this.errors);
+
+  final Set<VocabularyValidationError> errors;
+
+  @override
+  String toString() => 'VocabularyValidationException($errors)';
+}
+
+/// Fatal problems that make a CSV file unusable as a whole. Row-level
+/// problems are reported per row instead and do not throw.
+enum CsvFormatError {
+  empty,
+  tooLarge,
+  tooManyRows,
+  unsupportedEncoding,
+  unterminatedQuote,
+  noDataRows,
+}
+
+final class CsvFormatException extends AppException {
+  const CsvFormatException(this.error, {this.line});
+
+  final CsvFormatError error;
+
+  /// 1-based physical line where the problem starts, when known.
+  final int? line;
+
+  @override
+  String toString() => 'CsvFormatException($error, line: $line)';
+}

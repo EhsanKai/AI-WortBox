@@ -55,7 +55,6 @@
     }
   },
   "deckNotFound": "این دسته پیدا نشد.",
-  "deckEmptyBody": "این دسته هنوز لغتی ندارد. افزودن لغت در مرحلهٔ بعد فعال می‌شود.",
   "createDeckTitle": "دستهٔ جدید",
   "createDeckNameLabel": "نام دسته",
   "createDeckNameHint": "مثلاً Der Vorleser یا لغات A1",
@@ -126,5 +125,390 @@
   "settingsDefinitionLanguage": "زبان معنی",
   "settingsPrivacy": "حریم خصوصی و ذخیره‌سازی",
   "settingsPrivacyBody": "همهٔ داده‌ها فقط روی همین دستگاه ذخیره می‌شوند و نیازی به ثبت‌نام نیست.",
-  "settingsAbout": "درباره"
+  "settingsAbout": "درباره",
+  "deckAddWord": "افزودن لغت",
+  "deckImportCsv": "وارد کردن CSV",
+  "deckNoEntriesTitle": "این دسته هنوز لغتی ندارد",
+  "deckNoEntriesBody": "لغت‌ها را دستی اضافه کنید یا از یک فایل CSV وارد کنید.",
+  "searchHint": "جستجو در لغت‌ها و معنی‌ها",
+  "searchNoResults": "لغتی با این عبارت پیدا نشد.",
+  "entryNoMeaning": "بدون معنی",
+  "entryMeanings": "معنی‌ها",
+  "entryExample": "مثال",
+  "entryGrammar": "دستور زبان",
+  "entryLemma": "شکل پایه",
+  "entryPartOfSpeech": "نوع کلمه",
+  "entryNotes": "یادداشت",
+  "entrySource": "منبع",
+  "sourceManual": "ورود دستی",
+  "sourceCsv": "فایل CSV",
+  "sourceImage": "اسکن کتاب",
+  "entryStatus": "وضعیت معنی",
+  "entryStatusMissing": "منتظر معنی",
+  "entryStatusPending": "در حال تکمیل",
+  "entryStatusReady": "آماده",
+  "entryStatusFailed": "تکمیل ناموفق بود",
+  "entryUpdatedOn": "آخرین تغییر: {date}",
+  "@entryUpdatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "entryNotFound": "این لغت پیدا نشد.",
+  "actionEdit": "ویرایش",
+  "actionDelete": "حذف",
+  "actionSave": "ذخیره",
+  "actionSaveAndAddAnother": "ذخیره و لغت بعدی",
+  "deleteEntryTitle": "«{word}» حذف شود؟",
+  "@deleteEntryTitle": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteEntryBody": "این لغت، معنی‌ها و سابقهٔ مرور آن برای همیشه حذف می‌شوند.",
+  "entryDeletedMessage": "لغت حذف شد.",
+  "formNewEntryTitle": "لغت جدید",
+  "formEditEntryTitle": "ویرایش لغت",
+  "formDeckLabel": "دسته",
+  "formWordLabel": "لغت یا عبارت آلمانی",
+  "formWordHint": "مثلاً sich Mühe geben",
+  "formMeaningLabel": "معنی {index}",
+  "@formMeaningLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "formAddMeaning": "افزودن معنی دیگر",
+  "formRemoveMeaning": "حذف این معنی",
+  "formMeaningsHelper": "اگر معنی را هنوز نمی‌دانید، خالی بگذارید؛ بعداً قابل تکمیل است.",
+  "formMoreDetails": "جزئیات بیشتر",
+  "formExampleLabel": "جملهٔ مثال آلمانی",
+  "formExampleTranslationLabel": "ترجمهٔ فارسی مثال",
+  "formGrammarLabel": "اطلاعات دستوری",
+  "formGrammarHint": "مثلاً der Tisch, -e",
+  "formLemmaLabel": "شکل پایه",
+  "formPartOfSpeechLabel": "نوع کلمه",
+  "formPartOfSpeechHint": "مثلاً Nomen یا Verb",
+  "formNotesLabel": "یادداشت",
+  "formNoDecks": "برای افزودن لغت ابتدا یک دسته بسازید.",
+  "entrySavedMessage": "«{word}» ذخیره شد.",
+  "@entrySavedMessage": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "entryMergedMessage": "معنی‌های جدید به «{word}» اضافه شد.",
+  "@entryMergedMessage": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "errorWordEmpty": "لغت آلمانی را وارد کنید.",
+  "errorTooLong": "حداکثر {max} نویسه مجاز است.",
+  "@errorTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "errorTooManyMeanings": "حداکثر {max} معنی مجاز است.",
+  "@errorTooManyMeanings": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "errorDeckNotFound": "دستهٔ انتخاب‌شده دیگر وجود ندارد.",
+  "errorEntryNotFound": "این لغت دیگر وجود ندارد.",
+  "duplicateRedundantTitle": "این لغت قبلاً ذخیره شده",
+  "duplicateRedundantBody": "«{word}» با همین معنی در این دسته وجود دارد.",
+  "@duplicateRedundantBody": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "duplicateDifferentTitle": "این لغت با معنی دیگری وجود دارد",
+  "duplicateDifferentBody": "«{word}» در این دسته با این معنی‌ها ذخیره شده است:",
+  "@duplicateDifferentBody": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "duplicateOpenExisting": "نمایش لغت موجود",
+  "duplicateAddMeanings": "افزودن معنی‌ها به لغت موجود",
+  "duplicateSaveSeparate": "ذخیره به‌عنوان لغت جداگانه",
+  "duplicateSaveAnyway": "در هر صورت ذخیره شود",
+  "csvIntro": "فایلی با ستون‌هایی مانند word و meaning انتخاب کنید. پیش از ذخیره، همه‌چیز را بررسی می‌کنید.",
+  "csvSectionDeck": "دستهٔ مقصد",
+  "csvSectionFile": "فایل",
+  "csvSectionColumns": "ستون‌ها",
+  "csvSectionLanguages": "زبان‌ها",
+  "csvSectionDuplicates": "لغت‌های تکراری",
+  "csvSectionPreview": "پیش‌نمایش",
+  "csvChooseFile": "انتخاب فایل CSV",
+  "csvChooseAnother": "انتخاب فایل دیگر",
+  "csvRecordCount": "{count, plural, other{{count} ردیف}}",
+  "@csvRecordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvEncoding": "کدگذاری: {name}",
+  "@csvEncoding": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "csvDelimiterLabel": "جداکننده",
+  "csvDelimiterAuto": "تشخیص خودکار",
+  "csvDelimiterComma": "ویرگول ( , )",
+  "csvDelimiterSemicolon": "نقطه‌ویرگول ( ; )",
+  "csvDelimiterTab": "تب",
+  "csvDelimiterPipe": "خط عمودی ( | )",
+  "csvHasHeader": "ردیف اول شامل نام ستون‌هاست",
+  "csvColumnLabel": "ستون {index}",
+  "@csvColumnLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvFieldIgnore": "نادیده گرفته شود",
+  "csvFieldOriginal": "لغت آلمانی",
+  "csvFieldMeaning": "معنی فارسی",
+  "csvFieldLemma": "شکل پایه",
+  "csvFieldPartOfSpeech": "نوع کلمه",
+  "csvFieldExample": "جملهٔ مثال",
+  "csvFieldExampleTranslation": "ترجمهٔ مثال",
+  "csvFieldGrammar": "اطلاعات دستوری",
+  "csvFieldNotes": "یادداشت",
+  "csvMappingNeedsWord": "یک ستون را به «لغت آلمانی» اختصاص دهید.",
+  "csvMeaningSplitHint": "چند معنی در یک خانه را می‌توان با ؛ یا | جدا کرد.",
+  "csvLanguagesConfirm": "تأیید می‌کنم که لغت‌ها به زبان {source} و معنی‌ها به زبان {definition} هستند.",
+  "@csvLanguagesConfirm": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "definition": {
+        "type": "String"
+      }
+    }
+  },
+  "csvLanguagesSwapped": "به نظر می‌رسد ستون لغت فارسی و ستون معنی آلمانی است.",
+  "csvSwapColumns": "جابه‌جا کردن ستون‌ها",
+  "csvStrategySkip": "رد کردن لغت‌های موجود",
+  "csvStrategySkipDescription": "اگر لغت در دسته یا در ردیف‌های قبلی فایل باشد، وارد نمی‌شود.",
+  "csvStrategyMerge": "افزودن معنی‌های تازه به لغت موجود",
+  "csvStrategyMergeDescription": "فقط معنی‌ها و خانه‌های خالی اضافه می‌شوند؛ چیزی بازنویسی نمی‌شود.",
+  "csvStrategySeparate": "لغت جداگانه برای معنی متفاوت",
+  "csvStrategySeparateDescription": "اگر معنی متفاوت باشد، لغت جداگانه‌ای ساخته می‌شود.",
+  "csvStrategyNote": "ردیف‌هایی که معنی تازه‌ای ندارند همیشه رد می‌شوند.",
+  "csvCountNew": "{count} جدید",
+  "@csvCountNew": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvCountMerge": "{count} ادغام",
+  "@csvCountMerge": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvCountSkip": "{count} تکراری",
+  "@csvCountSkip": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvCountError": "{count} خطا",
+  "@csvCountError": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvRowLine": "خط {line}",
+  "@csvRowLine": {
+    "placeholders": {
+      "line": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvRowNew": "جدید",
+  "csvRowMerge": "افزودن معنی به لغت موجود",
+  "csvRowMergeInFile": "افزودن معنی به خط {line}",
+  "@csvRowMergeInFile": {
+    "placeholders": {
+      "line": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvRowRedundant": "تکراری — رد می‌شود",
+  "csvRowRedundantInFile": "تکرار خط {line} — رد می‌شود",
+  "@csvRowRedundantInFile": {
+    "placeholders": {
+      "line": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvRowExists": "لغت موجود — رد می‌شود",
+  "csvRowExistsInFile": "لغت در خط {line} آمده — رد می‌شود",
+  "@csvRowExistsInFile": {
+    "placeholders": {
+      "line": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvRowIssueMissingWord": "لغت آلمانی خالی است",
+  "csvRowIssueWordTooLong": "لغت بیش از حد طولانی است",
+  "csvRowIssueMeaningTooLong": "معنی بیش از حد طولانی است",
+  "csvRowIssueTooManyMeanings": "تعداد معنی‌ها بیش از حد است",
+  "csvRowIssueFieldTooLong": "یکی از خانه‌ها بیش از حد طولانی است",
+  "csvErrorsTitle": "{count, plural, other{{count} ردیف خطا دارد و وارد نمی‌شود}}",
+  "@csvErrorsTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvMoreRows": "و {count} ردیف دیگر",
+  "@csvMoreRows": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvImportButton": "{count, plural, other{وارد کردن {count} ردیف}}",
+  "@csvImportButton": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvNothingToImport": "ردیفی برای وارد کردن وجود ندارد.",
+  "csvImportDone": "وارد کردن انجام شد",
+  "csvResultCreated": "{count} لغت جدید ساخته شد",
+  "@csvResultCreated": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvResultMerged": "{count} ردیف به لغت‌های موجود اضافه شد",
+  "@csvResultMerged": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvResultSkipped": "{count} ردیف تکراری رد شد",
+  "@csvResultSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvResultErrors": "{count} ردیف به دلیل خطا وارد نشد",
+  "@csvResultErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvViewDeck": "مشاهدهٔ دسته",
+  "csvImportAnother": "وارد کردن فایل دیگر",
+  "csvImportFailed": "وارد کردن انجام نشد و هیچ تغییری ذخیره نشد. دوباره تلاش کنید.",
+  "csvFormatEmpty": "فایل خالی است.",
+  "csvFormatTooLarge": "فایل بزرگ‌تر از {max} مگابایت است.",
+  "@csvFormatTooLarge": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvFormatTooManyRows": "فایل بیش از {max} ردیف دارد.",
+  "@csvFormatTooManyRows": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvFormatEncoding": "کدگذاری فایل پشتیبانی نمی‌شود. فایل را با کدگذاری UTF-8 ذخیره کنید.",
+  "csvFormatUnterminatedQuote": "علامت نقل‌قول در خط {line} بسته نشده است.",
+  "@csvFormatUnterminatedQuote": {
+    "placeholders": {
+      "line": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "csvFormatNoDataRows": "فایل هیچ ردیف داده‌ای ندارد.",
+  "csvFileReadFailed": "فایل خوانده نشد. دوباره تلاش کنید."
 }

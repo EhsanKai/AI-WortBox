@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/id/id_generator.dart';
 import '../core/time/clock.dart';
 import '../data/database/app_database.dart';
+import '../features/csv_import/data/csv_file_source.dart';
 import '../features/decks/data/drift_deck_repository.dart';
 import '../features/decks/domain/deck_repository.dart';
+import '../features/vocabulary/data/drift_vocabulary_repository.dart';
+import '../features/vocabulary/domain/vocabulary_repository.dart';
 
 /// The single app-wide database connection. Tests override this with an
 /// in-memory database.
@@ -26,4 +29,16 @@ final deckRepositoryProvider = Provider<DeckRepository>(
     clock: ref.watch(clockProvider),
     ids: ref.watch(idGeneratorProvider),
   ),
+);
+
+final vocabularyRepositoryProvider = Provider<VocabularyRepository>(
+  (ref) => DriftVocabularyRepository(
+    ref.watch(appDatabaseProvider),
+    clock: ref.watch(clockProvider),
+    ids: ref.watch(idGeneratorProvider),
+  ),
+);
+
+final csvFileSourceProvider = Provider<CsvFileSource>(
+  (ref) => const FilePickerCsvFileSource(),
 );

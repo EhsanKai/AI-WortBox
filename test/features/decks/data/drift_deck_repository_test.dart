@@ -88,7 +88,7 @@ void main() {
       throwsValidation(DeckValidationError.nameDuplicate),
     );
     await expectLater(
-      repository.createDeck(const DeckDraft(name: 'ÜBUNGEN')),
+      repository.createDeck(const DeckDraft(name: 'U\u0308BUNGEN')),
       throwsValidation(DeckValidationError.nameDuplicate),
     );
     expect(await repository.getDecks(), hasLength(1));

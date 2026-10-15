@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../config/app_config.dart';
 import '../error/app_exception.dart';
 
 /// Centered illustration-free empty state with an optional action.
@@ -79,5 +80,23 @@ class ErrorStateView extends StatelessWidget {
 /// Maps an error to a user-facing message. Technical details are never shown.
 String errorMessage(AppLocalizations l10n, Object error) => switch (error) {
   StorageException() => l10n.errorStorage,
+  NotFoundException() => l10n.errorEntryNotFound,
+  VocabularyValidationException(:final errors)
+      when errors.contains(VocabularyValidationError.deckNotFound) =>
+    l10n.errorDeckNotFound,
+  CsvFormatException(:final error, :final line) => switch (error) {
+    CsvFormatError.empty => l10n.csvFormatEmpty,
+    CsvFormatError.tooLarge => l10n.csvFormatTooLarge(
+      AppConfig.maxCsvBytes ~/ (1024 * 1024),
+    ),
+    CsvFormatError.tooManyRows => l10n.csvFormatTooManyRows(
+      AppConfig.maxCsvRows,
+    ),
+    CsvFormatError.unsupportedEncoding => l10n.csvFormatEncoding,
+    CsvFormatError.unterminatedQuote => l10n.csvFormatUnterminatedQuote(
+      line ?? 1,
+    ),
+    CsvFormatError.noDataRows => l10n.csvFormatNoDataRows,
+  },
   _ => l10n.errorGeneric,
 };
