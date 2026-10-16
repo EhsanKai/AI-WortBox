@@ -860,4 +860,258 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get csvFileReadFailed =>
       'The file could not be read. Please try again.';
+
+  @override
+  String get scanTitle => 'Scan a book page';
+
+  @override
+  String get scanIntro =>
+      'Take or choose a photo of a German page. The text is read on this device and the photo is not sent anywhere.';
+
+  @override
+  String get scanOcrWarning =>
+      'Text recognition can make mistakes; check and correct the words before saving.';
+
+  @override
+  String get scanTakePhoto => 'Take photo';
+
+  @override
+  String get scanChoosePhoto => 'Choose from gallery';
+
+  @override
+  String get scanTypeText => 'Type or paste text';
+
+  @override
+  String get scanRecognizing => 'Reading the text…';
+
+  @override
+  String get scanErrorCameraPermission =>
+      'Camera access is not allowed. Allow it in the device settings or choose a photo from the gallery.';
+
+  @override
+  String get scanErrorPhotoPermission =>
+      'Photo access is not allowed. Allow it in the device settings or use the camera.';
+
+  @override
+  String get scanErrorCameraUnavailable => 'No camera is available.';
+
+  @override
+  String get scanErrorUnsupportedFormat =>
+      'This image format is not supported. Use JPG, PNG, HEIC or WebP.';
+
+  @override
+  String get scanErrorTooLarge => 'The image is too large.';
+
+  @override
+  String get scanErrorUnreadable => 'The image could not be read.';
+
+  @override
+  String get scanErrorOcrUnavailable =>
+      'Text recognition is not available on this device. You can type the text instead.';
+
+  @override
+  String get scanErrorOcrFailed =>
+      'Reading the text failed. Try again or type the text.';
+
+  @override
+  String get scanNoTextTitle => 'No text found';
+
+  @override
+  String get scanNoTextBody => 'Take a clearer photo or type the text.';
+
+  @override
+  String get scanTryAgain => 'Another photo';
+
+  @override
+  String get scanTypedHint => 'Type or paste the German text here';
+
+  @override
+  String get scanUseText => 'Use this text';
+
+  @override
+  String get scanSelectHint =>
+      'Tap words to select them. For a multi-word expression, switch to “Expression” and tap the first and last word.';
+
+  @override
+  String get scanModeWord => 'Word';
+
+  @override
+  String get scanModeExpression => 'Expression';
+
+  @override
+  String get scanExpressionPickEnd =>
+      'Now tap the last word of the expression.';
+
+  @override
+  String scanExpressionTooLong(int max) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return 'An expression must be within one paragraph and at most $maxString words.';
+  }
+
+  @override
+  String scanSelectedCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString items selected',
+      one: '1 item selected',
+      zero: 'Nothing selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanClearSelection => 'Clear selection';
+
+  @override
+  String get scanEditText => 'Correct text';
+
+  @override
+  String get scanEditTextTitle => 'Correct the recognized text';
+
+  @override
+  String scanSelectionsDropped(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString selections were removed because their text changed.',
+      one: '1 selection was removed because its text changed.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scanReviewButton(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Review $countString items',
+      one: 'Review 1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanReviewTitle => 'Review before saving';
+
+  @override
+  String get scanReviewIntro =>
+      'Only the items in this list will be saved. Correct any recognition mistakes.';
+
+  @override
+  String get scanItemWord => 'German word or expression';
+
+  @override
+  String get scanItemContext => 'Original sentence';
+
+  @override
+  String get scanItemLemma => 'Base form (optional)';
+
+  @override
+  String get scanItemMeaning => 'Persian meaning (optional)';
+
+  @override
+  String get scanItemRemove => 'Remove from list';
+
+  @override
+  String scanLemmaHint(String base) {
+    return 'Suggested base form: $base';
+  }
+
+  @override
+  String get scanLemmaHintNote =>
+      'From a built-in list of irregular verbs; please check.';
+
+  @override
+  String get scanUseHint => 'Use';
+
+  @override
+  String get scanStatusNew => 'New';
+
+  @override
+  String get scanStatusRedundant => 'Already in this deck — not saved';
+
+  @override
+  String get scanStatusRedundantInList => 'Duplicate in this list — not saved';
+
+  @override
+  String get scanStatusExists => 'Word exists with another meaning — not saved';
+
+  @override
+  String get scanStatusMerge => 'Meaning is added to the existing word';
+
+  @override
+  String get scanStatusInvalid => 'The word is empty';
+
+  @override
+  String scanSaveButton(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Save $countString items',
+      one: 'Save 1 item',
+      zero: 'Nothing to save',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanSavedTitle => 'Saved';
+
+  @override
+  String get scanScanAnother => 'Scan another page';
+
+  @override
+  String get scanBackToText => 'Back to text';
+
+  @override
+  String get scanSaveFailed =>
+      'Saving failed and nothing was changed. Please try again.';
+
+  @override
+  String scanResultCreated(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString new words saved';
+  }
+
+  @override
+  String scanResultMerged(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Meanings of $countString items added to existing words';
+  }
+
+  @override
+  String scanResultSkipped(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString duplicates not saved';
+  }
 }

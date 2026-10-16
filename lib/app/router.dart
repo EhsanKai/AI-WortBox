@@ -6,6 +6,7 @@ import '../features/csv_import/presentation/csv_import_screen.dart';
 import '../features/dashboard/presentation/today_screen.dart';
 import '../features/decks/presentation/deck_detail_screen.dart';
 import '../features/decks/presentation/decks_screen.dart';
+import '../features/scan/presentation/scan_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/statistics/presentation/statistics_screen.dart';
 import '../features/vocabulary/presentation/entry_detail_screen.dart';
@@ -21,12 +22,15 @@ abstract final class AppRoutes {
 
   static const manualEntry = '$add/manual';
   static const csvImport = '$add/csv';
+  static const scan = '$add/scan';
 
   static String deck(String id) => '$words/decks/${Uri.encodeComponent(id)}';
 
   static String newEntry(String deckId) => '${deck(deckId)}/entries/new';
 
   static String deckImport(String deckId) => '${deck(deckId)}/import';
+
+  static String deckScan(String deckId) => '${deck(deckId)}/scan';
 
   static String entry(String deckId, String entryId) =>
       '${deck(deckId)}/entries/${Uri.encodeComponent(entryId)}';
@@ -61,6 +65,12 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                   builder: (_, state) =>
                       DeckDetailScreen(deckId: state.pathParameters['deckId']!),
                   routes: [
+                    GoRoute(
+                      path: 'scan',
+                      builder: (_, state) => ScanScreen(
+                        initialDeckId: state.pathParameters['deckId'],
+                      ),
+                    ),
                     GoRoute(
                       path: 'import',
                       builder: (_, state) => CsvImportScreen(
@@ -105,6 +115,12 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                   path: 'manual',
                   builder: (_, state) => VocabularyFormScreen(
                     deckId: state.uri.queryParameters['deckId'],
+                  ),
+                ),
+                GoRoute(
+                  path: 'scan',
+                  builder: (_, state) => ScanScreen(
+                    initialDeckId: state.uri.queryParameters['deckId'],
                   ),
                 ),
                 GoRoute(

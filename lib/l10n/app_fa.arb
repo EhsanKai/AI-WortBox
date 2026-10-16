@@ -510,5 +510,131 @@
     }
   },
   "csvFormatNoDataRows": "فایل هیچ ردیف داده‌ای ندارد.",
-  "csvFileReadFailed": "فایل خوانده نشد. دوباره تلاش کنید."
+  "csvFileReadFailed": "فایل خوانده نشد. دوباره تلاش کنید.",
+  "scanTitle": "اسکن صفحهٔ کتاب",
+  "scanIntro": "از یک صفحهٔ آلمانی عکس بگیرید یا عکسی انتخاب کنید. متن روی همین دستگاه خوانده می‌شود و عکس جایی فرستاده نمی‌شود.",
+  "scanOcrWarning": "تشخیص متن ممکن است اشتباه کند؛ پیش از ذخیره، لغت‌ها را بررسی و اصلاح کنید.",
+  "scanTakePhoto": "گرفتن عکس",
+  "scanChoosePhoto": "انتخاب از گالری",
+  "scanTypeText": "تایپ یا چسباندن متن",
+  "scanRecognizing": "در حال خواندن متن…",
+  "scanErrorCameraPermission": "دسترسی به دوربین داده نشده است. در تنظیمات دستگاه اجازه دهید یا عکسی از گالری انتخاب کنید.",
+  "scanErrorPhotoPermission": "دسترسی به عکس‌ها داده نشده است. در تنظیمات دستگاه اجازه دهید یا از دوربین استفاده کنید.",
+  "scanErrorCameraUnavailable": "دوربین در دسترس نیست.",
+  "scanErrorUnsupportedFormat": "این قالب تصویر پشتیبانی نمی‌شود. از JPG، PNG، HEIC یا WebP استفاده کنید.",
+  "scanErrorTooLarge": "تصویر بیش از حد بزرگ است.",
+  "scanErrorUnreadable": "تصویر خوانده نشد.",
+  "scanErrorOcrUnavailable": "تشخیص متن روی این دستگاه در دسترس نیست. می‌توانید متن را تایپ کنید.",
+  "scanErrorOcrFailed": "خواندن متن انجام نشد. دوباره تلاش کنید یا متن را تایپ کنید.",
+  "scanNoTextTitle": "متنی پیدا نشد",
+  "scanNoTextBody": "عکس واضح‌تری بگیرید یا متن را تایپ کنید.",
+  "scanTryAgain": "عکس دیگر",
+  "scanTypedHint": "متن آلمانی را اینجا تایپ یا جای‌گذاری کنید",
+  "scanUseText": "استفاده از این متن",
+  "scanSelectHint": "روی لغت‌ها بزنید تا انتخاب شوند. برای عبارت چندکلمه‌ای، حالت «عبارت» را بزنید و سپس روی اولین و آخرین لغت بزنید.",
+  "scanModeWord": "لغت",
+  "scanModeExpression": "عبارت",
+  "scanExpressionPickEnd": "حالا روی آخرین لغت عبارت بزنید.",
+  "scanExpressionTooLong": "عبارت باید در یک پاراگراف و حداکثر {max} لغت باشد.",
+  "@scanExpressionTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanSelectedCount": "{count, plural, =0{هیچ لغتی انتخاب نشده} other{{count} مورد انتخاب شده}}",
+  "@scanSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanClearSelection": "پاک کردن انتخاب‌ها",
+  "scanEditText": "اصلاح متن",
+  "scanEditTextTitle": "اصلاح متن تشخیص‌داده‌شده",
+  "scanSelectionsDropped": "{count, plural, other{{count} انتخاب به‌دلیل تغییر متن حذف شد.}}",
+  "@scanSelectionsDropped": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanReviewButton": "{count, plural, other{بررسی {count} مورد}}",
+  "@scanReviewButton": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanReviewTitle": "بررسی پیش از ذخیره",
+  "scanReviewIntro": "فقط موارد این فهرست ذخیره می‌شوند. اشتباه‌های تشخیص را اصلاح کنید.",
+  "scanItemWord": "لغت یا عبارت آلمانی",
+  "scanItemContext": "جملهٔ اصلی",
+  "scanItemLemma": "شکل پایه (اختیاری)",
+  "scanItemMeaning": "معنی فارسی (اختیاری)",
+  "scanItemRemove": "حذف از فهرست",
+  "scanLemmaHint": "پیشنهاد شکل پایه: {base}",
+  "@scanLemmaHint": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      }
+    }
+  },
+  "scanLemmaHintNote": "از فهرست داخلی افعال بی‌قاعده؛ لطفاً بررسی کنید.",
+  "scanUseHint": "استفاده",
+  "scanStatusNew": "جدید",
+  "scanStatusRedundant": "در این دسته وجود دارد — ذخیره نمی‌شود",
+  "scanStatusRedundantInList": "تکراری در همین فهرست — ذخیره نمی‌شود",
+  "scanStatusExists": "لغت با معنی دیگری وجود دارد — ذخیره نمی‌شود",
+  "scanStatusMerge": "معنی به لغت موجود اضافه می‌شود",
+  "scanStatusInvalid": "لغت خالی است",
+  "scanSaveButton": "{count, plural, =0{چیزی برای ذخیره نیست} other{ذخیرهٔ {count} مورد}}",
+  "@scanSaveButton": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanSavedTitle": "ذخیره شد",
+  "scanScanAnother": "اسکن صفحهٔ دیگر",
+  "scanBackToText": "بازگشت به متن",
+  "scanSaveFailed": "ذخیره انجام نشد و هیچ تغییری اعمال نشد. دوباره تلاش کنید.",
+  "scanResultCreated": "{count} لغت جدید ذخیره شد",
+  "@scanResultCreated": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanResultMerged": "معنی {count} مورد به لغت‌های موجود اضافه شد",
+  "@scanResultMerged": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanResultSkipped": "{count} مورد تکراری ذخیره نشد",
+  "@scanResultSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

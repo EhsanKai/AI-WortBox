@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>AI WortBox uses the camera to photograph a book page so you can pick German words from it. The photo stays on your device. — برای عکس گرفتن از صفحهٔ کتاب و انتخاب لغت‌ها از دوربین استفاده می‌شود. عکس روی دستگاه می‌ماند.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>AI WortBox lets you choose a photo of a book page to pick German words from it. The photo stays on your device. — برای انتخاب عکس صفحهٔ کتاب و برداشتن لغت‌ها از آن. عکس روی دستگاه می‌ماند.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

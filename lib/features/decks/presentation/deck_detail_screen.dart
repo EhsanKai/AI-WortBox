@@ -36,6 +36,13 @@ class DeckDetailScreen extends ConsumerWidget {
         actions: [
           if (deck.value != null)
             IconButton(
+              key: const Key('deck.scan'),
+              tooltip: l10n.addScan,
+              icon: const Icon(Icons.document_scanner_outlined),
+              onPressed: () => context.push(AppRoutes.deckScan(deckId)),
+            ),
+          if (deck.value != null)
+            IconButton(
               key: const Key('deck.importCsv'),
               tooltip: l10n.deckImportCsv,
               icon: const Icon(Icons.upload_file_outlined),

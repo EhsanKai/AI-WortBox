@@ -4,6 +4,8 @@ import 'package:ai_wortbox/core/id/id_generator.dart';
 import 'package:ai_wortbox/core/time/clock.dart';
 import 'package:ai_wortbox/data/database/app_database.dart';
 import 'package:ai_wortbox/features/csv_import/data/csv_file_source.dart';
+import 'package:ai_wortbox/features/scan/data/scan_image_source.dart';
+import 'package:ai_wortbox/features/scan/data/text_recognition_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,10 +26,15 @@ Future<void> pumpApp(
   AppDatabase db, {
   String initialLocation = '/today',
   CsvFileSource? fileSource,
+  ScanImageSource? imageSource,
+  TextRecognitionEngine? recognitionEngine,
 }) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
+  // Unmount even when the test fails, so Drift streams are cancelled before
+  // the database is closed (otherwise closing it waits forever).
+  addTearDown(() => tester.pumpWidget(const SizedBox()));
 
   await tester.pumpWidget(
     ProviderScope(
@@ -39,6 +46,10 @@ Future<void> pumpApp(
         idGeneratorProvider.overrideWithValue(SequentialIdGenerator()),
         if (fileSource != null)
           csvFileSourceProvider.overrideWithValue(fileSource),
+        if (imageSource != null)
+          scanImageSourceProvider.overrideWithValue(imageSource),
+        if (recognitionEngine != null)
+          textRecognitionEngineProvider.overrideWithValue(recognitionEngine),
       ],
       retry: (_, _) => null,
       child: AiWortBoxApp(initialLocation: initialLocation),

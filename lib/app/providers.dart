@@ -6,6 +6,8 @@ import '../data/database/app_database.dart';
 import '../features/csv_import/data/csv_file_source.dart';
 import '../features/decks/data/drift_deck_repository.dart';
 import '../features/decks/domain/deck_repository.dart';
+import '../features/scan/data/scan_image_source.dart';
+import '../features/scan/data/text_recognition_engine.dart';
 import '../features/vocabulary/data/drift_vocabulary_repository.dart';
 import '../features/vocabulary/domain/vocabulary_repository.dart';
 
@@ -42,3 +44,14 @@ final vocabularyRepositoryProvider = Provider<VocabularyRepository>(
 final csvFileSourceProvider = Provider<CsvFileSource>(
   (ref) => const FilePickerCsvFileSource(),
 );
+
+final scanImageSourceProvider = Provider<ScanImageSource>(
+  (ref) => ImagePickerScanImageSource(),
+);
+
+/// On-device OCR. Released when no longer used.
+final textRecognitionEngineProvider = Provider<TextRecognitionEngine>((ref) {
+  final engine = MlKitTextRecognitionEngine();
+  ref.onDispose(engine.dispose);
+  return engine;
+});

@@ -98,5 +98,15 @@ String errorMessage(AppLocalizations l10n, Object error) => switch (error) {
     ),
     CsvFormatError.noDataRows => l10n.csvFormatNoDataRows,
   },
+  ScanException(:final error) => switch (error) {
+    ScanError.cameraPermissionDenied => l10n.scanErrorCameraPermission,
+    ScanError.photoPermissionDenied => l10n.scanErrorPhotoPermission,
+    ScanError.cameraUnavailable => l10n.scanErrorCameraUnavailable,
+    ScanError.unsupportedFormat => l10n.scanErrorUnsupportedFormat,
+    ScanError.imageTooLarge => l10n.scanErrorTooLarge,
+    ScanError.unreadableImage => l10n.scanErrorUnreadable,
+    ScanError.ocrUnavailable => l10n.scanErrorOcrUnavailable,
+    ScanError.ocrFailed => l10n.scanErrorOcrFailed,
+  },
   _ => l10n.errorGeneric,
 };

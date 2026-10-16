@@ -1261,6 +1261,336 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'فایل خوانده نشد. دوباره تلاش کنید.'**
   String get csvFileReadFailed;
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'اسکن صفحهٔ کتاب'**
+  String get scanTitle;
+
+  /// No description provided for @scanIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'از یک صفحهٔ آلمانی عکس بگیرید یا عکسی انتخاب کنید. متن روی همین دستگاه خوانده می‌شود و عکس جایی فرستاده نمی‌شود.'**
+  String get scanIntro;
+
+  /// No description provided for @scanOcrWarning.
+  ///
+  /// In fa, this message translates to:
+  /// **'تشخیص متن ممکن است اشتباه کند؛ پیش از ذخیره، لغت‌ها را بررسی و اصلاح کنید.'**
+  String get scanOcrWarning;
+
+  /// No description provided for @scanTakePhoto.
+  ///
+  /// In fa, this message translates to:
+  /// **'گرفتن عکس'**
+  String get scanTakePhoto;
+
+  /// No description provided for @scanChoosePhoto.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب از گالری'**
+  String get scanChoosePhoto;
+
+  /// No description provided for @scanTypeText.
+  ///
+  /// In fa, this message translates to:
+  /// **'تایپ یا چسباندن متن'**
+  String get scanTypeText;
+
+  /// No description provided for @scanRecognizing.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال خواندن متن…'**
+  String get scanRecognizing;
+
+  /// No description provided for @scanErrorCameraPermission.
+  ///
+  /// In fa, this message translates to:
+  /// **'دسترسی به دوربین داده نشده است. در تنظیمات دستگاه اجازه دهید یا عکسی از گالری انتخاب کنید.'**
+  String get scanErrorCameraPermission;
+
+  /// No description provided for @scanErrorPhotoPermission.
+  ///
+  /// In fa, this message translates to:
+  /// **'دسترسی به عکس‌ها داده نشده است. در تنظیمات دستگاه اجازه دهید یا از دوربین استفاده کنید.'**
+  String get scanErrorPhotoPermission;
+
+  /// No description provided for @scanErrorCameraUnavailable.
+  ///
+  /// In fa, this message translates to:
+  /// **'دوربین در دسترس نیست.'**
+  String get scanErrorCameraUnavailable;
+
+  /// No description provided for @scanErrorUnsupportedFormat.
+  ///
+  /// In fa, this message translates to:
+  /// **'این قالب تصویر پشتیبانی نمی‌شود. از JPG، PNG، HEIC یا WebP استفاده کنید.'**
+  String get scanErrorUnsupportedFormat;
+
+  /// No description provided for @scanErrorTooLarge.
+  ///
+  /// In fa, this message translates to:
+  /// **'تصویر بیش از حد بزرگ است.'**
+  String get scanErrorTooLarge;
+
+  /// No description provided for @scanErrorUnreadable.
+  ///
+  /// In fa, this message translates to:
+  /// **'تصویر خوانده نشد.'**
+  String get scanErrorUnreadable;
+
+  /// No description provided for @scanErrorOcrUnavailable.
+  ///
+  /// In fa, this message translates to:
+  /// **'تشخیص متن روی این دستگاه در دسترس نیست. می‌توانید متن را تایپ کنید.'**
+  String get scanErrorOcrUnavailable;
+
+  /// No description provided for @scanErrorOcrFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'خواندن متن انجام نشد. دوباره تلاش کنید یا متن را تایپ کنید.'**
+  String get scanErrorOcrFailed;
+
+  /// No description provided for @scanNoTextTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'متنی پیدا نشد'**
+  String get scanNoTextTitle;
+
+  /// No description provided for @scanNoTextBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'عکس واضح‌تری بگیرید یا متن را تایپ کنید.'**
+  String get scanNoTextBody;
+
+  /// No description provided for @scanTryAgain.
+  ///
+  /// In fa, this message translates to:
+  /// **'عکس دیگر'**
+  String get scanTryAgain;
+
+  /// No description provided for @scanTypedHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'متن آلمانی را اینجا تایپ یا جای‌گذاری کنید'**
+  String get scanTypedHint;
+
+  /// No description provided for @scanUseText.
+  ///
+  /// In fa, this message translates to:
+  /// **'استفاده از این متن'**
+  String get scanUseText;
+
+  /// No description provided for @scanSelectHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'روی لغت‌ها بزنید تا انتخاب شوند. برای عبارت چندکلمه‌ای، حالت «عبارت» را بزنید و سپس روی اولین و آخرین لغت بزنید.'**
+  String get scanSelectHint;
+
+  /// No description provided for @scanModeWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت'**
+  String get scanModeWord;
+
+  /// No description provided for @scanModeExpression.
+  ///
+  /// In fa, this message translates to:
+  /// **'عبارت'**
+  String get scanModeExpression;
+
+  /// No description provided for @scanExpressionPickEnd.
+  ///
+  /// In fa, this message translates to:
+  /// **'حالا روی آخرین لغت عبارت بزنید.'**
+  String get scanExpressionPickEnd;
+
+  /// No description provided for @scanExpressionTooLong.
+  ///
+  /// In fa, this message translates to:
+  /// **'عبارت باید در یک پاراگراف و حداکثر {max} لغت باشد.'**
+  String scanExpressionTooLong(int max);
+
+  /// No description provided for @scanSelectedCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, =0{هیچ لغتی انتخاب نشده} other{{count} مورد انتخاب شده}}'**
+  String scanSelectedCount(int count);
+
+  /// No description provided for @scanClearSelection.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاک کردن انتخاب‌ها'**
+  String get scanClearSelection;
+
+  /// No description provided for @scanEditText.
+  ///
+  /// In fa, this message translates to:
+  /// **'اصلاح متن'**
+  String get scanEditText;
+
+  /// No description provided for @scanEditTextTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'اصلاح متن تشخیص‌داده‌شده'**
+  String get scanEditTextTitle;
+
+  /// No description provided for @scanSelectionsDropped.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} انتخاب به‌دلیل تغییر متن حذف شد.}}'**
+  String scanSelectionsDropped(int count);
+
+  /// No description provided for @scanReviewButton.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{بررسی {count} مورد}}'**
+  String scanReviewButton(int count);
+
+  /// No description provided for @scanReviewTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'بررسی پیش از ذخیره'**
+  String get scanReviewTitle;
+
+  /// No description provided for @scanReviewIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط موارد این فهرست ذخیره می‌شوند. اشتباه‌های تشخیص را اصلاح کنید.'**
+  String get scanReviewIntro;
+
+  /// No description provided for @scanItemWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت یا عبارت آلمانی'**
+  String get scanItemWord;
+
+  /// No description provided for @scanItemContext.
+  ///
+  /// In fa, this message translates to:
+  /// **'جملهٔ اصلی'**
+  String get scanItemContext;
+
+  /// No description provided for @scanItemLemma.
+  ///
+  /// In fa, this message translates to:
+  /// **'شکل پایه (اختیاری)'**
+  String get scanItemLemma;
+
+  /// No description provided for @scanItemMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی فارسی (اختیاری)'**
+  String get scanItemMeaning;
+
+  /// No description provided for @scanItemRemove.
+  ///
+  /// In fa, this message translates to:
+  /// **'حذف از فهرست'**
+  String get scanItemRemove;
+
+  /// No description provided for @scanLemmaHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیشنهاد شکل پایه: {base}'**
+  String scanLemmaHint(String base);
+
+  /// No description provided for @scanLemmaHintNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'از فهرست داخلی افعال بی‌قاعده؛ لطفاً بررسی کنید.'**
+  String get scanLemmaHintNote;
+
+  /// No description provided for @scanUseHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'استفاده'**
+  String get scanUseHint;
+
+  /// No description provided for @scanStatusNew.
+  ///
+  /// In fa, this message translates to:
+  /// **'جدید'**
+  String get scanStatusNew;
+
+  /// No description provided for @scanStatusRedundant.
+  ///
+  /// In fa, this message translates to:
+  /// **'در این دسته وجود دارد — ذخیره نمی‌شود'**
+  String get scanStatusRedundant;
+
+  /// No description provided for @scanStatusRedundantInList.
+  ///
+  /// In fa, this message translates to:
+  /// **'تکراری در همین فهرست — ذخیره نمی‌شود'**
+  String get scanStatusRedundantInList;
+
+  /// No description provided for @scanStatusExists.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت با معنی دیگری وجود دارد — ذخیره نمی‌شود'**
+  String get scanStatusExists;
+
+  /// No description provided for @scanStatusMerge.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی به لغت موجود اضافه می‌شود'**
+  String get scanStatusMerge;
+
+  /// No description provided for @scanStatusInvalid.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت خالی است'**
+  String get scanStatusInvalid;
+
+  /// No description provided for @scanSaveButton.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, =0{چیزی برای ذخیره نیست} other{ذخیرهٔ {count} مورد}}'**
+  String scanSaveButton(int count);
+
+  /// No description provided for @scanSavedTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره شد'**
+  String get scanSavedTitle;
+
+  /// No description provided for @scanScanAnother.
+  ///
+  /// In fa, this message translates to:
+  /// **'اسکن صفحهٔ دیگر'**
+  String get scanScanAnother;
+
+  /// No description provided for @scanBackToText.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگشت به متن'**
+  String get scanBackToText;
+
+  /// No description provided for @scanSaveFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره انجام نشد و هیچ تغییری اعمال نشد. دوباره تلاش کنید.'**
+  String get scanSaveFailed;
+
+  /// No description provided for @scanResultCreated.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} لغت جدید ذخیره شد'**
+  String scanResultCreated(int count);
+
+  /// No description provided for @scanResultMerged.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی {count} مورد به لغت‌های موجود اضافه شد'**
+  String scanResultMerged(int count);
+
+  /// No description provided for @scanResultSkipped.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} مورد تکراری ذخیره نشد'**
+  String scanResultSkipped(int count);
 }
 
 class _AppLocalizationsDelegate

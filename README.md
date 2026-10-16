@@ -48,6 +48,21 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
   transactional import.
 - Review state (flashcards) is never modified by editing vocabulary.
 
+### Phase 3 — implemented, awaiting commit
+
+- Scan a book page: take a photo or choose one from the gallery; German text
+  is recognized **on the device** (Google ML Kit, no internet, the photo is
+  deleted right after recognition).
+- Select single words or multi-word expressions in the recognized text
+  (shown left-to-right inside the Persian UI); correct OCR mistakes; the
+  original sentence is kept as context for each word.
+- Review screen listing exactly what will be saved, with optional Persian
+  meaning, optional base form and cautious offline base-form hints for common
+  irregular verbs (never applied automatically).
+- Typed-text fallback when OCR fails, finds nothing or is unavailable.
+- Saves only confirmed items, to a chosen deck, in one transaction, with the
+  same duplicate rules as CSV import.
+
 ## Platform build status
 
 iOS and Android builds are **not yet verified**. The development machine used
@@ -56,6 +71,11 @@ so far has no Android SDK and no full Xcode installation, so
 is limited to formatting, static analysis and host-side automated tests
 (including widget tests of the full UI flows). The native file picker
 (`file_picker`) in particular has not been exercised on a device.
+
+Phase 3 adds native plugins (`image_picker`, `google_mlkit_text_recognition`)
+and raises the iOS minimum to 15.5. Camera, gallery and OCR are tested only
+with fakes so far; they must be checked on real devices (see
+[docs/testing.md](docs/testing.md)).
 
 ## CSV format
 

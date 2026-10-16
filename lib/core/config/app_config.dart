@@ -33,6 +33,19 @@ abstract final class AppConfig {
   static const int maxCsvBytes = 5 * 1024 * 1024;
   static const int maxCsvRows = 10000;
 
+  // Page scanning limits.
+  /// Largest image file accepted for OCR (after the picker's downscaling).
+  static const int maxScanImageBytes = 20 * 1024 * 1024;
+
+  /// Images are downscaled by the picker to at most this many pixels per side.
+  static const double maxScanImageDimension = 3000;
+
+  /// Longest multi-word expression that can be selected, in words.
+  static const int maxExpressionWords = 10;
+
+  /// Longest sentence context stored with an entry, in characters.
+  static const int maxContextLength = 400;
+
   /// File name (without extension) of the local SQLite database.
   static const String databaseName = 'ai_wortbox';
 }

@@ -54,6 +54,7 @@ keeps its own navigation stack.
 | `/words/decks/:deckId/entries/:entryId` | Word details |
 | `/words/decks/:deckId/entries/:entryId/edit` | Edit word |
 | `/add`, `/add/manual?deckId=`, `/add/csv?deckId=` | Add tab and its flows |
+| `/add/scan?deckId=`, `/words/decks/:deckId/scan` | Page scan flow (Phase 3) |
 | `/statistics`, `/settings` | Statistics, settings |
 
 ## Database
@@ -130,6 +131,60 @@ tested. `importEntries` re-plans inside the transaction against the current
 database state, so the result does not depend on a stale preview. Any failure
 rolls back the whole import. Files above 256 KB are parsed on a background
 isolate.
+
+## Page scanning (Phase 3 — implemented, awaiting commit)
+
+Photo or gallery image → on-device OCR → word/expression selection →
+review and correction → transactional save. No schema change (uses the v1
+columns `source_context`, `lemma` and `source_type = image`).
+
+```
+ScanImageSource (image_picker)  ─▶ PickedImage ─ validatePickedImage
+TextRecognitionEngine (ML Kit)  ─▶ ScanText (normalized text + line boxes)
+ScanDocument (TextTokenizer)    ─▶ word tokens with character offsets
+WordSelection (offset ranges)   ─▶ ScanReviewItem (text, sentence, hint)
+ScanReviewItem.toDraft          ─▶ VocabularyRepository.importEntries
+```
+
+- **Interfaces** (`features/scan/data`): `ScanImageSource` (pick from camera
+  or gallery, Android lost-data recovery, deleting the temporary photo) and
+  `TextRecognitionEngine` (recognize, availability, dispose). Production
+  implementations: `ImagePickerScanImageSource`,
+  `MlKitTextRecognitionEngine`; tests use fakes. Both are provided through
+  Riverpod (`scanImageSourceProvider`, `textRecognitionEngineProvider`).
+- **Text** (`features/scan/domain`): `ScanText` keeps the normalized text the
+  user sees, the raw recognizer output, its origin (OCR, typed, edited) and
+  per-line bounding boxes from OCR. `OcrTextNormalizer` only applies
+  encoding-level fixes (line endings, decomposed umlauts, ligatures, soft
+  hyphens, invisible characters, extra spaces); words and punctuation are
+  never changed.
+- **Tokens and selection**: `TextTokenizer` produces word tokens (letters
+  incl. umlauts/ß, inner hyphens/apostrophes) with exact offsets. Words
+  hyphenated across a line break are shown joined and marked with a dotted
+  underline ("Ver-⏎ständnis" → "Verständnis"; "Nord-⏎Süd" keeps the hyphen;
+  "Ein-⏎und" is not joined). `WordSelection` stores character ranges, so
+  selections do not depend on screen layout; after a text correction they
+  are remapped (unchanged parts kept, edited parts dropped and reported).
+- **Expressions**: in "expression" mode the user taps the first and last
+  word; the range must stay within one paragraph and at most 10 words.
+- **Context**: `SentenceContext` finds the sentence around a selection
+  (handles German abbreviations such as "z. B.", "Dr.", ordinals like
+  "3. Mai", quotes and paragraph breaks), joins lines and hyphenation, and
+  limits it to 400 characters around the selection.
+- **Base-form hints**: `LemmaHints` is a small, offline, curated list of
+  unambiguous irregular verb forms ("ging" → gehen). Hints are shown with a
+  "please check" note and only fill the optional base-form field when the
+  user taps "Use". The selected form is always saved as `original`.
+- **Saving**: review items become `VocabularyDraft`s
+  (`sourceType = image`, `sourceContext` = sentence) and are saved with
+  `importEntries`, i.e. one transaction, the same duplicate rules and the
+  same three `DuplicateStrategy` options as CSV import (default: skip).
+  Items already in the deck are marked and not saved again.
+- **Privacy**: the picked photo is a temporary copy that is deleted right
+  after recognition (also on errors). Images are never uploaded or stored.
+- **State**: `ScanController` (Riverpod, one per screen instance) drives the
+  steps capture → (typing) → select → review → done inside one route; the
+  back button returns to the previous step.
 
 ## Languages and localization
 

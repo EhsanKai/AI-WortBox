@@ -854,4 +854,254 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get csvFileReadFailed => 'فایل خوانده نشد. دوباره تلاش کنید.';
+
+  @override
+  String get scanTitle => 'اسکن صفحهٔ کتاب';
+
+  @override
+  String get scanIntro =>
+      'از یک صفحهٔ آلمانی عکس بگیرید یا عکسی انتخاب کنید. متن روی همین دستگاه خوانده می‌شود و عکس جایی فرستاده نمی‌شود.';
+
+  @override
+  String get scanOcrWarning =>
+      'تشخیص متن ممکن است اشتباه کند؛ پیش از ذخیره، لغت‌ها را بررسی و اصلاح کنید.';
+
+  @override
+  String get scanTakePhoto => 'گرفتن عکس';
+
+  @override
+  String get scanChoosePhoto => 'انتخاب از گالری';
+
+  @override
+  String get scanTypeText => 'تایپ یا چسباندن متن';
+
+  @override
+  String get scanRecognizing => 'در حال خواندن متن…';
+
+  @override
+  String get scanErrorCameraPermission =>
+      'دسترسی به دوربین داده نشده است. در تنظیمات دستگاه اجازه دهید یا عکسی از گالری انتخاب کنید.';
+
+  @override
+  String get scanErrorPhotoPermission =>
+      'دسترسی به عکس‌ها داده نشده است. در تنظیمات دستگاه اجازه دهید یا از دوربین استفاده کنید.';
+
+  @override
+  String get scanErrorCameraUnavailable => 'دوربین در دسترس نیست.';
+
+  @override
+  String get scanErrorUnsupportedFormat =>
+      'این قالب تصویر پشتیبانی نمی‌شود. از JPG، PNG، HEIC یا WebP استفاده کنید.';
+
+  @override
+  String get scanErrorTooLarge => 'تصویر بیش از حد بزرگ است.';
+
+  @override
+  String get scanErrorUnreadable => 'تصویر خوانده نشد.';
+
+  @override
+  String get scanErrorOcrUnavailable =>
+      'تشخیص متن روی این دستگاه در دسترس نیست. می‌توانید متن را تایپ کنید.';
+
+  @override
+  String get scanErrorOcrFailed =>
+      'خواندن متن انجام نشد. دوباره تلاش کنید یا متن را تایپ کنید.';
+
+  @override
+  String get scanNoTextTitle => 'متنی پیدا نشد';
+
+  @override
+  String get scanNoTextBody => 'عکس واضح‌تری بگیرید یا متن را تایپ کنید.';
+
+  @override
+  String get scanTryAgain => 'عکس دیگر';
+
+  @override
+  String get scanTypedHint => 'متن آلمانی را اینجا تایپ یا جای‌گذاری کنید';
+
+  @override
+  String get scanUseText => 'استفاده از این متن';
+
+  @override
+  String get scanSelectHint =>
+      'روی لغت‌ها بزنید تا انتخاب شوند. برای عبارت چندکلمه‌ای، حالت «عبارت» را بزنید و سپس روی اولین و آخرین لغت بزنید.';
+
+  @override
+  String get scanModeWord => 'لغت';
+
+  @override
+  String get scanModeExpression => 'عبارت';
+
+  @override
+  String get scanExpressionPickEnd => 'حالا روی آخرین لغت عبارت بزنید.';
+
+  @override
+  String scanExpressionTooLong(int max) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+
+    return 'عبارت باید در یک پاراگراف و حداکثر $maxString لغت باشد.';
+  }
+
+  @override
+  String scanSelectedCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString مورد انتخاب شده',
+      zero: 'هیچ لغتی انتخاب نشده',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanClearSelection => 'پاک کردن انتخاب‌ها';
+
+  @override
+  String get scanEditText => 'اصلاح متن';
+
+  @override
+  String get scanEditTextTitle => 'اصلاح متن تشخیص‌داده‌شده';
+
+  @override
+  String scanSelectionsDropped(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString انتخاب به‌دلیل تغییر متن حذف شد.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scanReviewButton(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'بررسی $countString مورد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanReviewTitle => 'بررسی پیش از ذخیره';
+
+  @override
+  String get scanReviewIntro =>
+      'فقط موارد این فهرست ذخیره می‌شوند. اشتباه‌های تشخیص را اصلاح کنید.';
+
+  @override
+  String get scanItemWord => 'لغت یا عبارت آلمانی';
+
+  @override
+  String get scanItemContext => 'جملهٔ اصلی';
+
+  @override
+  String get scanItemLemma => 'شکل پایه (اختیاری)';
+
+  @override
+  String get scanItemMeaning => 'معنی فارسی (اختیاری)';
+
+  @override
+  String get scanItemRemove => 'حذف از فهرست';
+
+  @override
+  String scanLemmaHint(String base) {
+    return 'پیشنهاد شکل پایه: $base';
+  }
+
+  @override
+  String get scanLemmaHintNote =>
+      'از فهرست داخلی افعال بی‌قاعده؛ لطفاً بررسی کنید.';
+
+  @override
+  String get scanUseHint => 'استفاده';
+
+  @override
+  String get scanStatusNew => 'جدید';
+
+  @override
+  String get scanStatusRedundant => 'در این دسته وجود دارد — ذخیره نمی‌شود';
+
+  @override
+  String get scanStatusRedundantInList =>
+      'تکراری در همین فهرست — ذخیره نمی‌شود';
+
+  @override
+  String get scanStatusExists => 'لغت با معنی دیگری وجود دارد — ذخیره نمی‌شود';
+
+  @override
+  String get scanStatusMerge => 'معنی به لغت موجود اضافه می‌شود';
+
+  @override
+  String get scanStatusInvalid => 'لغت خالی است';
+
+  @override
+  String scanSaveButton(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ذخیرهٔ $countString مورد',
+      zero: 'چیزی برای ذخیره نیست',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanSavedTitle => 'ذخیره شد';
+
+  @override
+  String get scanScanAnother => 'اسکن صفحهٔ دیگر';
+
+  @override
+  String get scanBackToText => 'بازگشت به متن';
+
+  @override
+  String get scanSaveFailed =>
+      'ذخیره انجام نشد و هیچ تغییری اعمال نشد. دوباره تلاش کنید.';
+
+  @override
+  String scanResultCreated(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString لغت جدید ذخیره شد';
+  }
+
+  @override
+  String scanResultMerged(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'معنی $countString مورد به لغت‌های موجود اضافه شد';
+  }
+
+  @override
+  String scanResultSkipped(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString مورد تکراری ذخیره نشد';
+  }
 }

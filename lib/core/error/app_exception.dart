@@ -89,3 +89,31 @@ final class CsvFormatException extends AppException {
   @override
   String toString() => 'CsvFormatException($error, line: $line)';
 }
+
+/// Problems while obtaining or reading a page image.
+enum ScanError {
+  cameraPermissionDenied,
+  photoPermissionDenied,
+  cameraUnavailable,
+  unsupportedFormat,
+  imageTooLarge,
+  unreadableImage,
+  ocrUnavailable,
+  ocrFailed,
+}
+
+final class ScanException extends AppException {
+  const ScanException(this.error, [this.cause]);
+
+  final ScanError error;
+
+  /// Underlying platform error, for diagnostics only.
+  final Object? cause;
+
+  bool get isPermissionError =>
+      error == ScanError.cameraPermissionDenied ||
+      error == ScanError.photoPermissionDenied;
+
+  @override
+  String toString() => 'ScanException($error)';
+}

@@ -161,3 +161,67 @@ the feature is approved.
 
 iOS and Android builds remain **unverified** (no Android SDK, no full
 Xcode). This must be reported in every phase until real builds have run.
+
+## Phase 3 results (2026-10-16)
+
+- `dart format --set-exit-if-changed lib test`: 98 files, 0 changed
+- `flutter analyze`: no issues
+- `flutter test`: **189 passed, 0 failed** (136 from Phases 1–2 unchanged,
+  53 new)
+- `flutter build apk --debug`: not possible — "No Android SDK found"
+- `flutter build ios --debug --no-codesign`: not possible — "Application not
+  configured for iOS" (no full Xcode)
+
+### Phase 3 suites
+
+| File | Covers |
+| --- | --- |
+| `test/features/scan/domain/ocr_text_normalizer_test.dart` | Umlauts/ß/punctuation/quotes preserved, decomposed umlauts, ligatures, invisible characters, line endings; `ScanText` from OCR blocks (offsets, boxes), typed and edited text |
+| `test/features/scan/domain/text_tokenizer_test.dart` | German word tokens, exact offsets, hyphenated line breaks (joined, kept hyphen, conjunction exception) |
+| `test/features/scan/domain/sentence_context_test.dart` | Sentence boundaries, abbreviations/ordinals, quotes, paragraph breaks, multi-sentence selections, length limit |
+| `test/features/scan/domain/word_selection_test.dart` | Toggle, overlap replacement, remapping after text correction |
+| `test/features/scan/domain/lemma_hints_test.dart` | Listed irregular forms; no hint for ambiguous, regular, base or multi-word input |
+| `test/features/scan/domain/scan_document_test.dart` | Paragraphs, word/expression text, expression limits, context, review item → draft (`image`, context, lemma, meanings), hint update after correction |
+| `test/features/scan/data/scan_image_source_test.dart` | Format/size validation, `image_picker` error-code mapping |
+| `test/features/scan/presentation/scan_controller_test.dart` | Pick/cancel/permission denied/unsupported image/OCR failure/OCR unavailable/empty result, photo always discarded, Android lost-image recovery, typed fallback, word and expression selection, deselect/reset, text correction, saving only reviewed items with corrections and context, duplicate handling and explicit merge, deck choice, failed save changes nothing |
+| `test/widgets/scan_flow_test.dart` | Full UI flow from the Add tab (LTR text view, hint, correction, save, deck), permission denial message, empty result → typed fallback, existing word not saved again |
+
+These tests use fakes for the camera/gallery and the OCR engine. They prove
+the app logic and UI, **not** real camera, gallery or ML Kit behaviour.
+
+## Manual device checklist (Phase 3)
+
+Requires an Android device/emulator and an iPhone (iOS 15.5+; ML Kit may not
+run on all iOS simulators).
+
+1. Add Vocabulary → Scan a Book Page (or the scan icon in a deck). The intro
+   says the photo stays on the device and that recognition can be wrong.
+2. **Camera:** take a photo of a German book page. First use asks for camera
+   permission (iOS shows the Persian/English usage text).
+3. **Permission denied:** deny camera access; a clear message appears and the
+   gallery and typing options still work. Re-allow in system settings.
+4. **Gallery:** choose a JPEG, a PNG and an iPhone HEIC photo.
+5. **Accuracy:** check umlauts (ä ö ü Ä Ö Ü), ß, „German quotes“, commas and
+   line breaks against the page. Note typical OCR mistakes.
+6. **Hyphenation:** a word split at a line end appears joined with a dotted
+   underline.
+7. **Selection:** tap single words; switch to «عبارت» and select a
+   multi-word expression; tap again to deselect; clear all.
+8. **Correction:** use «اصلاح متن», fix a misrecognized word; unrelated
+   selections stay, changed ones are removed with a notice.
+9. **Review:** the list shows exactly the selected items; edit a word, use a
+   base-form hint (e.g. for "ging"), add an optional Persian meaning, check
+   the original sentence.
+10. **Save** to a chosen deck; open the deck and the entry: original form,
+    sentence, base form and source «اسکن کتاب» are shown.
+11. Scan the same page again and select a saved word: it is marked as already
+    in the deck and is not saved twice.
+12. **Empty/unreadable:** photograph a blank surface → "No text found" with
+    retry and typing options. Try a very large panorama image.
+13. **Typed fallback:** type/paste German text and save words from it.
+14. **Android low memory:** enable "Don't keep activities" in developer
+    options, take a photo; after returning, the recognized text should appear
+    (lost-data recovery).
+15. **Offline:** in airplane mode, OCR, selection and saving still work.
+16. Check the device's photo/cache folders: no page photos are left behind
+    by the app.

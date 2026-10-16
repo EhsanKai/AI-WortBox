@@ -151,3 +151,65 @@ Status: accepted.
 Schema changes are made only for approved features, each documented with its
 migration and backfill before implementation, and tested with migration tests
 from real older data. The schema remains v1 after Phase 2.
+
+## D22 — OCR with Google ML Kit, images with `image_picker` (2026-10-16)
+
+Status: accepted (Phase 3).
+
+- `google_mlkit_text_recognition` 0.17.1 (flutter-ml.dev, Android + iOS).
+  Google lists German (`de`, Latin script) among the prioritized, regularly
+  evaluated languages of ML Kit Text Recognition v2. The Latin model is
+  bundled (Android: `com.google.mlkit:text-recognition:16.0.1`; iOS:
+  `GoogleMLKit/TextRecognition`), so OCR works offline without a model
+  download. Other scripts are not bundled.
+- Requirements: Android minSdk 21 (Flutter default is higher); iOS 15.5 or
+  newer, 64-bit only. The iOS deployment target was raised from 15.0 to 15.5
+  in the Xcode project, and `ios/Podfile` (from Flutter's template) sets the
+  platform, excludes armv7 and enforces the deployment target for pods.
+- `image_picker` 1.2.4 (flutter.dev) for camera and gallery, with
+  downscaling to 3000 px and JPEG quality 92, without full metadata.
+  Info.plist contains camera and photo-library usage descriptions; Android
+  needs no extra permissions (system camera/photo picker intents).
+- The OCR engine and image source sit behind interfaces so they can be
+  replaced (e.g. a different OCR engine) and faked in tests.
+- Not verified: real builds and on-device behaviour (no Android SDK, no full
+  Xcode). ML Kit is reported not to run on some iOS simulators; real-device
+  testing is required.
+
+## D23 — Select from a tokenized text view, not an image overlay (2026-10-16)
+
+Status: accepted (Phase 3).
+
+Selection happens on the recognized text, shown as tappable words in a
+left-to-right view inside the Persian UI. This works the same for OCR,
+typed and corrected text, keeps touch targets large, and stores selections
+as character offsets. OCR line boxes are kept in `ScanText.lines` for a
+possible future overlay, but are not used by the UI.
+
+## D24 — Hyphenation is joined visibly, never silently (2026-10-16)
+
+Status: accepted (Phase 3).
+
+The normalizer never changes words. Words split by a hyphen at a line end
+are joined only in the token display (dotted underline) and in the saved
+item, which the user reviews and can edit before saving.
+
+## D25 — Offline base-form hints from a curated list only (2026-10-16)
+
+Status: accepted (Phase 3).
+
+No AI and no general stemming in Phase 3. Only unambiguous irregular verb
+forms produce a hint; ambiguous forms (e.g. "gestanden", "gefallen",
+"gelassen") and regular inflection produce none. Better lemma handling is
+part of the Phase 4 plan / proposal P4.
+
+## D26 — Scanned items reuse the import path (2026-10-16)
+
+Status: accepted (Phase 3).
+
+Saving uses `VocabularyRepository.importEntries` with the user's
+`DuplicateStrategy`, so scanned words follow exactly the CSV duplicate rules,
+are saved in one transaction, and never overwrite existing meanings. Imports
+do not set `userEditedAt`; meanings typed on the review screen are user
+content either way (entries with meanings are `ready` and are not candidates
+for AI enrichment).
