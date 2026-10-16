@@ -133,7 +133,8 @@ void main() {
     await tester.enterText(find.byKey(const Key('createDeck.name')), 'A1');
     await tester.tap(find.byKey(const Key('createDeck.submit')));
     await tester.pumpAndSettle();
-    expect(find.text('دستهٔ «A1» ساخته شد.'), findsOneWidget);
+    // The deck name is bidi-isolated inside the Persian sentence.
+    expect(find.text('دستهٔ «\u2068A1\u2069» ساخته شد.'), findsOneWidget);
     // Let the confirmation snackbar expire.
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();

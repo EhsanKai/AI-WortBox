@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/design/typography.dart';
 import '../../../core/widgets/auto_direction_text.dart';
+import '../../../core/widgets/info_banner.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
+import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../decks/presentation/deck_providers.dart';
 import '../../decks/presentation/decks_screen.dart';
@@ -31,7 +37,7 @@ class ScanReviewView extends ConsumerWidget {
     final deckList = decks.value ?? const [];
     if (decks.hasValue && deckList.isEmpty) {
       return EmptyStateView(
-        icon: Icons.style_outlined,
+        icon: Icons.inventory_2_outlined,
         title: l10n.formNoDecks,
         action: FilledButton.icon(
           onPressed: () => createDeckAndAnnounce(context),
@@ -59,17 +65,17 @@ class ScanReviewView extends ConsumerWidget {
         0;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.gutter,
+        AppSpace.sm,
+        AppSpace.gutter,
+        AppSpace.xxl,
+      ),
       children: [
-        Text(l10n.scanReviewIntro, style: theme.textTheme.bodyMedium),
-        const SizedBox(height: 4),
-        Text(
-          l10n.scanOcrWarning,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 16),
+        Text(l10n.scanReviewIntro, style: theme.textTheme.bodyLarge),
+        const SizedBox(height: AppSpace.md),
+        InfoBanner(tone: StatusTone.warning, message: l10n.scanOcrWarning),
+        const SizedBox(height: AppSpace.lg),
         if (deckList.isNotEmpty)
           DropdownButtonFormField<String>(
             key: const Key('scan.deck'),
@@ -91,7 +97,7 @@ class ScanReviewView extends ConsumerWidget {
                     if (id != null) controller.selectDeck(id);
                   },
           ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpace.lg),
         for (final (index, (_, item)) in state.items.indexed)
           _ReviewItemCard(
             key: ValueKey(item.id),
@@ -100,8 +106,8 @@ class ScanReviewView extends ConsumerWidget {
             onChanged: controller.updateItem,
             onRemove: () => controller.removeItem(item.id),
           ),
-        const SizedBox(height: 8),
-        Text(l10n.csvSectionDuplicates, style: theme.textTheme.titleSmall),
+        const SizedBox(height: AppSpace.md),
+        SectionHeader(l10n.csvSectionDuplicates),
         RadioGroup<DuplicateStrategy>(
           groupValue: state.strategy,
           onChanged: (v) => controller.setStrategy(v ?? state.strategy),
@@ -128,24 +134,18 @@ class ScanReviewView extends ConsumerWidget {
           ),
         ),
         if (state.saveError != null) ...[
-          const SizedBox(height: 16),
-          Text(
-            l10n.scanSaveFailed,
-            style: TextStyle(color: theme.colorScheme.error),
-          ),
+          const SizedBox(height: AppSpace.lg),
+          InfoBanner(tone: StatusTone.danger, message: l10n.scanSaveFailed),
         ],
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpace.xl),
         FilledButton(
           key: const Key('scan.save'),
           onPressed: saveCount == 0 || state.isBusy ? null : controller.save,
           child: state.isBusy
-              ? const SizedBox.square(
-                  dimension: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
+              ? const ButtonProgress()
               : Text(l10n.scanSaveButton(saveCount)),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpace.sm),
         TextButton(
           key: const Key('scan.backToText'),
           onPressed: controller.backToSelect,
@@ -200,44 +200,49 @@ class _ReviewItemCardState extends State<_ReviewItemCard> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final id = widget.item.id;
     final hint = widget.item.hint;
 
-    final (status, color) = switch (widget.decision) {
-      null => (l10n.scanStatusInvalid, theme.colorScheme.error),
-      CreateDecision() => (l10n.scanStatusNew, theme.colorScheme.primary),
-      MergeIntoEntryDecision() || MergeIntoRowDecision() => (
-        l10n.scanStatusMerge,
-        theme.colorScheme.tertiary,
-      ),
+    final (status, tone) = switch (widget.decision) {
+      null => (l10n.scanStatusInvalid, StatusTone.danger),
+      CreateDecision() => (l10n.scanStatusNew, StatusTone.success),
+      MergeIntoEntryDecision() ||
+      MergeIntoRowDecision() => (l10n.scanStatusMerge, StatusTone.warning),
       SkipDecision(reason: SkipReason.redundant, :final targetRowNumber?) => (
         l10n.scanStatusRedundantInList,
-        theme.colorScheme.outline,
+        StatusTone.neutral,
       ),
       SkipDecision(reason: SkipReason.redundant) => (
         l10n.scanStatusRedundant,
-        theme.colorScheme.outline,
+        StatusTone.neutral,
       ),
-      SkipDecision() => (l10n.scanStatusExists, theme.colorScheme.outline),
+      SkipDecision() => (l10n.scanStatusExists, StatusTone.neutral),
     };
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Card.outlined(
+      padding: const EdgeInsets.only(bottom: AppSpace.md),
+      child: Card(
         key: Key('scan.item.$id'),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.lg,
+            AppSpace.xs,
+            AppSpace.lg,
+            AppSpace.lg,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      status,
-                      key: Key('scan.item.$id.status'),
-                      style: theme.textTheme.labelLarge?.copyWith(color: color),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: StatusBadge(
+                        label: status,
+                        tone: tone,
+                        textKey: Key('scan.item.$id.status'),
+                      ),
                     ),
                   ),
                   IconButton(
@@ -252,6 +257,7 @@ class _ReviewItemCardState extends State<_ReviewItemCard> {
                 key: Key('scan.item.$id.word'),
                 controller: _word,
                 textDirection: TextDirection.ltr,
+                style: AppTypography.wordTitle,
                 maxLength: AppConfig.maxOriginalLength,
                 decoration: InputDecoration(
                   labelText: l10n.scanItemWord,
@@ -260,35 +266,32 @@ class _ReviewItemCardState extends State<_ReviewItemCard> {
                 onChanged: (_) => _emit(),
               ),
               if (hint != null) ...[
-                const SizedBox(height: 8),
-                Card.filled(
+                const SizedBox(height: AppSpace.sm),
+                InfoBanner(
                   key: Key('scan.item.$id.hint'),
-                  margin: EdgeInsets.zero,
-                  child: ListTile(
-                    dense: true,
-                    leading: const Icon(Icons.lightbulb_outline),
-                    title: Text(l10n.scanLemmaHint(hint.baseForm)),
-                    subtitle: Text(l10n.scanLemmaHintNote),
-                    trailing: TextButton(
-                      key: Key('scan.item.$id.useHint'),
-                      onPressed: () {
-                        _lemma.text = hint.baseForm;
-                        _emit();
-                      },
-                      child: Text(l10n.scanUseHint),
-                    ),
+                  tone: StatusTone.accent,
+                  title: l10n.scanLemmaHint(hint.baseForm),
+                  message: l10n.scanLemmaHintNote,
+                  action: TextButton(
+                    key: Key('scan.item.$id.useHint'),
+                    onPressed: () {
+                      _lemma.text = hint.baseForm;
+                      _emit();
+                    },
+                    child: Text(l10n.scanUseHint),
                   ),
                 ),
               ],
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpace.md),
               TextField(
                 key: Key('scan.item.$id.lemma'),
                 controller: _lemma,
                 textDirection: TextDirection.ltr,
+                style: AppTypography.germanBody,
                 decoration: InputDecoration(labelText: l10n.scanItemLemma),
                 onChanged: (_) => _emit(),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpace.md),
               TextField(
                 key: Key('scan.item.$id.meaning'),
                 controller: _meaning,
@@ -296,11 +299,12 @@ class _ReviewItemCardState extends State<_ReviewItemCard> {
                 decoration: InputDecoration(labelText: l10n.scanItemMeaning),
                 onChanged: (_) => _emit(),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpace.md),
               TextField(
                 key: Key('scan.item.$id.context'),
                 controller: _context,
                 textDirection: TextDirection.ltr,
+                style: AppTypography.germanBody,
                 minLines: 1,
                 maxLines: 4,
                 maxLength: AppConfig.maxTextFieldLength,

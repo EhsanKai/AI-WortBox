@@ -3,7 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/design/typography.dart';
 import '../../../core/error/app_exception.dart';
+import '../../../core/widgets/brand_mark.dart';
+import '../../../core/widgets/info_banner.dart';
+import '../../../core/widgets/outcome_view.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/scan_image_source.dart';
@@ -110,6 +116,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     final edited = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: Text(l10n.scanEditTextTitle),
         content: SizedBox(
           width: double.maxFinite,
@@ -117,6 +124,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             key: const Key('scan.editTextField'),
             controller: textController,
             textDirection: TextDirection.ltr,
+            style: AppTypography.germanBody,
             maxLines: 12,
             minLines: 4,
             autofocus: true,
@@ -155,71 +163,61 @@ class _CaptureView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    if (state.isBusy) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text(l10n.scanRecognizing),
-          ],
-        ),
-      );
-    }
+    if (state.isBusy) return LoadingView(message: l10n.scanRecognizing);
 
     final error = state.error;
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.gutter,
+        AppSpace.sm,
+        AppSpace.gutter,
+        AppSpace.xxl,
+      ),
       children: [
-        Text(l10n.scanIntro, style: theme.textTheme.bodyLarge),
-        const SizedBox(height: 8),
-        Text(
-          l10n.scanOcrWarning,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const BrandMark(size: 56),
+            const SizedBox(width: AppSpace.lg),
+            Expanded(
+              child: Text(l10n.scanIntro, style: theme.textTheme.bodyMedium),
+            ),
+          ],
         ),
         if (error != null) ...[
-          const SizedBox(height: 16),
-          Card.filled(
+          const SizedBox(height: AppSpace.lg),
+          InfoBanner(
             key: const Key('scan.error'),
-            color: theme.colorScheme.errorContainer,
-            child: ListTile(
-              leading: Icon(
-                error is ScanException && error.isPermissionError
-                    ? Icons.no_photography_outlined
-                    : Icons.error_outline,
-                color: theme.colorScheme.onErrorContainer,
-              ),
-              title: Text(
-                errorMessage(l10n, error),
-                style: TextStyle(color: theme.colorScheme.onErrorContainer),
-              ),
-            ),
+            tone: StatusTone.danger,
+            icon: error is ScanException && error.isPermissionError
+                ? Icons.no_photography_outlined
+                : Icons.error_outline,
+            message: errorMessage(l10n, error),
           ),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpace.xl),
         FilledButton.icon(
           key: const Key('scan.camera'),
           onPressed: () => controller.pickImage(ImageOrigin.camera),
           icon: const Icon(Icons.photo_camera_outlined),
           label: Text(l10n.scanTakePhoto),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpace.sm),
         FilledButton.tonalIcon(
           key: const Key('scan.gallery'),
           onPressed: () => controller.pickImage(ImageOrigin.gallery),
           icon: const Icon(Icons.photo_library_outlined),
           label: Text(l10n.scanChoosePhoto),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpace.sm),
         OutlinedButton.icon(
           key: const Key('scan.typeText'),
           onPressed: controller.startTyping,
           icon: const Icon(Icons.keyboard_outlined),
           label: Text(l10n.scanTypeText),
         ),
+        const SizedBox(height: AppSpace.xl),
+        InfoBanner(tone: StatusTone.warning, message: l10n.scanOcrWarning),
       ],
     );
   }
@@ -247,13 +245,19 @@ class _TypingViewState extends State<_TypingView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.gutter,
+        AppSpace.sm,
+        AppSpace.gutter,
+        AppSpace.xxl,
+      ),
       children: [
         TextField(
           key: const Key('scan.typedText'),
           controller: _text,
           autofocus: true,
           textDirection: TextDirection.ltr,
+          style: AppTypography.germanBody,
           minLines: 6,
           maxLines: 16,
           decoration: InputDecoration(
@@ -262,7 +266,7 @@ class _TypingViewState extends State<_TypingView> {
           ),
           onChanged: (_) => setState(() {}),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpace.lg),
         FilledButton(
           key: const Key('scan.useText'),
           onPressed: _text.text.trim().isEmpty
@@ -284,51 +288,37 @@ class _DoneView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final summary = state.result!;
-    return ListView(
+    return OutcomeView(
       key: const Key('scan.done'),
-      padding: const EdgeInsets.all(24),
-      children: [
-        Icon(
-          Icons.check_circle_outline,
-          size: 56,
-          color: theme.colorScheme.primary,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          l10n.scanSavedTitle,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.titleLarge,
-        ),
-        const SizedBox(height: 16),
-        ListTile(
-          leading: const Icon(Icons.add_circle_outline),
-          title: Text(l10n.scanResultCreated(summary.createdCount)),
+      title: l10n.scanSavedTitle,
+      lines: [
+        OutcomeLine(
+          Icons.add_circle_outline,
+          l10n.scanResultCreated(summary.createdCount),
+          tone: StatusTone.success,
         ),
         if (summary.mergedCount > 0)
-          ListTile(
-            leading: const Icon(Icons.merge_type),
-            title: Text(l10n.scanResultMerged(summary.mergedCount)),
+          OutcomeLine(
+            Icons.merge_type,
+            l10n.scanResultMerged(summary.mergedCount),
           ),
         if (summary.skippedCount > 0)
-          ListTile(
-            leading: const Icon(Icons.copy_all_outlined),
-            title: Text(l10n.scanResultSkipped(summary.skippedCount)),
+          OutcomeLine(
+            Icons.copy_all_outlined,
+            l10n.scanResultSkipped(summary.skippedCount),
           ),
-        const SizedBox(height: 24),
-        FilledButton(
-          key: const Key('scan.viewDeck'),
-          onPressed: () => context.go(AppRoutes.deck(state.deckId!)),
-          child: Text(l10n.csvViewDeck),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton(
-          key: const Key('scan.another'),
-          onPressed: controller.reset,
-          child: Text(l10n.scanScanAnother),
-        ),
       ],
+      primary: FilledButton(
+        key: const Key('scan.viewDeck'),
+        onPressed: () => context.go(AppRoutes.deck(state.deckId!)),
+        child: Text(l10n.csvViewDeck),
+      ),
+      secondary: OutlinedButton(
+        key: const Key('scan.another'),
+        onPressed: controller.reset,
+        child: Text(l10n.scanScanAnother),
+      ),
     );
   }
 }

@@ -1,7 +1,7 @@
 {
   "@@locale": "fa",
   "appTitle": "AI WortBox",
-  "appTagline": "از صفحهٔ کتاب تا حافظهٔ ماندگار",
+  "appTagline": "از صفحه کتاب تا یادگیری ماندگار",
   "navToday": "مرور امروز",
   "navMyWords": "لغات من",
   "navAdd": "افزودن لغت",
@@ -636,5 +636,17 @@
         "format": "decimalPattern"
       }
     }
+  },
+  "settingsLicenses": "مجوزهای نرم‌افزار و فونت‌ها",
+  "@settingsLicenses": {
+    "description": "Settings row opening the license page (app dependencies and bundled fonts)."
+  },
+  "scanWordTapToSelect": "انتخاب لغت",
+  "@scanWordTapToSelect": {
+    "description": "Screen-reader hint for an unselected word on the scanned page."
+  },
+  "scanWordTapToDeselect": "لغو انتخاب",
+  "@scanWordTapToDeselect": {
+    "description": "Screen-reader hint for a selected word on the scanned page."
   }
 }

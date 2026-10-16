@@ -5,8 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../../app/providers.dart';
 import '../../../app/router.dart';
 import '../../../core/config/app_config.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/design/typography.dart';
 import '../../../core/error/app_exception.dart';
+import '../../../core/text/bidi.dart';
 import '../../../core/widgets/auto_direction_text.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../decks/presentation/deck_providers.dart';
@@ -54,7 +58,7 @@ class VocabularyFormScreen extends ConsumerWidget {
           title: l10n.entryNotFound,
         ),
         AsyncError(:final error) => ErrorStateView(error: error),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingView(),
       },
     );
   }
@@ -84,7 +88,7 @@ class _DeckGate extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     return switch (ref.watch(deckSummariesProvider)) {
       AsyncData(:final value) when value.isEmpty => EmptyStateView(
-        icon: Icons.style_outlined,
+        icon: Icons.inventory_2_outlined,
         title: l10n.formNoDecks,
         action: FilledButton.icon(
           onPressed: () => createDeckAndAnnounce(context),
@@ -101,7 +105,7 @@ class _DeckGate extends ConsumerWidget {
         error: error,
         onRetry: () => ref.invalidate(deckSummariesProvider),
       ),
-      _ => const Center(child: CircularProgressIndicator()),
+      _ => const LoadingView(),
     };
   }
 }
@@ -252,12 +256,12 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
           return;
         case AddMeaningsToExisting(:final entry):
           final merged = await repository.mergeIntoEntry(entry.id, draft);
-          message = l10n.entryMergedMessage(merged.original);
+          message = l10n.entryMergedMessage(bidiIsolate(merged.original));
         case SaveAsNew():
           final saved = _isEditing
               ? await repository.updateEntry(widget.existing!.id, draft)
               : await repository.createEntry(draft);
-          message = l10n.entrySavedMessage(saved.original);
+          message = l10n.entrySavedMessage(bidiIsolate(saved.original));
       }
 
       messenger.showSnackBar(SnackBar(content: Text(message)));
@@ -295,7 +299,12 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.gutter,
+          AppSpace.lg,
+          AppSpace.gutter,
+          AppSpace.xxl,
+        ),
         children: [
           if (!_isEditing && decks.length > 1) ...[
             DropdownButtonFormField<String>(
@@ -312,7 +321,7 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
               ],
               onChanged: (id) => setState(() => _deckId = id ?? _deckId),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpace.lg),
           ],
           TextFormField(
             key: const Key('entryForm.word'),
@@ -320,6 +329,7 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
             focusNode: _wordFocus,
             autofocus: !_isEditing,
             textDirection: TextDirection.ltr,
+            style: AppTypography.wordTitle,
             textInputAction: TextInputAction.next,
             maxLength: AppConfig.maxOriginalLength,
             decoration: InputDecoration(
@@ -330,7 +340,8 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
             ),
             validator: _validateWord,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpace.xl),
+          SectionHeader(l10n.entryMeanings),
           for (final (index, controller) in _meanings.indexed) ...[
             TextFormField(
               key: Key('entryForm.meaning.$index'),
@@ -352,7 +363,7 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
                     : null,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpace.md),
           ],
           Align(
             alignment: AlignmentDirectional.centerStart,
@@ -372,13 +383,16 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpace.lg),
           ExpansionTile(
             key: const Key('entryForm.details'),
-            title: Text(l10n.formMoreDetails),
+            title: Text(
+              l10n.formMoreDetails,
+              style: theme.textTheme.titleSmall,
+            ),
             initiallyExpanded: _hasDetails,
             tilePadding: EdgeInsets.zero,
-            childrenPadding: const EdgeInsets.only(bottom: 8),
+            childrenPadding: const EdgeInsets.only(bottom: AppSpace.sm),
             children: [
               _field(
                 const Key('entryForm.example'),
@@ -423,19 +437,14 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpace.xl),
           FilledButton(
             key: const Key('entryForm.save'),
             onPressed: _saving ? null : () => _save(addAnother: false),
-            child: _saving
-                ? const SizedBox.square(
-                    dimension: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.actionSave),
+            child: _saving ? const ButtonProgress() : Text(l10n.actionSave),
           ),
           if (!_isEditing) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpace.sm),
             OutlinedButton(
               key: const Key('entryForm.saveAndNext'),
               onPressed: _saving ? null : () => _save(addAnother: true),
@@ -455,11 +464,13 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
     String? hint,
     int maxLines = 1,
   }) => Padding(
-    padding: const EdgeInsets.only(top: 12),
+    padding: const EdgeInsets.only(top: AppSpace.md),
     child: TextFormField(
       key: key,
       controller: controller,
       textDirection: direction,
+      // German input uses the book face; Persian input the UI face.
+      style: direction == TextDirection.ltr ? AppTypography.germanBody : null,
       minLines: 1,
       maxLines: maxLines,
       maxLength: AppConfig.maxTextFieldLength,

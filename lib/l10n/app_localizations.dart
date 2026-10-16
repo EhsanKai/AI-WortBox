@@ -107,7 +107,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTagline.
   ///
   /// In fa, this message translates to:
-  /// **'از صفحهٔ کتاب تا حافظهٔ ماندگار'**
+  /// **'از صفحه کتاب تا یادگیری ماندگار'**
   String get appTagline;
 
   /// No description provided for @navToday.
@@ -1591,6 +1591,24 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'{count} مورد تکراری ذخیره نشد'**
   String scanResultSkipped(int count);
+
+  /// Settings row opening the license page (app dependencies and bundled fonts).
+  ///
+  /// In fa, this message translates to:
+  /// **'مجوزهای نرم‌افزار و فونت‌ها'**
+  String get settingsLicenses;
+
+  /// Screen-reader hint for an unselected word on the scanned page.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب لغت'**
+  String get scanWordTapToSelect;
+
+  /// Screen-reader hint for a selected word on the scanned page.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغو انتخاب'**
+  String get scanWordTapToDeselect;
 }
 
 class _AppLocalizationsDelegate

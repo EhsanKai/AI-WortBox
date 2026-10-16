@@ -21,6 +21,9 @@ class FakeCsvFileSource implements CsvFileSource {
 }
 
 /// Pumps the full app on a phone-sized viewport with an in-memory database.
+///
+/// [size] is the logical viewport (default 390×844), [textScale] the system
+/// text scale and [brightness] the system theme.
 Future<void> pumpApp(
   WidgetTester tester,
   AppDatabase db, {
@@ -28,10 +31,16 @@ Future<void> pumpApp(
   CsvFileSource? fileSource,
   ScanImageSource? imageSource,
   TextRecognitionEngine? recognitionEngine,
+  Size size = const Size(390, 844),
+  double textScale = 1,
+  Brightness brightness = Brightness.light,
 }) async {
-  tester.view.physicalSize = const Size(1170, 2532);
+  tester.view.physicalSize = size * 3;
   tester.view.devicePixelRatio = 3;
+  tester.platformDispatcher.textScaleFactorTestValue = textScale;
+  tester.platformDispatcher.platformBrightnessTestValue = brightness;
   addTearDown(tester.view.reset);
+  addTearDown(tester.platformDispatcher.clearAllTestValues);
   // Unmount even when the test fails, so Drift streams are cancelled before
   // the database is closed (otherwise closing it waits forever).
   addTearDown(() => tester.pumpWidget(const SizedBox()));

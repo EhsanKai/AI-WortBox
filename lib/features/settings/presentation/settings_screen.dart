@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/widgets/action_tile.dart';
+import '../../../core/widgets/brand_mark.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -10,41 +14,90 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    Widget header(String text) => Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Text(
-        text,
-        style: theme.textTheme.titleSmall?.copyWith(
-          color: theme.colorScheme.primary,
-        ),
-      ),
-    );
+    const sectionGap = SizedBox(height: AppSpace.xl);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navSettings)),
       body: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.gutter,
+          AppSpace.sm,
+          AppSpace.gutter,
+          AppSpace.xxl,
+        ),
         children: [
-          header(l10n.settingsLanguages),
-          ListTile(
-            leading: const Icon(Icons.school_outlined),
-            title: Text(l10n.settingsSourceLanguage),
-            trailing: Text(AppConfig.defaultSourceLanguage.nativeName),
+          SectionHeader(l10n.settingsLanguages),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.school_outlined),
+                  title: Text(l10n.settingsSourceLanguage),
+                  trailing: Text(AppConfig.defaultSourceLanguage.nativeName),
+                ),
+                const Divider(indent: AppSpace.lg, endIndent: AppSpace.lg),
+                ListTile(
+                  leading: const Icon(Icons.translate),
+                  title: Text(l10n.settingsDefinitionLanguage),
+                  trailing: Text(
+                    AppConfig.defaultDefinitionLanguage.nativeName,
+                  ),
+                ),
+              ],
+            ),
           ),
-          ListTile(
-            leading: const Icon(Icons.translate),
-            title: Text(l10n.settingsDefinitionLanguage),
-            trailing: Text(AppConfig.defaultDefinitionLanguage.nativeName),
+          sectionGap,
+          SectionHeader(l10n.settingsPrivacy),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.lock_outline),
+              title: Text(l10n.settingsPrivacyBody),
+            ),
           ),
-          header(l10n.settingsPrivacy),
-          ListTile(
-            leading: const Icon(Icons.phone_android),
-            title: Text(l10n.settingsPrivacyBody),
+          sectionGap,
+          SectionHeader(l10n.settingsAbout),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpace.lg),
+              child: Row(
+                children: [
+                  const BrandMark(size: 48),
+                  const SizedBox(width: AppSpace.lg),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.appTitle,
+                          textDirection: TextDirection.ltr,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        Text(
+                          l10n.appTagline,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          header(l10n.settingsAbout),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: Text(l10n.appTitle),
-            subtitle: Text(l10n.appTagline),
+          const SizedBox(height: AppSpace.sm),
+          ActionTile(
+            key: const Key('settings.licenses'),
+            icon: Icons.description_outlined,
+            title: l10n.settingsLicenses,
+            onTap: () => showLicensePage(
+              context: context,
+              applicationName: l10n.appTitle,
+              applicationIcon: const Padding(
+                padding: EdgeInsets.all(AppSpace.sm),
+                child: BrandMark(size: 48),
+              ),
+            ),
           ),
         ],
       ),

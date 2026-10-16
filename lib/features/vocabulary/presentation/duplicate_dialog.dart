@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/design/tokens.dart';
+import '../../../core/design/typography.dart';
+import '../../../core/text/bidi.dart';
 import '../../../core/widgets/auto_direction_text.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/duplicate_detection.dart';
@@ -51,68 +54,101 @@ Future<DuplicateChoice> showDuplicateDialog(
           throw StateError('No duplicate to resolve');
         case RedundantDuplicate(:final existing):
           return AlertDialog(
+            scrollable: true,
             title: Text(l10n.duplicateRedundantTitle),
-            content: Text(l10n.duplicateRedundantBody(word)),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, const CancelSave()),
-                child: Text(l10n.actionCancel),
-              ),
-              if (isEditing)
-                TextButton(
-                  onPressed: () => Navigator.pop(context, const SaveAsNew()),
-                  child: Text(l10n.duplicateSaveAnyway),
+            icon: const Icon(Icons.inventory_2_outlined),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l10n.duplicateRedundantBody(bidiIsolate(word))),
+                const SizedBox(height: AppSpace.xl),
+                FilledButton(
+                  onPressed: () =>
+                      Navigator.pop(context, OpenExisting(existing)),
+                  child: Text(l10n.duplicateOpenExisting),
                 ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, OpenExisting(existing)),
-                child: Text(l10n.duplicateOpenExisting),
-              ),
-            ],
+                if (isEditing) ...[
+                  const SizedBox(height: AppSpace.sm),
+                  OutlinedButton(
+                    onPressed: () => Navigator.pop(context, const SaveAsNew()),
+                    child: Text(l10n.duplicateSaveAnyway),
+                  ),
+                ],
+                const SizedBox(height: AppSpace.sm),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, const CancelSave()),
+                  child: Text(l10n.actionCancel),
+                ),
+              ],
+            ),
           );
         case SameWordDifferentMeanings(:final existing):
           final first = existing.first;
           return AlertDialog(
+            scrollable: true,
+            icon: const Icon(Icons.call_split),
             title: Text(l10n.duplicateDifferentTitle),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(l10n.duplicateDifferentBody(word)),
-                  const SizedBox(height: 12),
-                  for (final entry in existing)
-                    for (final meaning in entry.meanings)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: AutoDirectionText(
-                          '• ${meaning.text}',
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                      ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l10n.duplicateDifferentBody(bidiIsolate(word))),
+                const SizedBox(height: AppSpace.md),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: AppRadius.mdAll,
+                    border: Border.all(color: theme.colorScheme.outlineVariant),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpace.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AutoDirectionText(word, style: AppTypography.wordTitle),
+                        const SizedBox(height: AppSpace.xs),
+                        for (final entry in existing)
+                          for (final meaning in entry.meanings)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpace.xs,
+                              ),
+                              child: AutoDirectionText(
+                                '• ${meaning.text}',
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                            ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Actions scroll with the content: the labels are long and
+                // must stay reachable with large text on small screens.
+                const SizedBox(height: AppSpace.xl),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, const SaveAsNew()),
+                  child: Text(
+                    isEditing
+                        ? l10n.duplicateSaveAnyway
+                        : l10n.duplicateSaveSeparate,
+                  ),
+                ),
+                if (!isEditing) ...[
+                  const SizedBox(height: AppSpace.sm),
+                  OutlinedButton(
+                    onPressed: () =>
+                        Navigator.pop(context, AddMeaningsToExisting(first)),
+                    child: Text(l10n.duplicateAddMeanings),
+                  ),
                 ],
-              ),
-            ),
-            actionsOverflowDirection: VerticalDirection.up,
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, const CancelSave()),
-                child: Text(l10n.actionCancel),
-              ),
-              if (!isEditing)
+                const SizedBox(height: AppSpace.sm),
                 TextButton(
-                  onPressed: () =>
-                      Navigator.pop(context, AddMeaningsToExisting(first)),
-                  child: Text(l10n.duplicateAddMeanings),
+                  onPressed: () => Navigator.pop(context, const CancelSave()),
+                  child: Text(l10n.actionCancel),
                 ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, const SaveAsNew()),
-                child: Text(
-                  isEditing
-                      ? l10n.duplicateSaveAnyway
-                      : l10n.duplicateSaveSeparate,
-                ),
-              ),
-            ],
+              ],
+            ),
           );
       }
     },

@@ -248,5 +248,8 @@
   "scanSaveFailed": "Saving failed and nothing was changed. Please try again.",
   "scanResultCreated": "{count} new words saved",
   "scanResultMerged": "Meanings of {count} items added to existing words",
-  "scanResultSkipped": "{count} duplicates not saved"
+  "scanResultSkipped": "{count} duplicates not saved",
+  "settingsLicenses": "Software and font licenses",
+  "scanWordTapToSelect": "select word",
+  "scanWordTapToDeselect": "deselect word"
 }

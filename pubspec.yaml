@@ -72,6 +72,30 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # Bundled fonts (SIL Open Font License 1.1, see assets/fonts/OFL-*.txt).
+  # Vazirmatn: Persian UI text (static instances of the variable font).
+  # Literata: German vocabulary, examples and scanned text (static instances,
+  # subset to Latin; see docs/design-system.md).
+  fonts:
+    - family: Vazirmatn
+      fonts:
+        - asset: assets/fonts/Vazirmatn-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Vazirmatn-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Vazirmatn-Bold.ttf
+          weight: 700
+    - family: Literata
+      fonts:
+        - asset: assets/fonts/Literata-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Literata-SemiBold.ttf
+          weight: 600
+
+  assets:
+    - assets/fonts/OFL-Vazirmatn.txt
+    - assets/fonts/OFL-Literata.txt
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

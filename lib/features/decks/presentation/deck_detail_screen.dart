@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/text/text_normalizer.dart';
 import '../../../core/widgets/auto_direction_text.dart';
 import '../../../core/widgets/state_views.dart';
@@ -68,7 +69,7 @@ class DeckDetailScreen extends ConsumerWidget {
           error: error,
           onRetry: () => ref.invalidate(deckProvider(deckId)),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingView(),
       },
     );
   }
@@ -102,7 +103,12 @@ class _DeckEntriesState extends ConsumerState<_DeckEntries> {
     final entries = ref.watch(deckEntriesProvider(deck.id));
 
     final header = Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.gutter,
+        AppSpace.xs,
+        AppSpace.gutter,
+        AppSpace.md,
+      ),
       child: Text(
         [
           l10n.deckLanguagePair(
@@ -137,7 +143,7 @@ class _DeckEntriesState extends ConsumerState<_DeckEntries> {
         error: error,
         onRetry: () => ref.invalidate(deckEntriesProvider(deck.id)),
       ),
-      _ => const Center(child: CircularProgressIndicator()),
+      _ => const LoadingView(),
     };
   }
 
@@ -157,12 +163,19 @@ class _DeckEntriesState extends ConsumerState<_DeckEntries> {
       children: [
         header,
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: SearchBar(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.gutter,
+            0,
+            AppSpace.gutter,
+            AppSpace.md,
+          ),
+          child: TextField(
             key: const Key('deck.search'),
-            hintText: l10n.searchHint,
-            leading: const Icon(Icons.search),
-            elevation: const WidgetStatePropertyAll(0),
+            textInputAction: TextInputAction.search,
+            decoration: InputDecoration(
+              hintText: l10n.searchHint,
+              prefixIcon: const Icon(Icons.search),
+            ),
             onChanged: (value) => setState(() => _query = value),
           ),
         ),
@@ -173,9 +186,15 @@ class _DeckEntriesState extends ConsumerState<_DeckEntries> {
                   title: l10n.searchNoResults,
                 )
               : ListView.separated(
-                  padding: const EdgeInsets.only(bottom: 96),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpace.gutter,
+                    0,
+                    AppSpace.gutter,
+                    AppSpace.fabClearance,
+                  ),
                   itemCount: visible.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpace.sm),
                   itemBuilder: (context, index) {
                     final entry = visible[index];
                     return EntryTile(

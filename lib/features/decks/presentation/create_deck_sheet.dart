@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/config/app_config.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
@@ -16,7 +17,6 @@ Future<Deck?> showCreateDeckSheet(BuildContext context) {
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    showDragHandle: true,
     builder: (_) => const CreateDeckSheet(),
   );
 }
@@ -114,89 +114,92 @@ class _CreateDeckSheetState extends ConsumerState<CreateDeckSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + 24,
+        left: AppSpace.xl,
+        right: AppSpace.xl,
+        bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpace.xl,
       ),
       child: Form(
         key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(l10n.createDeckTitle, style: theme.textTheme.titleLarge),
-            const SizedBox(height: 20),
-            TextFormField(
-              key: const Key('createDeck.name'),
-              controller: _nameController,
-              autofocus: true,
-              maxLength: AppConfig.maxDeckNameLength,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: l10n.createDeckNameLabel,
-                hintText: l10n.createDeckNameHint,
-              ),
-              validator: _validateName,
-              onChanged: (_) {
-                if (_serverErrors.isNotEmpty) {
-                  setState(() => _serverErrors = const {});
-                }
-              },
-            ),
-            const SizedBox(height: 8),
-            InputDecorator(
-              decoration: InputDecoration(
-                labelText: l10n.createDeckLanguagesLabel,
-                enabled: false,
-              ),
-              child: Text(
-                l10n.deckLanguagePair(source.nativeName, definition.nativeName),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              key: const Key('createDeck.dailyLimit'),
-              controller: _limitController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
-                labelText: l10n.createDeckDailyLimitLabel,
-                helperText: l10n.createDeckDailyLimitHelper(
-                  AppConfig.minDailyNewCardLimit,
-                  AppConfig.maxDailyNewCardLimit,
+        // Scrolls when the keyboard and large text leave little room.
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l10n.createDeckTitle, style: theme.textTheme.titleLarge),
+              const SizedBox(height: AppSpace.lg + AppSpace.xs),
+              TextFormField(
+                key: const Key('createDeck.name'),
+                controller: _nameController,
+                autofocus: true,
+                maxLength: AppConfig.maxDeckNameLength,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: l10n.createDeckNameLabel,
+                  hintText: l10n.createDeckNameHint,
                 ),
-                helperMaxLines: 2,
+                validator: _validateName,
+                onChanged: (_) {
+                  if (_serverErrors.isNotEmpty) {
+                    setState(() => _serverErrors = const {});
+                  }
+                },
               ),
-              validator: _validateLimit,
-              onFieldSubmitted: (_) => _submit(),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _submitting
-                        ? null
-                        : () => Navigator.of(context).pop(),
-                    child: Text(l10n.actionCancel),
+              const SizedBox(height: AppSpace.sm),
+              InputDecorator(
+                decoration: InputDecoration(
+                  labelText: l10n.createDeckLanguagesLabel,
+                  enabled: false,
+                ),
+                child: Text(
+                  l10n.deckLanguagePair(
+                    source.nativeName,
+                    definition.nativeName,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    key: const Key('createDeck.submit'),
-                    onPressed: _submitting ? null : _submit,
-                    child: _submitting
-                        ? const SizedBox.square(
-                            dimension: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(l10n.createDeckSubmit),
+              ),
+              const SizedBox(height: AppSpace.lg),
+              TextFormField(
+                key: const Key('createDeck.dailyLimit'),
+                controller: _limitController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: InputDecoration(
+                  labelText: l10n.createDeckDailyLimitLabel,
+                  helperText: l10n.createDeckDailyLimitHelper(
+                    AppConfig.minDailyNewCardLimit,
+                    AppConfig.maxDailyNewCardLimit,
                   ),
+                  helperMaxLines: 2,
                 ),
-              ],
-            ),
-          ],
+                validator: _validateLimit,
+                onFieldSubmitted: (_) => _submit(),
+              ),
+              const SizedBox(height: AppSpace.xl),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _submitting
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      child: Text(l10n.actionCancel),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpace.md),
+                  Expanded(
+                    child: FilledButton(
+                      key: const Key('createDeck.submit'),
+                      onPressed: _submitting ? null : _submit,
+                      child: _submitting
+                          ? const ButtonProgress()
+                          : Text(l10n.createDeckSubmit),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

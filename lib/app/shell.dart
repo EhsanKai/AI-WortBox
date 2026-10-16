@@ -28,13 +28,13 @@ class AppShell extends StatelessWidget {
             label: l10n.navToday,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.style_outlined),
-            selectedIcon: const Icon(Icons.style),
+            icon: const Icon(Icons.inventory_2_outlined),
+            selectedIcon: const Icon(Icons.inventory_2),
             label: l10n.navMyWords,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.add_circle_outline),
-            selectedIcon: const Icon(Icons.add_circle),
+            icon: const Icon(Icons.add_box_outlined),
+            selectedIcon: const Icon(Icons.add_box),
             label: l10n.navAdd,
           ),
           NavigationDestination(

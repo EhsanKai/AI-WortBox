@@ -3,8 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/design/typography.dart';
 import '../../../core/widgets/auto_direction_text.dart';
+import '../../../core/widgets/info_banner.dart';
+import '../../../core/widgets/outcome_view.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
+import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../decks/domain/deck.dart';
 import '../../decks/presentation/deck_providers.dart';
@@ -35,7 +42,7 @@ class CsvImportScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.addImportCsv)),
       body: switch (decks) {
         AsyncData(:final value) when value.isEmpty => EmptyStateView(
-          icon: Icons.style_outlined,
+          icon: Icons.inventory_2_outlined,
           title: l10n.formNoDecks,
           action: FilledButton.icon(
             onPressed: () => createDeckAndAnnounce(context),
@@ -57,7 +64,7 @@ class CsvImportScreen extends ConsumerWidget {
           error: error,
           onRetry: () => ref.invalidate(deckSummariesProvider),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingView(),
       },
     );
   }
@@ -84,7 +91,7 @@ class _ImportForm extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (decks.isNotEmpty) controller.selectDeck(decks.first.id);
       });
-      return const Center(child: CircularProgressIndicator());
+      return const LoadingView();
     }
 
     final table = state.table;
@@ -92,7 +99,12 @@ class _ImportForm extends ConsumerWidget {
     final preview = analysis.value;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.gutter,
+        AppSpace.sm,
+        AppSpace.gutter,
+        AppSpace.xxl,
+      ),
       children: [
         Text(
           l10n.csvIntro,
@@ -136,22 +148,19 @@ class _ImportForm extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (preview?.languagesLookSwapped ?? false)
-                  Card.filled(
-                    color: theme.colorScheme.tertiaryContainer,
-                    child: ListTile(
-                      leading: const Icon(Icons.swap_horiz),
-                      title: Text(l10n.csvLanguagesSwapped),
-                      subtitle: Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: TextButton(
-                          key: const Key('csv.swap'),
-                          onPressed: controller.swapLanguageColumns,
-                          child: Text(l10n.csvSwapColumns),
-                        ),
-                      ),
+                if (preview?.languagesLookSwapped ?? false) ...[
+                  InfoBanner(
+                    tone: StatusTone.warning,
+                    icon: Icons.swap_horiz,
+                    message: l10n.csvLanguagesSwapped,
+                    action: TextButton(
+                      key: const Key('csv.swap'),
+                      onPressed: controller.swapLanguageColumns,
+                      child: Text(l10n.csvSwapColumns),
                     ),
                   ),
+                  const SizedBox(height: AppSpace.sm),
+                ],
                 CheckboxListTile(
                   key: const Key('csv.confirmLanguages'),
                   contentPadding: EdgeInsets.zero,
@@ -187,13 +196,13 @@ class _ImportForm extends ConsumerWidget {
           ),
           if (state.importError != null)
             Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Text(
-                l10n.csvImportFailed,
-                style: TextStyle(color: theme.colorScheme.error),
+              padding: const EdgeInsets.only(top: AppSpace.lg),
+              child: InfoBanner(
+                tone: StatusTone.danger,
+                message: l10n.csvImportFailed,
               ),
             ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpace.xl),
           _ImportButton(
             analysis: preview,
             enabled:
@@ -218,21 +227,11 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(top: 24),
+      padding: const EdgeInsets.only(top: AppSpace.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          child,
-        ],
+        children: [SectionHeader(title), child],
       ),
     );
   }
@@ -254,7 +253,6 @@ class _FileSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final table = state.table;
     final file = state.file;
 
@@ -285,11 +283,15 @@ class _FileSection extends StatelessWidget {
           ),
         ),
         if (file != null && table != null) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpace.sm),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.description_outlined),
-            title: AutoDirectionText(file.name, maxLines: 1),
+            title: AutoDirectionText(
+              file.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
             subtitle: Text(
               '${l10n.csvRecordCount(table.records.length)} · '
               '${l10n.csvEncoding(encodingName(table.encoding))}',
@@ -317,20 +319,11 @@ class _FileSection extends StatelessWidget {
           ),
         ],
         if (state.fileError != null) ...[
-          const SizedBox(height: 8),
-          Card.filled(
+          const SizedBox(height: AppSpace.sm),
+          InfoBanner(
             key: const Key('csv.fileError'),
-            color: theme.colorScheme.errorContainer,
-            child: ListTile(
-              leading: Icon(
-                Icons.error_outline,
-                color: theme.colorScheme.onErrorContainer,
-              ),
-              title: Text(
-                errorMessage(l10n, state.fileError!),
-                style: TextStyle(color: theme.colorScheme.onErrorContainer),
-              ),
-            ),
+            tone: StatusTone.danger,
+            message: errorMessage(l10n, state.fileError!),
           ),
         ],
       ],
@@ -382,10 +375,10 @@ class _ColumnsSection extends StatelessWidget {
         ),
         for (var column = 0; column < table.columnCount; column++)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Card.outlined(
+            padding: const EdgeInsets.only(bottom: AppSpace.sm),
+            child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppSpace.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -403,11 +396,12 @@ class _ColumnsSection extends StatelessWidget {
                           record.cell(column).trim(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall?.copyWith(
+                          style: AppTypography.germanBody.copyWith(
+                            fontSize: 14,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpace.sm),
                     DropdownButtonFormField<ImportField>(
                       key: Key('csv.column.$column'),
                       initialValue: mapping.fieldOf(column),
@@ -429,11 +423,13 @@ class _ColumnsSection extends StatelessWidget {
               ),
             ),
           ),
-        if (!mapping.hasOriginal)
-          Text(
-            l10n.csvMappingNeedsWord,
-            style: TextStyle(color: theme.colorScheme.error),
+        if (!mapping.hasOriginal) ...[
+          InfoBanner(
+            tone: StatusTone.danger,
+            message: l10n.csvMappingNeedsWord,
           ),
+          const SizedBox(height: AppSpace.sm),
+        ],
         Text(
           l10n.csvMeaningSplitHint,
           style: theme.textTheme.bodySmall?.copyWith(
@@ -518,31 +514,30 @@ class _PreviewSection extends StatelessWidget {
       ImportRowIssue.fieldTooLong => l10n.csvRowIssueFieldTooLong,
     };
 
-    (String, Color) statusOf(ImportDecision? decision) => switch (decision) {
-      CreateDecision() => (l10n.csvRowNew, theme.colorScheme.primary),
-      MergeIntoEntryDecision() => (
-        l10n.csvRowMerge,
-        theme.colorScheme.tertiary,
-      ),
-      MergeIntoRowDecision(:final targetRowNumber) => (
-        l10n.csvRowMergeInFile(lineOfRow[targetRowNumber] ?? 0),
-        theme.colorScheme.tertiary,
-      ),
-      SkipDecision(reason: SkipReason.redundant, :final targetRowNumber?) => (
-        l10n.csvRowRedundantInFile(lineOfRow[targetRowNumber] ?? 0),
-        theme.colorScheme.outline,
-      ),
-      SkipDecision(reason: SkipReason.redundant) => (
-        l10n.csvRowRedundant,
-        theme.colorScheme.outline,
-      ),
-      SkipDecision(:final targetRowNumber?) => (
-        l10n.csvRowExistsInFile(lineOfRow[targetRowNumber] ?? 0),
-        theme.colorScheme.outline,
-      ),
-      SkipDecision() => (l10n.csvRowExists, theme.colorScheme.outline),
-      null => ('', theme.colorScheme.outline),
-    };
+    (String, StatusTone) statusOf(ImportDecision? decision) =>
+        switch (decision) {
+          CreateDecision() => (l10n.csvRowNew, StatusTone.success),
+          MergeIntoEntryDecision() => (l10n.csvRowMerge, StatusTone.warning),
+          MergeIntoRowDecision(:final targetRowNumber) => (
+            l10n.csvRowMergeInFile(lineOfRow[targetRowNumber] ?? 0),
+            StatusTone.warning,
+          ),
+          SkipDecision(reason: SkipReason.redundant, :final targetRowNumber?) =>
+            (
+              l10n.csvRowRedundantInFile(lineOfRow[targetRowNumber] ?? 0),
+              StatusTone.neutral,
+            ),
+          SkipDecision(reason: SkipReason.redundant) => (
+            l10n.csvRowRedundant,
+            StatusTone.neutral,
+          ),
+          SkipDecision(:final targetRowNumber?) => (
+            l10n.csvRowExistsInFile(lineOfRow[targetRowNumber] ?? 0),
+            StatusTone.neutral,
+          ),
+          SkipDecision() => (l10n.csvRowExists, StatusTone.neutral),
+          null => ('', StatusTone.neutral),
+        };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -551,21 +546,31 @@ class _PreviewSection extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            Chip(
+            StatusBadge(
               key: const Key('csv.count.new'),
-              label: Text(l10n.csvCountNew(analysis.createCount)),
+              tone: StatusTone.success,
+              icon: Icons.add,
+              label: l10n.csvCountNew(analysis.createCount),
             ),
-            Chip(
+            StatusBadge(
               key: const Key('csv.count.merge'),
-              label: Text(l10n.csvCountMerge(analysis.mergeCount)),
+              tone: StatusTone.warning,
+              icon: Icons.merge_type,
+              label: l10n.csvCountMerge(analysis.mergeCount),
             ),
-            Chip(
+            StatusBadge(
               key: const Key('csv.count.skip'),
-              label: Text(l10n.csvCountSkip(analysis.skipCount)),
+              tone: StatusTone.neutral,
+              icon: Icons.copy_all_outlined,
+              label: l10n.csvCountSkip(analysis.skipCount),
             ),
-            Chip(
+            StatusBadge(
               key: const Key('csv.count.error'),
-              label: Text(l10n.csvCountError(analysis.errorCount)),
+              tone: analysis.errorCount > 0
+                  ? StatusTone.danger
+                  : StatusTone.neutral,
+              icon: Icons.error_outline,
+              label: l10n.csvCountError(analysis.errorCount),
             ),
           ],
         ),
@@ -574,7 +579,7 @@ class _PreviewSection extends StatelessWidget {
           Text(l10n.csvFormatNoDataRows),
         ],
         if (invalid.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpace.lg),
           Text(
             l10n.csvErrorsTitle(invalid.length),
             style: theme.textTheme.titleSmall?.copyWith(
@@ -601,32 +606,54 @@ class _PreviewSection extends StatelessWidget {
           if (invalid.length > _previewLimit)
             Text(l10n.csvMoreRows(invalid.length - _previewLimit)),
         ],
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpace.lg),
         for (final row in valid.take(_previewLimit))
           Builder(
             builder: (context) {
-              final (status, color) = statusOf(
+              final (status, tone) = statusOf(
                 analysis.decisions[row.rowNumber],
               );
-              return ListTile(
+              return Padding(
                 key: Key('csv.row.${row.line}'),
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: Text(
-                  l10n.csvRowLine(row.line),
-                  style: theme.textTheme.bodySmall,
-                ),
-                title: AutoDirectionText(row.draft.original, maxLines: 1),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                padding: const EdgeInsets.only(bottom: AppSpace.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (row.draft.meanings.isNotEmpty)
-                      AutoDirectionText(
-                        row.draft.meanings.map((m) => m.text).join('، '),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                    SizedBox(
+                      width: 56,
+                      child: Text(
+                        l10n.csvRowLine(row.line),
+                        style: theme.textTheme.bodySmall,
                       ),
-                    Text(status, style: TextStyle(color: color)),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AutoDirectionText(
+                            row.draft.original,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.wordTitle.copyWith(
+                              fontSize: 17,
+                            ),
+                          ),
+                          if (row.draft.meanings.isNotEmpty)
+                            AutoDirectionText(
+                              row.draft.meanings.map((m) => m.text).join('، '),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          if (status.isNotEmpty) ...[
+                            const SizedBox(height: AppSpace.xs),
+                            Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: StatusBadge(label: status, tone: tone),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -664,14 +691,11 @@ class _ImportButton extends StatelessWidget {
           key: const Key('csv.import'),
           onPressed: enabled ? onPressed : null,
           child: importing
-              ? const SizedBox.square(
-                  dimension: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
+              ? const ButtonProgress()
               : Text(l10n.csvImportButton(count)),
         ),
         if (analysis != null && count == 0) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpace.sm),
           Text(
             l10n.csvNothingToImport,
             textAlign: TextAlign.center,
@@ -699,52 +723,39 @@ class _ResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return ListView(
+    return OutcomeView(
       key: const Key('csv.result'),
-      padding: const EdgeInsets.all(24),
-      children: [
-        Icon(
-          Icons.check_circle_outline,
-          size: 56,
-          color: theme.colorScheme.primary,
+      title: l10n.csvImportDone,
+      lines: [
+        OutcomeLine(
+          Icons.add_circle_outline,
+          l10n.csvResultCreated(summary.createdCount),
+          tone: StatusTone.success,
         ),
-        const SizedBox(height: 12),
-        Text(
-          l10n.csvImportDone,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.titleLarge,
+        OutcomeLine(
+          Icons.merge_type,
+          l10n.csvResultMerged(summary.mergedCount),
         ),
-        const SizedBox(height: 16),
-        ListTile(
-          leading: const Icon(Icons.add_circle_outline),
-          title: Text(l10n.csvResultCreated(summary.createdCount)),
-        ),
-        ListTile(
-          leading: const Icon(Icons.merge_type),
-          title: Text(l10n.csvResultMerged(summary.mergedCount)),
-        ),
-        ListTile(
-          leading: const Icon(Icons.copy_all_outlined),
-          title: Text(l10n.csvResultSkipped(summary.skippedCount)),
+        OutcomeLine(
+          Icons.copy_all_outlined,
+          l10n.csvResultSkipped(summary.skippedCount),
         ),
         if (errorCount > 0)
-          ListTile(
-            leading: Icon(Icons.error_outline, color: theme.colorScheme.error),
-            title: Text(l10n.csvResultErrors(errorCount)),
+          OutcomeLine(
+            Icons.error_outline,
+            l10n.csvResultErrors(errorCount),
+            tone: StatusTone.danger,
           ),
-        const SizedBox(height: 24),
-        FilledButton(
-          key: const Key('csv.viewDeck'),
-          onPressed: () => context.go(AppRoutes.deck(deckId)),
-          child: Text(l10n.csvViewDeck),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton(
-          onPressed: onImportAnother,
-          child: Text(l10n.csvImportAnother),
-        ),
       ],
+      primary: FilledButton(
+        key: const Key('csv.viewDeck'),
+        onPressed: () => context.go(AppRoutes.deck(deckId)),
+        child: Text(l10n.csvViewDeck),
+      ),
+      secondary: OutlinedButton(
+        onPressed: onImportAnother,
+        child: Text(l10n.csvImportAnother),
+      ),
     );
   }
 }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 
 import '../../../app/router.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/widgets/brand_mark.dart';
+import '../../../core/widgets/info_banner.dart';
+import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../decks/domain/deck.dart';
@@ -28,7 +32,7 @@ class TodayScreen extends ConsumerWidget {
           error: error,
           onRetry: () => ref.invalidate(deckSummariesProvider),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingView(),
       },
     );
   }
@@ -45,50 +49,48 @@ class _Dashboard extends StatelessWidget {
     final theme = Theme.of(context);
     final numbers = NumberFormat.decimalPattern(l10n.localeName);
     final wordCount = summaries.fold<int>(0, (sum, s) => sum + s.entryCount);
+    final reviewNote = InfoBanner(
+      icon: Icons.schedule,
+      message: l10n.dashboardReviewPending,
+    );
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.gutter,
+        AppSpace.sm,
+        AppSpace.gutter,
+        AppSpace.xxl,
+      ),
       children: [
-        Text(l10n.appTitle, style: theme.textTheme.headlineSmall),
-        const SizedBox(height: 4),
-        Text(
-          l10n.appTagline,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 20),
         Row(
           children: [
+            const BrandMark(size: 64),
+            const SizedBox(width: AppSpace.lg),
             Expanded(
-              child: _StatCard(
-                key: const Key('today.deckCount'),
-                label: l10n.dashboardDecks,
-                value: numbers.format(summaries.length),
-                icon: Icons.style_outlined,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _StatCard(
-                key: const Key('today.wordCount'),
-                label: l10n.dashboardWords,
-                value: numbers.format(wordCount),
-                icon: Icons.translate,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.appTitle,
+                    textDirection: TextDirection.ltr,
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                  Text(
+                    l10n.appTagline,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        Card.filled(
-          child: ListTile(
-            leading: const Icon(Icons.schedule),
-            title: Text(l10n.dashboardReviewPending),
-          ),
-        ),
-        const SizedBox(height: 24),
-        if (summaries.isEmpty)
+        const SizedBox(height: AppSpace.xl),
+        // First run: the call to action comes before anything else.
+        if (summaries.isEmpty) ...[
           EmptyStateView(
+            scrollable: false,
             icon: Icons.auto_stories_outlined,
             title: l10n.emptyDecksTitle,
             message: l10n.emptyDecksBody,
@@ -98,16 +100,41 @@ class _Dashboard extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: Text(l10n.actionCreateDeck),
             ),
-          )
-        else ...[
-          Text(l10n.dashboardYourDecks, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
+          ),
+          reviewNote,
+        ] else ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _StatCard(
+                  key: const Key('today.deckCount'),
+                  label: l10n.dashboardDecks,
+                  value: numbers.format(summaries.length),
+                  icon: Icons.inventory_2_outlined,
+                ),
+              ),
+              const SizedBox(width: AppSpace.md),
+              Expanded(
+                child: _StatCard(
+                  key: const Key('today.wordCount'),
+                  label: l10n.dashboardWords,
+                  value: numbers.format(wordCount),
+                  icon: Icons.translate,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpace.md),
+          reviewNote,
+          const SizedBox(height: AppSpace.xl),
+          SectionHeader(l10n.dashboardYourDecks),
           for (final summary in summaries.take(5)) ...[
             DeckTile(
               summary: summary,
               onTap: () => context.go(AppRoutes.deck(summary.deck.id)),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpace.sm),
           ],
         ],
       ],
@@ -130,17 +157,24 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card.outlined(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: theme.colorScheme.primary),
-            const SizedBox(height: 8),
-            Text(value, style: theme.textTheme.headlineMedium),
-            Text(label, style: theme.textTheme.bodyMedium),
-          ],
+    return MergeSemantics(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpace.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: theme.colorScheme.onSurfaceVariant),
+              const SizedBox(height: AppSpace.sm),
+              Text(value, style: theme.textTheme.displaySmall),
+              Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

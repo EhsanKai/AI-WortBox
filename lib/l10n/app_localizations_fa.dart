@@ -13,7 +13,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get appTitle => 'AI WortBox';
 
   @override
-  String get appTagline => 'از صفحهٔ کتاب تا حافظهٔ ماندگار';
+  String get appTagline => 'از صفحه کتاب تا یادگیری ماندگار';
 
   @override
   String get navToday => 'مرور امروز';
@@ -1104,4 +1104,13 @@ class AppLocalizationsFa extends AppLocalizations {
 
     return '$countString مورد تکراری ذخیره نشد';
   }
+
+  @override
+  String get settingsLicenses => 'مجوزهای نرم‌افزار و فونت‌ها';
+
+  @override
+  String get scanWordTapToSelect => 'انتخاب لغت';
+
+  @override
+  String get scanWordTapToDeselect => 'لغو انتخاب';
 }

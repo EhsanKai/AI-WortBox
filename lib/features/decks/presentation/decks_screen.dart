@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/text/bidi.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
 import 'create_deck_sheet.dart';
@@ -28,14 +30,19 @@ class DecksScreen extends ConsumerWidget {
       ),
       body: switch (summaries) {
         AsyncData(:final value) when value.isEmpty => EmptyStateView(
-          icon: Icons.style_outlined,
+          icon: Icons.inventory_2_outlined,
           title: l10n.emptyDecksTitle,
           message: l10n.emptyDecksBody,
         ),
         AsyncData(:final value) => ListView.separated(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpace.gutter,
+            AppSpace.sm,
+            AppSpace.gutter,
+            AppSpace.fabClearance,
+          ),
           itemCount: value.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 8),
+          separatorBuilder: (_, _) => const SizedBox(height: AppSpace.sm),
           itemBuilder: (context, index) {
             final summary = value[index];
             return DeckTile(
@@ -48,7 +55,7 @@ class DecksScreen extends ConsumerWidget {
           error: error,
           onRetry: () => ref.invalidate(deckSummariesProvider),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingView(),
       },
     );
   }
@@ -60,7 +67,9 @@ Future<void> createDeckAndAnnounce(BuildContext context) async {
   if (deck == null || !context.mounted) return;
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(AppLocalizations.of(context).deckCreatedMessage(deck.name)),
+      content: Text(
+        AppLocalizations.of(context).deckCreatedMessage(bidiIsolate(deck.name)),
+      ),
     ),
   );
 }

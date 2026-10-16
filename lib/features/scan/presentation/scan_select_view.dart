@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/design/app_colors.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/design/typography.dart';
+import '../../../core/widgets/info_banner.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/scan_image_source.dart';
@@ -31,8 +35,8 @@ class ScanSelectView extends ConsumerWidget {
         title: l10n.scanNoTextTitle,
         message: l10n.scanNoTextBody,
         action: Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: AppSpace.sm,
+          runSpacing: AppSpace.sm,
           alignment: WrapAlignment.center,
           children: [
             FilledButton.tonal(
@@ -50,27 +54,43 @@ class ScanSelectView extends ConsumerWidget {
       );
     }
 
-    final notice = switch (state.notice) {
-      SelectionNotice.pickExpressionEnd => l10n.scanExpressionPickEnd,
-      SelectionNotice.expressionTooLong => l10n.scanExpressionTooLong(
-        AppConfig.maxExpressionWords,
+    final (notice, noticeTone) = switch (state.notice) {
+      SelectionNotice.pickExpressionEnd => (
+        l10n.scanExpressionPickEnd,
+        StatusTone.accent,
       ),
-      SelectionNotice.selectionsDropped => l10n.scanSelectionsDropped(
-        state.droppedCount,
+      SelectionNotice.expressionTooLong => (
+        l10n.scanExpressionTooLong(AppConfig.maxExpressionWords),
+        StatusTone.warning,
       ),
-      null => null,
+      SelectionNotice.selectionsDropped => (
+        l10n.scanSelectionsDropped(state.droppedCount),
+        StatusTone.warning,
+      ),
+      null => (null, StatusTone.neutral),
     };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        // Instructions and the page scroll together, so the page keeps its
+        // room on small screens and with large text.
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpace.gutter,
+              AppSpace.xs,
+              AppSpace.gutter,
+              AppSpace.md,
+            ),
             children: [
-              Text(l10n.scanSelectHint, style: theme.textTheme.bodyMedium),
-              const SizedBox(height: 8),
+              Text(
+                l10n.scanSelectHint,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpace.sm),
               SegmentedButton<SelectionMode>(
                 key: const Key('scan.mode'),
                 segments: [
@@ -89,68 +109,96 @@ class ScanSelectView extends ConsumerWidget {
                 onSelectionChanged: (s) => controller.setMode(s.first),
               ),
               if (notice != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  notice,
+                const SizedBox(height: AppSpace.sm),
+                InfoBanner(
                   key: const Key('scan.notice'),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.tertiary,
-                  ),
+                  tone: noticeTone,
+                  message: notice,
                 ),
               ],
-            ],
-          ),
-        ),
-        Expanded(
-          child: Directionality(
-            // German text always reads left to right.
-            textDirection: TextDirection.ltr,
-            child: ListView(
-              key: const Key('scan.text'),
-              padding: const EdgeInsets.all(16),
-              children: [
-                for (final paragraph in document.paragraphs)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Wrap(
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+              const SizedBox(height: AppSpace.md),
+              // The recognized text on a paper-like reading surface.
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: context.colors.paper,
+                  borderRadius: AppRadius.lgAll,
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpace.md),
+                  child: Directionality(
+                    // German text always reads left to right.
+                    textDirection: TextDirection.ltr,
+                    child: Column(
+                      key: const Key('scan.text'),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (final index in paragraph)
-                          _TokenView(
-                            token: document.tokens[index],
-                            document: document,
-                            state: state,
-                            onTap: controller.tapWord,
+                        for (final paragraph in document.paragraphs)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: AppSpace.md),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                for (final index in paragraph)
+                                  _TokenView(
+                                    token: document.tokens[index],
+                                    document: document,
+                                    state: state,
+                                    onTap: controller.tapWord,
+                                  ),
+                              ],
+                            ),
                           ),
                       ],
                     ),
                   ),
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         ),
-        SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  l10n.scanSelectedCount(state.selection.length),
-                  key: const Key('scan.selectedCount'),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                FilledButton(
-                  key: const Key('scan.review'),
-                  onPressed: state.selection.isEmpty
-                      ? null
-                      : controller.goToReview,
-                  child: Text(l10n.scanReviewButton(state.selection.length)),
-                ),
-              ],
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerLow,
+            border: Border(
+              top: BorderSide(color: theme.colorScheme.outlineVariant),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.gutter,
+                AppSpace.md,
+                AppSpace.gutter,
+                AppSpace.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Semantics(
+                    liveRegion: true,
+                    // Repeats the button's count, so one line is enough even
+                    // with large text.
+                    child: Text(
+                      l10n.scanSelectedCount(state.selection.length),
+                      key: const Key('scan.selectedCount'),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelLarge,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.sm),
+                  FilledButton(
+                    key: const Key('scan.review'),
+                    onPressed: state.selection.isEmpty
+                        ? null
+                        : controller.goToReview,
+                    child: Text(l10n.scanReviewButton(state.selection.length)),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -159,6 +207,9 @@ class ScanSelectView extends ConsumerWidget {
   }
 }
 
+/// One token of the recognized text. Words are tap targets of at least
+/// 48×48 logical pixels; the visible highlight hugs the word like a
+/// highlighter stroke.
 class _TokenView extends StatelessWidget {
   const _TokenView({
     required this.token,
@@ -174,42 +225,69 @@ class _TokenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final style = theme.textTheme.titleMedium;
+    final colors = context.colors;
+    final style = AppTypography.pageText.copyWith(
+      color: theme.colorScheme.onSurface,
+    );
 
     if (!token.isWord) {
       // Punctuation and spacing; line breaks inside a paragraph reflow.
       final text = token.source.replaceAll(RegExp(r'\s+'), ' ');
-      if (text.trim().isEmpty) return const SizedBox(width: 4);
-      return Text(text.trim(), style: style);
+      if (text.trim().isEmpty) return const SizedBox.shrink();
+      return ExcludeSemantics(child: Text(text.trim(), style: style));
     }
 
     final selected = state.selection.rangeAt(token.start) != null;
     final isAnchor = state.anchor?.start == token.start;
     final scheme = theme.colorScheme;
     return Semantics(
-      selected: selected,
+      key: Key('scan.word.${token.start}'),
       button: true,
-      child: Material(
-        key: Key('scan.word.${token.start}'),
-        color: selected
-            ? scheme.primaryContainer
-            : isAnchor
-            ? scheme.tertiaryContainer
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(6),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(6),
-          onTap: () => onTap(token),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 40, minWidth: 32),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      selected: selected,
+      label: token.display,
+      onTapHint: selected
+          ? l10n.scanWordTapToDeselect
+          : l10n.scanWordTapToSelect,
+      onTap: () => onTap(token),
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: AppRadius.smAll,
+        onTap: () => onTap(token),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: AppTouch.minTarget,
+            minWidth: AppTouch.minTarget,
+          ),
+          child: Center(
+            widthFactor: 1,
+            child: AnimatedContainer(
+              duration: AppMotion.quick,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpace.xs + AppSpace.xxs,
+                vertical: AppSpace.xxs,
+              ),
+              decoration: BoxDecoration(
+                color: selected
+                    ? colors.highlight
+                    : isAnchor
+                    ? scheme.tertiaryContainer
+                    : null,
+                borderRadius: AppRadius.smAll,
+                border: isAnchor
+                    ? Border.all(
+                        color: scheme.tertiary,
+                        width: AppBorder.emphasis,
+                      )
+                    : null,
+              ),
               child: Text(
                 token.display,
                 textAlign: TextAlign.center,
-                style: style?.copyWith(
-                  color: selected ? scheme.onPrimaryContainer : null,
+                style: style.copyWith(
+                  color: selected ? colors.onHighlight : null,
+                  fontWeight: selected ? FontWeight.w600 : null,
                   decoration: token.isJoinedAcrossLines
                       ? TextDecoration.underline
                       : null,

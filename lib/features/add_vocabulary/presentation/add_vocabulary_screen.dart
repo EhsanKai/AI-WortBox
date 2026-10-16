@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/widgets/action_tile.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// Entry point for the three ways of adding vocabulary.
@@ -15,27 +17,32 @@ class AddVocabularyScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navAdd)),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.gutter,
+          AppSpace.sm,
+          AppSpace.gutter,
+          AppSpace.xxl,
+        ),
         children: [
-          Text(l10n.addSubtitle, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 12),
-          _AddAction(
+          Text(l10n.addSubtitle, style: theme.textTheme.titleLarge),
+          const SizedBox(height: AppSpace.lg),
+          ActionTile(
             key: const Key('add.csv'),
             icon: Icons.upload_file_outlined,
             title: l10n.addImportCsv,
             description: l10n.addImportCsvDescription,
             onTap: () => context.go(AppRoutes.csvImport),
           ),
-          const SizedBox(height: 8),
-          _AddAction(
+          const SizedBox(height: AppSpace.md),
+          ActionTile(
             key: const Key('add.manual'),
             icon: Icons.edit_note,
             title: l10n.addManual,
             description: l10n.addManualDescription,
             onTap: () => context.go(AppRoutes.manualEntry),
           ),
-          const SizedBox(height: 8),
-          _AddAction(
+          const SizedBox(height: AppSpace.md),
+          ActionTile(
             key: const Key('add.scan'),
             icon: Icons.document_scanner_outlined,
             title: l10n.addScan,
@@ -43,38 +50,6 @@ class AddVocabularyScreen extends StatelessWidget {
             onTap: () => context.go(AppRoutes.scan),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AddAction extends StatelessWidget {
-  const _AddAction({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String description;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card.outlined(
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(icon, size: 32),
-        title: Text(title),
-        subtitle: Text(description),
-        trailing: Icon(
-          Directionality.of(context) == TextDirection.rtl
-              ? Icons.chevron_left
-              : Icons.chevron_right,
-        ),
       ),
     );
   }

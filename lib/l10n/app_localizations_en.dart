@@ -1114,4 +1114,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
     return '$countString duplicates not saved';
   }
+
+  @override
+  String get settingsLicenses => 'Software and font licenses';
+
+  @override
+  String get scanWordTapToSelect => 'select word';
+
+  @override
+  String get scanWordTapToDeselect => 'deselect word';
 }
