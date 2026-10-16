@@ -158,3 +158,66 @@ isolate.
 The app never contains OpenRouter credentials. A minimal backend holds the key
 and exposes `POST /api/v1/vocabulary/enrich`; the app sends only the selected
 words and their sentence context.
+
+## Planned extension points (proposed — not approved)
+
+This section records how proposed features would fit the architecture. It is
+planning only: none of it is implemented, and no schema, dependency or code
+change may be made for it without explicit approval. Feature IDs refer to the
+register in [implementation-plan.md](implementation-plan.md).
+
+### Phase 3 boundaries (approved)
+
+- OCR sits behind a provider-neutral `TextRecognitionEngine` interface in
+  `features/scan/data`, so the ML Kit adapter can be replaced and tests use a
+  fake. Selection logic (tokens with stable character offsets, contiguous
+  expressions, sentence boundaries) is pure Dart in `features/scan/domain`.
+- Confirmed items become `VocabularyDraft`s with `sourceType = image` and
+  `sourceContext` set, and are saved through the existing
+  `VocabularyRepository`, reusing duplicate detection. No schema change.
+
+### Data model implications of proposals
+
+| ID | Likely change | Migration notes |
+| --- | --- | --- |
+| P2 tags | `tags`, `entry_tags` tables | Additive; cascades on entry delete |
+| P4 lemma duplicates | `lemma_normalized` column + index | Backfill from `lemma`/`original` |
+| P5 sources | `sources` table and/or `entry_contexts` table | Move existing `source_context` into it, or keep column and add table |
+| P9 manual difficult mark | one boolean column | Additive, default false |
+| P10 reverse cards per deck | one deck setting column | Additive; card rows already support `direction` |
+| P11 structured grammar | JSON column or `grammar_details` table | Keep existing `grammar_info` text |
+| P13 media | `media` table + files in documents dir | Backup must include files |
+| P7 reminders, P6 TTS | settings storage | Prefer a key-value settings table or platform preferences; decide once |
+| P1, P8, P12 | none expected | P1 may need FTS5 for large collections |
+
+Planned (original specification): schema v2 adds a review log table in
+Phase 5.
+
+### Backup format boundary (P3)
+
+A `BackupService` in the data layer would export and import a versioned
+archive. Restore would run in four steps — read → validate → preview →
+transactional apply — with an automatic safety backup of the current data.
+It would never send data to a network service. The backup format version is
+independent of the database schema version; the manifest records both.
+
+### Images boundary (P13)
+
+Three independent interfaces, each enabled separately:
+
+- `UserImageSource` — camera/gallery, local only.
+- `ImageSuggestionService` — searches existing images through the backend;
+  results carry licence and attribution.
+- `ImageGenerationService` — AI image generation through the backend, with a
+  provider chosen after a separate evaluation. OpenRouter is not assumed to
+  support image generation.
+
+Images are stored as local files referenced from a `media` table, never
+inside SQLite rows.
+
+### Anki boundary
+
+CSV/text exchange uses the existing CSV pipeline (import) and a future
+exporter. `.apkg` support would be a separate adapter, added only after the
+evaluation described in the roadmap; it must not shape the core data model
+before that evaluation.

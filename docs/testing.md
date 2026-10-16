@@ -110,3 +110,54 @@ marks them `-text` so Git never changes their bytes.
 11. Try a Latin-1/Windows-encoded CSV: a clear encoding error appears.
 12. Force-quit and relaunch: words and meanings are still there.
 13. Turn on airplane mode: all of the above still works.
+
+## Test requirements for upcoming and proposed work
+
+Planning only. Tests for proposed features are written when, and only when,
+the feature is approved.
+
+### Phase 3 (approved)
+
+- OCR adapter behind an interface; unit tests with a fake recognizer and
+  recorded recognition results (no camera or ML model in automated tests).
+- Tokenization and selection: single words, contiguous expressions,
+  deselect/reset, selections stable when text is reflowed, punctuation and
+  German quotes, hyphenated line breaks, umlauts and ß.
+- Sentence-context extraction and lemma hints (conservative; original
+  spelling preserved).
+- Failure paths: permission denied, invalid image, OCR error, empty result,
+  typed-text fallback; existing data unchanged after failures.
+- Widget tests for selection, correction screen and saving only confirmed
+  items.
+- Manual device checks for real camera/gallery and German OCR accuracy, as
+  soon as a toolchain is available.
+
+### Schema migrations (whenever the schema changes)
+
+- `make-migrations` generated tests for every version step.
+- Data-preserving tests starting from realistic v1 data (decks, entries with
+  several Persian meanings, flashcards) and verifying nothing is lost.
+
+### Proposed features (only after approval)
+
+| ID | Required tests |
+| --- | --- |
+| P1 | Search across decks, Persian/German normalization, filter combinations, performance with large collections |
+| P2 | Tag CRUD, uniqueness, cascades, filter by tag, CSV tag column |
+| P3 | Export → import round trip; backup → restore round trip preserving meanings order, tags, media, scheduling state and review history; rejection of corrupt, truncated, tampered (checksum) and future-version backups with no data change; preview counts; rollback on failure |
+| P4 | Lemma/article matching, separable verbs, never merging distinct meanings |
+| P5 | Multiple contexts/sources, migration of existing `source_context` |
+| P6 | Fake TTS adapter; missing German voice handling |
+| P7 | Fake notification scheduler; time zones/DST; permission denied |
+| P8 | Streak and statistics calculations with an injected clock and day boundaries |
+| P9 | Difficult-word detection thresholds; practice does not alter FSRS state unless decided otherwise |
+| P10 | Independent forward/reverse scheduling; sibling handling |
+| P11 | Structured grammar validation; migration keeps free-text grammar |
+| P12 | Airplane-mode checks for words, decks, search and review |
+| P13 | Media storage/deletion, backup inclusion, provider mocks (no paid calls in tests) |
+| Anki | Fixtures from real Anki exports per supported version before any `.apkg` claim |
+
+### Platform status
+
+iOS and Android builds remain **unverified** (no Android SDK, no full
+Xcode). This must be reported in every phase until real builds have run.

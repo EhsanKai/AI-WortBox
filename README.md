@@ -14,13 +14,20 @@ them with FSRS spaced repetition.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
-| 1 | Foundation, navigation, Drift database, decks | **Done (approved)** |
-| 2 | Manual vocabulary entry, CSV import | **Done (awaiting approval)** |
-| 3 | Book scanning (OCR) and word selection | Not started |
-| 4 | OpenRouter AI enrichment via secure backend | Not started |
-| 5 | FSRS review, statistics, release readiness | Not started |
+| 1 | Foundation, navigation, Drift database, decks | **Complete** (`73fa370`) |
+| 2 | Manual vocabulary entry, CSV import | **Implemented — awaiting commit** |
+| 3 | Photo/gallery input, German OCR, word selection | **Implemented — awaiting commit** |
+| 4 | AI enrichment via secure backend (OpenRouter) | Planned |
+| 5 | FSRS review and release preparation | Planned |
 
-See [docs/implementation-plan.md](docs/implementation-plan.md).
+Additional features (search filters, tags, backup/restore, reminders,
+streaks, text-to-speech, images, Anki interoperability and more) are recorded
+as **proposed — not approved** in the
+[roadmap](docs/implementation-plan.md#proposed-feature-register-not-approved).
+They are not implemented and will not be without explicit approval.
+
+See [docs/implementation-plan.md](docs/implementation-plan.md) and
+[docs/claude-phase-instructions.md](docs/claude-phase-instructions.md).
 
 ## What works today (Phases 1–2)
 
@@ -98,7 +105,8 @@ See [docs/testing.md](docs/testing.md) for what is covered.
 
 ## Documentation
 
-- [Implementation plan](docs/implementation-plan.md)
+- [Implementation plan and roadmap](docs/implementation-plan.md)
+- [Phase working instructions](docs/claude-phase-instructions.md)
 - [Architecture](docs/architecture.md)
 - [Decisions](docs/decisions.md)
 - [Testing](docs/testing.md)

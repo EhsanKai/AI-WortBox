@@ -104,3 +104,50 @@ not, because `,` and `،` occur inside Persian and German phrases.
 Phase 2 stores vocabulary only. Cards (and their FSRS state) will be created
 for entries when the review feature is implemented, including for entries
 saved before then.
+
+## D17 — Exactly five phases; proposals need separate approval (2026-10-15)
+
+Status: accepted (roadmap rule).
+
+The roadmap keeps five phases. Additional features are recorded in a
+proposed-feature register (P1–P13 in `implementation-plan.md`) with an
+intended phase, dependencies, data-model implications and open decisions.
+Proposed features are not implemented, and no schema or dependency change is
+made for them, until the product owner explicitly approves each one.
+
+## D18 — CSV exchange is separate from Anki `.apkg` compatibility (2026-10-15)
+
+Status: accepted (principle). `.apkg` support itself: not approved.
+
+CSV/text exchange (content only) is the supported interoperability path.
+Complete `.apkg` compatibility is not promised. It would cover notes, note
+types/templates, deck structure, tags, media and scheduling/review history.
+It requires an evaluation against real Anki exports before any scope is
+proposed.
+
+## D19 — Backup/restore principles (2026-10-15)
+
+Status: accepted (principle). Feature (P3): not approved.
+
+If built, backups are versioned and validated. They include vocabulary,
+ordered meanings, decks, tags, media references/files and full review state.
+Restoring requires a preview and an explicit confirmation, runs in a single
+transaction and makes a safety backup first. Backups are stored locally or
+shared by the user. Nothing is uploaded to a cloud service by default.
+
+## D20 — Images are three separate capabilities (2026-10-15)
+
+Status: accepted (principle). Features (P13): not approved.
+
+User-selected images, suggestions of existing images and AI-generated images
+are designed and approved separately behind provider-neutral interfaces.
+OpenRouter is not assumed to provide image generation; any image provider is
+evaluated separately for cost, licensing, privacy and content safety.
+
+## D21 — No speculative schema changes (2026-10-15)
+
+Status: accepted.
+
+Schema changes are made only for approved features, each documented with its
+migration and backfill before implementation, and tested with migration tests
+from real older data. The schema remains v1 after Phase 2.
