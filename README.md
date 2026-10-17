@@ -17,7 +17,7 @@ them with FSRS spaced repetition.
 | 1 | Foundation, navigation, Drift database, decks | **Complete** (`73fa370`) |
 | 2 | Manual vocabulary entry, CSV import | **Complete** (`bbc9877`) |
 | 3 | Photo/gallery input, German OCR, word selection | **Complete** (`77287d7`) |
-| 4 | AI enrichment with your own OpenRouter key | **Implemented — awaiting commit** (live API and device checks outstanding) |
+| 4 | AI enrichment with your own OpenRouter key | **Complete** (`eaa0278`); live OpenRouter and real-device/platform verification outstanding |
 | 5 | FSRS review and release preparation | Planned |
 
 Additional features (search filters, tags, backup/restore, reminders,
@@ -63,7 +63,7 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
 - Saves only confirmed items, to a chosen deck, in one transaction, with the
   same duplicate rules as CSV import.
 
-### Phase 4 — implemented, awaiting commit
+### AI suggestions (Phase 4, `eaa0278`)
 
 - AI suggestions with **your own OpenRouter key** (bring your own key):
   usage is billed to your OpenRouter account. The key is stored only in the

@@ -26,7 +26,7 @@ to formatting, static analysis and host-side automated tests.
 | 1 | Foundation and local persistence | **Complete** (`73fa370`) |
 | 2 | Vocabulary management and CSV import | **Complete** (`bbc9877`) |
 | 3 | Photo/gallery input, German OCR, word and expression selection | **Complete** (`77287d7`) |
-| 4 | AI enrichment with the user's own OpenRouter key (BYOK) | **Implemented — awaiting commit**; live API and real-device checks outstanding |
+| 4 | AI enrichment with the user's own OpenRouter key (BYOK) | **Complete** (`eaa0278`); live OpenRouter and real-device/platform verification outstanding |
 | 5 | FSRS review, release preparation | Planned (original specification), plus proposed extensions |
 
 ## Phase 1 — Foundation and local persistence — Complete (`73fa370`)
@@ -90,7 +90,7 @@ Likely dependencies (to be verified before adding): `google_mlkit_text_recogniti
 Related proposed (not approved) item: extended source metadata such as book
 title and page (P5 below).
 
-## Phase 4 — AI enrichment with the user's own key — Implemented, awaiting commit
+## Phase 4 — AI enrichment with the user's own key — Complete (`eaa0278`)
 
 Architecture (product owner decision, D27/D28): **bring your own key
 (BYOK)**. Each user enters their own OpenRouter API key; it is stored only in
@@ -122,9 +122,11 @@ Not implemented from the original specification: response caching, and a
 persisted `pending` status (failed or cancelled requests write nothing; see
 D30).
 
-Outstanding before Phase 4 can be called verified: a live OpenRouter call
-with a real key, and iOS/Android builds and real-device checks (secure
-storage, backup exclusion, network). See `docs/testing.md`.
+Committed as `eaa0278`. Still outstanding: a live OpenRouter call with a
+real key, and iOS/Android builds and real-device checks (secure storage,
+backup exclusion, network, timeout behaviour). Until these run, Phase 4 is
+verified only by host-side automated tests with mocked HTTP. See
+`docs/testing.md`.
 
 Proposed extensions in this phase (not approved): improved lemma and
 inflected-form duplicate handling (P4), rich editable grammar data (P11),
