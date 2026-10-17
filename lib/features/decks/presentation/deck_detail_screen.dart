@@ -37,6 +37,13 @@ class DeckDetailScreen extends ConsumerWidget {
         actions: [
           if (deck.value != null)
             IconButton(
+              key: const Key('deck.enrich'),
+              tooltip: l10n.enrichDeckAction,
+              icon: const Icon(Icons.auto_awesome_outlined),
+              onPressed: () => context.push(AppRoutes.deckEnrich(deckId)),
+            ),
+          if (deck.value != null)
+            IconButton(
               key: const Key('deck.scan'),
               tooltip: l10n.addScan,
               icon: const Icon(Icons.document_scanner_outlined),

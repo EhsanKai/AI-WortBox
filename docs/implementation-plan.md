@@ -24,9 +24,9 @@ to formatting, static analysis and host-side automated tests.
 | Phase | Theme | Status |
 | --- | --- | --- |
 | 1 | Foundation and local persistence | **Complete** (`73fa370`) |
-| 2 | Vocabulary management and CSV import | **Implemented — awaiting commit** (136 tests passing) |
-| 3 | Photo/gallery input, German OCR, word and expression selection | **Implemented — awaiting commit** (189 tests passing) |
-| 4 | AI enrichment via secure backend (OpenRouter) | Planned (original specification), plus proposed extensions |
+| 2 | Vocabulary management and CSV import | **Complete** (`bbc9877`) |
+| 3 | Photo/gallery input, German OCR, word and expression selection | **Complete** (`77287d7`) |
+| 4 | AI enrichment with the user's own OpenRouter key (BYOK) | **Implemented — awaiting commit**; live API and real-device checks outstanding |
 | 5 | FSRS review, release preparation | Planned (original specification), plus proposed extensions |
 
 ## Phase 1 — Foundation and local persistence — Complete (`73fa370`)
@@ -45,7 +45,7 @@ to formatting, static analysis and host-side automated tests.
 - Deck creation and listing, deck detail view.
 - Unit, database, schema and widget tests.
 
-## Phase 2 — Vocabulary management and CSV import — Implemented, awaiting commit
+## Phase 2 — Vocabulary management and CSV import — Complete (`bbc9877`)
 
 - `DriftVocabularyRepository` (create/update/merge/delete/import, reactive
   queries with meanings). No schema change (still v1).
@@ -60,11 +60,10 @@ to formatting, static analysis and host-side automated tests.
   `ColumnMapping`), row analysis (`analyzeCsvImport`), `file_picker` adapter.
 - Dependency added: `file_picker` 13.1.0. No CSV package (see D11).
 - 11 CSV fixtures in `test/fixtures/csv/`, 86 new tests.
-- Phase 2 must be committed on its own before Phase 3 code starts.
 
-## Phase 3 — Photo/gallery input and German OCR — Approved
+## Phase 3 — Photo/gallery input and German OCR — Complete (`77287d7`)
 
-Approved scope:
+Scope:
 
 - Camera capture and gallery selection of a book page.
 - On-device German OCR. Google ML Kit text recognition (Latin script) is the
@@ -91,21 +90,41 @@ Likely dependencies (to be verified before adding): `google_mlkit_text_recogniti
 Related proposed (not approved) item: extended source metadata such as book
 title and page (P5 below).
 
-## Phase 4 — AI enrichment through a secure backend
+## Phase 4 — AI enrichment with the user's own key — Implemented, awaiting commit
 
-Planned (original specification):
+Architecture (product owner decision, D27/D28): **bring your own key
+(BYOK)**. Each user enters their own OpenRouter API key; it is stored only in
+OS-backed secure storage (iOS Keychain, Android Keystore-protected storage)
+on the device. The Flutter app calls the OpenRouter API directly over HTTPS.
+There is currently **no backend or proxy**. A backend that holds a shared
+key is a possible future alternative behind the same provider-neutral
+interface; it is not part of the current implementation.
 
-- Provider-neutral `VocabularyEnrichmentService`; mock provider for
-  development and tests; HTTP implementation against a minimal backend
-  (`POST /api/v1/vocabulary/enrich`) that holds the OpenRouter key
-  server-side.
+Implemented:
+
+- Provider-neutral `VocabularyEnrichmentService`; `OpenRouterEnrichmentService`
+  as the current implementation; mocked HTTP and an in-memory key store in
+  all automated tests.
+- AI settings: explanation, hidden key entry, test, replace, remove, curated
+  model choice; no request is sent without a saved key, and only on an
+  explicit user action.
 - Contextual Persian meanings (using the stored sentence context), German
-  example sentences with Persian translations, grammar assistance (noun
-  gender/plural, separable verbs, cases, idioms), ambiguity indicator.
-- Schema-validated structured output, bounded batching, bounded retries with
-  backoff, caching, cancellation, clear missing/pending/ready/failed states,
-  protection of user-edited content (`user_edited_at`).
-- No API keys in the app, in committed configuration or in logs.
+  example sentences with Persian translations, grammar assistance, an
+  optional base-form (lemma) field suggestion, ambiguity indicator.
+- Schema-validated structured output, bounded batching, automatic retries
+  only for requests rejected before generation (ambiguous failures such as
+  timeouts are retried by the user, D32), cancellation, clear failure
+  states, review before save, additions only (existing meanings and review
+  state are never changed), protection of user-edited content.
+- No API key in the app bundle, in committed configuration or in logs.
+
+Not implemented from the original specification: response caching, and a
+persisted `pending` status (failed or cancelled requests write nothing; see
+D30).
+
+Outstanding before Phase 4 can be called verified: a live OpenRouter call
+with a real key, and iOS/Android builds and real-device checks (secure
+storage, backup exclusion, network). See `docs/testing.md`.
 
 Proposed extensions in this phase (not approved): improved lemma and
 inflected-form duplicate handling (P4), rich editable grammar data (P11),
@@ -306,9 +325,9 @@ column is the intended placement if approved.
 - **Principle (original specification):** saved words, decks, search and
   review work without a network; only AI features (and optional cloud
   services, if ever approved) need connectivity.
-- **Current state:** Phases 1–2 are fully offline. Phase 5 review must be
-  offline. Phase 4 must queue or clearly fail AI requests without breaking
-  saved data.
+- **Current state:** Phases 1–3 are fully offline. Phase 5 review must be
+  offline. Phase 4 fails AI requests clearly without changing saved data
+  (no automatic queue).
 - **Data model:** none.
 - **Open decisions:** whether pending AI requests are queued automatically
   when back online (requires user consent and cost limits).
@@ -328,7 +347,8 @@ Three separate capabilities, each requiring its own approval:
    interfaces behind the backend).
 
 - **Dependencies:** media storage, backup (P3) must include media files,
-  Phase 4 backend for any external provider.
+  key handling for any external provider (Phase 4 uses the user's own key;
+  there is no backend).
 - **Data model:** a `media` table (id, entry_id, kind, relative file path,
   MIME type, origin = user/suggested/generated, attribution/licence,
   created_at) with cascade on entry delete; files in the app's documents

@@ -1113,4 +1113,330 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get scanWordTapToDeselect => 'لغو انتخاب';
+
+  @override
+  String get settingsAi => 'هوش مصنوعی';
+
+  @override
+  String get settingsAiConfigured => 'فعال — کلید OpenRouter شما ذخیره شده است';
+
+  @override
+  String get settingsAiNotConfigured => 'غیرفعال — کلید OpenRouter تنظیم نشده';
+
+  @override
+  String get aiSettingsTitle => 'هوش مصنوعی';
+
+  @override
+  String get aiIntroTitle => 'با حساب OpenRouter خودتان';
+
+  @override
+  String get aiIntroBody =>
+      'برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. هزینهٔ هر درخواست از اعتبار حساب OpenRouter شما کم می‌شود. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.';
+
+  @override
+  String get aiGetKey => 'دریافت کلید در openrouter.ai/keys';
+
+  @override
+  String get aiKeyLabel => 'کلید API';
+
+  @override
+  String get aiKeyNewLabel => 'کلید API جدید';
+
+  @override
+  String get aiKeyShow => 'نمایش کلید';
+
+  @override
+  String get aiKeyHide => 'پنهان کردن کلید';
+
+  @override
+  String get aiKeySave => 'ذخیره و بررسی';
+
+  @override
+  String aiKeySaved(String suffix) {
+    return 'کلید ذخیره‌شده: ••••$suffix';
+  }
+
+  @override
+  String get aiKeySavedNote => 'کلید کامل دیگر نمایش داده نمی‌شود.';
+
+  @override
+  String get aiKeyTest => 'بررسی کلید';
+
+  @override
+  String get aiKeyReplace => 'جایگزینی کلید';
+
+  @override
+  String get aiKeyRemove => 'حذف کلید';
+
+  @override
+  String get aiKeyRemoveTitle => 'کلید حذف شود؟';
+
+  @override
+  String get aiKeyRemoveBody =>
+      'کلید از حافظهٔ امن این دستگاه حذف می‌شود. لغت‌ها و معنی‌های ذخیره‌شده دست نمی‌خورند. کلید در حساب OpenRouter شما همچنان فعال است؛ برای باطل کردن آن به openrouter.ai بروید.';
+
+  @override
+  String get aiKeyRemoved => 'کلید حذف شد.';
+
+  @override
+  String get aiKeySaveFailed =>
+      'کلید در فضای امن این دستگاه ذخیره نشد. دوباره تلاش کنید.';
+
+  @override
+  String get aiKeyRemoveFailed =>
+      'کلید از فضای امن این دستگاه حذف نشد. دوباره تلاش کنید.';
+
+  @override
+  String get aiModelSaveFailed => 'انتخاب مدل ذخیره نشد. دوباره تلاش کنید.';
+
+  @override
+  String get aiKeyProblemEmpty => 'کلید را وارد کنید.';
+
+  @override
+  String get aiKeyProblemWhitespace =>
+      'کلید نباید فاصله یا خط جدید داشته باشد.';
+
+  @override
+  String get aiKeyProblemShort => 'این کلید خیلی کوتاه است.';
+
+  @override
+  String get aiKeyProblemLong => 'این کلید خیلی بلند است.';
+
+  @override
+  String get aiCheckRunning => 'در حال بررسی کلید…';
+
+  @override
+  String get aiCheckPassed => 'کلید معتبر است و هوش مصنوعی آماده است.';
+
+  @override
+  String aiCheckUsage(String amount) {
+    return 'اعتبار مصرف‌شده با این کلید (گزارش OpenRouter): $amount دلار';
+  }
+
+  @override
+  String aiCheckRemaining(String amount) {
+    return 'باقی‌ماندهٔ سقف این کلید: $amount دلار';
+  }
+
+  @override
+  String get aiCheckModelUnavailable =>
+      'مدل انتخاب‌شده اکنون در OpenRouter با خروجی ساختاریافته در دسترس نیست. مدل دیگری انتخاب کنید.';
+
+  @override
+  String get aiCheckModelUnknown =>
+      'فهرست مدل‌ها بارگیری نشد؛ در دسترس بودن مدل بررسی نشد.';
+
+  @override
+  String get aiModelLabel => 'مدل';
+
+  @override
+  String get aiModelHelper =>
+      'فهرستی منتخب از مدل‌های کم‌هزینه که خروجی ساختاریافته دارند. قیمت‌ها در openrouter.ai آمده است.';
+
+  @override
+  String get aiPrivacyTitle => 'حریم خصوصی و اتصال';
+
+  @override
+  String get aiPrivacyBody =>
+      'فقط وقتی شما درخواست کنید، لغت، جملهٔ آن و معنی‌های فعلی‌اش به OpenRouter و ارائه‌دهندهٔ مدل فرستاده می‌شود. این متن از دستگاه خارج می‌شود و سیاست‌های آن‌ها بر آن اعمال می‌شود. پیشنهاد هوش مصنوعی به اینترنت نیاز دارد؛ بقیهٔ برنامه بدون اینترنت کار می‌کند.';
+
+  @override
+  String get aiSecurityTitle => 'نگهداری کلید';
+
+  @override
+  String get aiSecurityBody =>
+      'کلید در حافظهٔ امن سیستم (Keychain در iOS، Keystore در اندروید) نگه داشته می‌شود؛ هرگز نمایش داده نمی‌شود و در پایگاه داده، گزارش‌ها یا پشتیبان قرار نمی‌گیرد. این کار خطر را کم می‌کند، اما روی دستگاهی آلوده یا دستکاری‌شده، استخراج کلید ناممکن نیست. در OpenRouter برای این کلید سقف اعتبار تعیین کنید.';
+
+  @override
+  String get enrichTitle => 'پیشنهادهای هوش مصنوعی';
+
+  @override
+  String get enrichAction => 'پیشنهاد هوش مصنوعی';
+
+  @override
+  String get enrichDeckAction => 'پیشنهاد برای لغت‌های بدون معنی';
+
+  @override
+  String get enrichNotConfiguredTitle => 'هوش مصنوعی تنظیم نشده است';
+
+  @override
+  String get enrichNotConfiguredBody =>
+      'کلید API حساب OpenRouter خودتان را در تنظیمات وارد کنید. بدون کلید هیچ درخواستی فرستاده نمی‌شود.';
+
+  @override
+  String get enrichOpenSettings => 'تنظیمات هوش مصنوعی';
+
+  @override
+  String get enrichEmptyTitle => 'لغتی برای تکمیل نیست';
+
+  @override
+  String get enrichEmptyBody =>
+      'فقط لغت‌های بدون معنی گروهی پیشنهاد می‌گیرند. برای لغتی که معنی دارد، از صفحهٔ همان لغت درخواست کنید.';
+
+  @override
+  String enrichReadyBatch(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString لغت بدون معنی به OpenRouter فرستاده می‌شود.',
+    );
+    return '$_temp0 پیش از ذخیره، همهٔ پیشنهادها را بررسی می‌کنید.';
+  }
+
+  @override
+  String get enrichReadySingle =>
+      'این لغت و جملهٔ آن به OpenRouter فرستاده می‌شود. معنی‌ها و اطلاعات فعلی بدون تأیید شما تغییر نمی‌کنند.';
+
+  @override
+  String enrichModel(String model) {
+    return 'مدل: $model';
+  }
+
+  @override
+  String get enrichStart => 'دریافت پیشنهادها';
+
+  @override
+  String enrichProgress(int done, int total) {
+    final intl.NumberFormat doneNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String doneString = doneNumberFormat.format(done);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$doneString از $totalString';
+  }
+
+  @override
+  String get enrichCancel => 'توقف';
+
+  @override
+  String get enrichStatusQueued => 'در صف';
+
+  @override
+  String get enrichStatusRunning => 'در حال دریافت…';
+
+  @override
+  String get enrichStatusProposed => 'پیشنهاد هوش مصنوعی — بررسی کنید';
+
+  @override
+  String get enrichStatusFailed => 'ناموفق';
+
+  @override
+  String get enrichStatusSkipped => 'پیشنهاد تازه‌ای نبود';
+
+  @override
+  String get enrichNewMeanings => 'معنی‌های پیشنهادی';
+
+  @override
+  String get enrichExistingKept =>
+      'معنی‌های فعلی دست نمی‌خورند؛ موارد انتخاب‌شده اضافه می‌شوند.';
+
+  @override
+  String get enrichDetails => 'جزئیات پیشنهادی';
+
+  @override
+  String enrichReplaces(String current) {
+    return 'به جای: $current';
+  }
+
+  @override
+  String get enrichAmbiguous =>
+      'بدون جملهٔ کامل‌تر، معنی قطعی نیست؛ با دقت بررسی کنید.';
+
+  @override
+  String enrichSave(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ذخیرهٔ $countString لغت',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get enrichNothingSelected => 'چیزی برای ذخیره انتخاب نشده است.';
+
+  @override
+  String get enrichRetry => 'تلاش دوباره برای موارد ناموفق';
+
+  @override
+  String get enrichSavedTitle => 'پیشنهادها ذخیره شد';
+
+  @override
+  String enrichSavedCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString لغت به‌روز شد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String enrichCost(String amount) {
+    return 'هزینهٔ گزارش‌شده توسط OpenRouter: $amount دلار';
+  }
+
+  @override
+  String get enrichConflict =>
+      'برخی لغت‌ها در این فاصله تغییر کرده‌اند، پس چیزی ذخیره نشد. دوباره پیشنهاد بگیرید.';
+
+  @override
+  String get aiErrorNotConfigured => 'کلید OpenRouter تنظیم نشده است.';
+
+  @override
+  String get aiErrorInvalidKey =>
+      'OpenRouter این کلید را نپذیرفت. کلید را بررسی یا جایگزین کنید.';
+
+  @override
+  String get aiErrorCredits =>
+      'اعتبار حساب یا سقف این کلید در OpenRouter تمام شده است. در openrouter.ai اعتبار اضافه کنید.';
+
+  @override
+  String get aiErrorForbidden =>
+      'OpenRouter یا ارائه‌دهندهٔ مدل این درخواست را رد کرد.';
+
+  @override
+  String get aiErrorRateLimited =>
+      'تعداد درخواست‌ها زیاد است. کمی بعد دوباره امتحان کنید.';
+
+  @override
+  String get aiErrorTimeout =>
+      'پاسخ به‌موقع نرسید. ممکن است OpenRouter درخواست را پردازش کرده و هزینه‌اش را حساب کرده باشد؛ فقط در صورت نیاز دوباره امتحان کنید.';
+
+  @override
+  String get aiErrorNetwork =>
+      'اتصال به اینترنت برقرار نیست. پیشنهاد هوش مصنوعی به اینترنت نیاز دارد.';
+
+  @override
+  String get aiErrorModel =>
+      'مدل انتخاب‌شده در دسترس نیست. مدل دیگری در تنظیمات انتخاب کنید.';
+
+  @override
+  String get aiErrorBadRequest =>
+      'OpenRouter درخواست را نپذیرفت. مدل دیگری را امتحان کنید.';
+
+  @override
+  String get aiErrorServer => 'OpenRouter خطا داد. کمی بعد دوباره امتحان کنید.';
+
+  @override
+  String get aiErrorMalformed =>
+      'پاسخ مدل قابل استفاده نبود. دوباره امتحان کنید یا مدل دیگری انتخاب کنید.';
+
+  @override
+  String get aiErrorCancelled => 'متوقف شد.';
 }

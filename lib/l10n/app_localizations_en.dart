@@ -1123,4 +1123,333 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanWordTapToDeselect => 'deselect word';
+
+  @override
+  String get settingsAi => 'AI';
+
+  @override
+  String get settingsAiConfigured => 'On — your OpenRouter key is saved';
+
+  @override
+  String get settingsAiNotConfigured => 'Off — no OpenRouter key set';
+
+  @override
+  String get aiSettingsTitle => 'AI';
+
+  @override
+  String get aiIntroTitle => 'With your own OpenRouter account';
+
+  @override
+  String get aiIntroBody =>
+      'To suggest meanings, examples and grammar notes, AI WortBox uses your own OpenRouter account. Each request is charged to your OpenRouter credits. AI WortBox has no shared key or account and sends nothing without your key.';
+
+  @override
+  String get aiGetKey => 'Get a key at openrouter.ai/keys';
+
+  @override
+  String get aiKeyLabel => 'API key';
+
+  @override
+  String get aiKeyNewLabel => 'New API key';
+
+  @override
+  String get aiKeyShow => 'Show key';
+
+  @override
+  String get aiKeyHide => 'Hide key';
+
+  @override
+  String get aiKeySave => 'Save and test';
+
+  @override
+  String aiKeySaved(String suffix) {
+    return 'Saved key: ••••$suffix';
+  }
+
+  @override
+  String get aiKeySavedNote => 'The full key is never shown again.';
+
+  @override
+  String get aiKeyTest => 'Test key';
+
+  @override
+  String get aiKeyReplace => 'Replace key';
+
+  @override
+  String get aiKeyRemove => 'Remove key';
+
+  @override
+  String get aiKeyRemoveTitle => 'Remove the key?';
+
+  @override
+  String get aiKeyRemoveBody =>
+      'The key is deleted from this device’s secure storage. Saved words and meanings are not affected. The key stays active in your OpenRouter account; revoke it at openrouter.ai.';
+
+  @override
+  String get aiKeyRemoved => 'Key removed.';
+
+  @override
+  String get aiKeySaveFailed =>
+      'The key could not be saved in this device\'s secure storage. Please try again.';
+
+  @override
+  String get aiKeyRemoveFailed =>
+      'The key could not be removed from this device\'s secure storage. Please try again.';
+
+  @override
+  String get aiModelSaveFailed =>
+      'The model choice could not be saved. Please try again.';
+
+  @override
+  String get aiKeyProblemEmpty => 'Enter the key.';
+
+  @override
+  String get aiKeyProblemWhitespace =>
+      'The key must not contain spaces or line breaks.';
+
+  @override
+  String get aiKeyProblemShort => 'This key is too short.';
+
+  @override
+  String get aiKeyProblemLong => 'This key is too long.';
+
+  @override
+  String get aiCheckRunning => 'Testing the key…';
+
+  @override
+  String get aiCheckPassed => 'The key works; AI is ready.';
+
+  @override
+  String aiCheckUsage(String amount) {
+    return 'Credits used with this key (reported by OpenRouter): \$$amount';
+  }
+
+  @override
+  String aiCheckRemaining(String amount) {
+    return 'Remaining limit of this key: \$$amount';
+  }
+
+  @override
+  String get aiCheckModelUnavailable =>
+      'The selected model is not currently available on OpenRouter with structured output. Choose another model.';
+
+  @override
+  String get aiCheckModelUnknown =>
+      'The model list could not be loaded; the model was not checked.';
+
+  @override
+  String get aiModelLabel => 'Model';
+
+  @override
+  String get aiModelHelper =>
+      'A curated list of low-cost models with structured output. Prices are listed on openrouter.ai.';
+
+  @override
+  String get aiPrivacyTitle => 'Privacy and connection';
+
+  @override
+  String get aiPrivacyBody =>
+      'Only when you ask, the word, its sentence and its current meanings are sent to OpenRouter and the model provider. This text leaves the device and is subject to their policies. AI suggestions need the internet; the rest of the app works offline.';
+
+  @override
+  String get aiSecurityTitle => 'How the key is kept';
+
+  @override
+  String get aiSecurityBody =>
+      'The key is kept in the system’s secure storage (Keychain on iOS, Keystore on Android). It is never shown, and never stored in the database, logs or backups. This reduces exposure, but a compromised or instrumented device can still extract it. Set a credit limit for this key on OpenRouter.';
+
+  @override
+  String get enrichTitle => 'AI suggestions';
+
+  @override
+  String get enrichAction => 'AI suggestions';
+
+  @override
+  String get enrichDeckAction => 'Suggest for words without meanings';
+
+  @override
+  String get enrichNotConfiguredTitle => 'AI is not set up';
+
+  @override
+  String get enrichNotConfiguredBody =>
+      'Enter your own OpenRouter API key in settings. Without a key, nothing is sent.';
+
+  @override
+  String get enrichOpenSettings => 'AI settings';
+
+  @override
+  String get enrichEmptyTitle => 'Nothing to complete';
+
+  @override
+  String get enrichEmptyBody =>
+      'Only words without meanings are completed in a batch. For a word that has meanings, ask from its own page.';
+
+  @override
+  String enrichReadyBatch(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString words without meanings will be sent to OpenRouter.',
+      one: '1 word without meanings will be sent to OpenRouter.',
+    );
+    return '$_temp0 You review every suggestion before anything is saved.';
+  }
+
+  @override
+  String get enrichReadySingle =>
+      'This word and its sentence will be sent to OpenRouter. Existing meanings and details do not change without your approval.';
+
+  @override
+  String enrichModel(String model) {
+    return 'Model: $model';
+  }
+
+  @override
+  String get enrichStart => 'Get suggestions';
+
+  @override
+  String enrichProgress(int done, int total) {
+    final intl.NumberFormat doneNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String doneString = doneNumberFormat.format(done);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return '$doneString of $totalString';
+  }
+
+  @override
+  String get enrichCancel => 'Stop';
+
+  @override
+  String get enrichStatusQueued => 'Queued';
+
+  @override
+  String get enrichStatusRunning => 'Requesting…';
+
+  @override
+  String get enrichStatusProposed => 'AI suggestion — please review';
+
+  @override
+  String get enrichStatusFailed => 'Failed';
+
+  @override
+  String get enrichStatusSkipped => 'No new suggestions';
+
+  @override
+  String get enrichNewMeanings => 'Suggested meanings';
+
+  @override
+  String get enrichExistingKept =>
+      'Existing meanings are kept; selected ones are added.';
+
+  @override
+  String get enrichDetails => 'Suggested details';
+
+  @override
+  String enrichReplaces(String current) {
+    return 'Replaces: $current';
+  }
+
+  @override
+  String get enrichAmbiguous =>
+      'The sense is unclear without more context; review carefully.';
+
+  @override
+  String enrichSave(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Save $countString words',
+      one: 'Save 1 word',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get enrichNothingSelected => 'Nothing is selected to save.';
+
+  @override
+  String get enrichRetry => 'Retry failed items';
+
+  @override
+  String get enrichSavedTitle => 'Suggestions saved';
+
+  @override
+  String enrichSavedCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString words updated',
+      one: '1 word updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String enrichCost(String amount) {
+    return 'Cost reported by OpenRouter: \$$amount';
+  }
+
+  @override
+  String get enrichConflict =>
+      'Some words changed in the meantime, so nothing was saved. Get suggestions again.';
+
+  @override
+  String get aiErrorNotConfigured => 'No OpenRouter key is set.';
+
+  @override
+  String get aiErrorInvalidKey =>
+      'OpenRouter rejected this key. Check or replace it.';
+
+  @override
+  String get aiErrorCredits =>
+      'Your OpenRouter credits or this key’s limit are used up. Add credits at openrouter.ai.';
+
+  @override
+  String get aiErrorForbidden =>
+      'OpenRouter or the model provider refused this request.';
+
+  @override
+  String get aiErrorRateLimited => 'Too many requests. Try again in a moment.';
+
+  @override
+  String get aiErrorTimeout =>
+      'No answer arrived in time. OpenRouter may still have processed (and charged) the request; retry only if needed.';
+
+  @override
+  String get aiErrorNetwork =>
+      'No internet connection. AI suggestions need the internet.';
+
+  @override
+  String get aiErrorModel =>
+      'The selected model is unavailable. Choose another model in settings.';
+
+  @override
+  String get aiErrorBadRequest =>
+      'OpenRouter did not accept the request. Try another model.';
+
+  @override
+  String get aiErrorServer => 'OpenRouter reported an error. Try again later.';
+
+  @override
+  String get aiErrorMalformed =>
+      'The model’s answer was not usable. Try again or choose another model.';
+
+  @override
+  String get aiErrorCancelled => 'Stopped.';
 }

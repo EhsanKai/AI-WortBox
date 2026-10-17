@@ -80,6 +80,13 @@ class EntryDetailScreen extends ConsumerWidget {
         actions: [
           if (current != null) ...[
             IconButton(
+              key: const Key('entryDetail.enrich'),
+              tooltip: l10n.enrichAction,
+              icon: const Icon(Icons.auto_awesome_outlined),
+              onPressed: () =>
+                  context.push(AppRoutes.entryEnrich(deckId, entryId)),
+            ),
+            IconButton(
               key: const Key('entryDetail.edit'),
               tooltip: l10n.actionEdit,
               icon: const Icon(Icons.edit_outlined),

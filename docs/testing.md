@@ -225,3 +225,68 @@ run on all iOS simulators).
 15. **Offline:** in airplane mode, OCR, selection and saving still work.
 16. Check the device's photo/cache folders: no page photos are left behind
     by the app.
+
+## Phase 4 results (2026-10-17)
+
+- `dart format --set-exit-if-changed lib test`: 0 changed
+- `flutter analyze`: no issues
+- `flutter test`: **358 passed, 2 skipped, 0 failed** (252 from earlier
+  phases unchanged, 106 new). The 2 skipped tests are the opt-in live tests.
+- No live OpenRouter request has been made; all AI tests use mocked HTTP
+  (`package:http/testing.dart`) and an in-memory key store.
+- Builds: still not possible on this machine (no Android SDK, no full
+  Xcode).
+
+### Phase 4 suites
+
+| File | Covers |
+| --- | --- |
+| `test/features/enrichment/domain/enrichment_parser_test.dart` (18) | Valid structured output; code fences; non-JSON, truncated, wrong types, missing meanings; non-Persian meanings/explanations dropped; dedupe; meaning count/length limits; example/translation only as a valid pair; «» quotes, Persian digits, ZWNJ; lemma rules; part-of-speech mapping; control characters; strict schema |
+| `test/features/enrichment/domain/enrichment_plan_test.dart` (11) | Defaults for entries without meanings; exact update contents; existing meanings protected (additions only, Persian letter variants, entry limit); filled fields only as non-default replacements; batch candidates and limit; request contains only word/context/meanings |
+| `test/features/enrichment/data/openrouter_service_test.dart` (34) | Request URL, headers, body, structured-output routing, key only in `Authorization`; model selection; no key → no request; reported model/cost, no invented cost; malformed/truncated/no-choices; 200-with-error not retried; 400/401/402/403 not retried; 429/503 retried with backoff and `Retry-After` (capped); 402 with `Retry-After`; 408/500/502, network failures and client timeouts not retried (one request each); a later user retry sends a new request; retry classification; exceptions never contain the key; cancellation; `GET /key`; public model list sent without key |
+| `test/features/enrichment/presentation/ai_settings_controller_test.dart` (15) | Save (trimmed), only last four characters in state, test result; malformed keys not saved; replace; remove; invalid key; offline; delisted/unknown model; no key → no request; catalog-only models; secure-storage read failure; failed save (unconfigured, no request), failed replacement (stored key shown), failed removal (still configured), failed model change (previous model kept), no key in errors |
+| `test/features/vocabulary/data/apply_enrichments_test.dart` (8) | Fill and mark ready with metadata; existing meanings/user fields/`userEditedAt` kept; flashcards unchanged; conflict → nothing written; invalid update and deleted entry roll back the batch; duplicate meanings; empty list |
+| `test/widgets/enrichment_flow_test.dart` (12) | Settings onboarding (explanation, link, hidden key, saved suffix, test, usage, remove); secure-storage save/remove failures shown with no success state and no key in messages; invalid and malformed keys; no key → setup prompt, no request; batch review/save with review state untouched; offline failure and user retry (one request each); timeout not repeated automatically, charge warning, user retry; invalid key stops the batch; insufficient credits; single entry with meanings (nothing preselected, other entries untouched); review screen at 320 px / 2× / dark |
+| `test/widgets/design_system_test.dart` (+8) | AI settings and AI suggestions screens at 320 px, 1.5×/2×, light/dark |
+| `test/live/openrouter_live_test.dart` (2, opt-in) | Real `GET /key` and one real enrichment; skipped unless `OPENROUTER_API_KEY` is set |
+
+Every widget test runs with an HTTP client that fails on any request and an
+in-memory key store, so no test can reach the network or the real Keychain/
+Keystore.
+
+Live check (spends a little of the key owner's credits; never commit keys):
+
+```sh
+OPENROUTER_API_KEY=sk-or-... flutter test test/live/openrouter_live_test.dart
+```
+
+## Manual device checklist (Phase 4)
+
+Needs a real OpenRouter account with a small credit limit on the key,
+Android and iPhone devices.
+
+1. Settings → AI shows "Off"; the explanation says your own account pays.
+   "Get a key" opens openrouter.ai/keys in the browser.
+2. Enter a key: hidden by default, show/hide works, no keyboard suggestions.
+   Save → "The key works", reported usage; status "On". Leave and return:
+   only ••••last-four is shown.
+3. Enter a wrong key → actionable error. Replace the key; remove it (with
+   confirmation) → status "Off".
+4. Choose each catalog model and test; note any "model not available".
+5. Scan a page, save words without meanings; deck → AI suggestions → the
+   screen says what is sent; start; review Persian meanings, example,
+   grammar, base form; deselect some; save. Check the entries.
+6. A word with meanings: AI suggestions from its page → nothing preselected;
+   only new meanings offered; saving appends them.
+7. Airplane mode → network message, nothing changed; the rest of the app
+   works offline.
+8. Key with exhausted limit → credits message, batch stops.
+9. Stop a running batch; leave the screen mid-run → nothing saved.
+   On a very slow connection, a timeout shows the "may have been charged"
+   message and is not repeated until you tap "Retry failed items"; compare
+   with the activity log on openrouter.ai.
+10. Android: confirm `adb shell bmgr` backup excludes the key (restore on a
+    new device → key absent, vocabulary present). iOS: reinstall → check
+    whether the Keychain item persists; "Remove key" clears it.
+11. Review states and due cards unchanged after enrichment (Phase 5 will
+    show them; inspect the database if needed).

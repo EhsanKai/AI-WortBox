@@ -46,6 +46,34 @@ abstract final class AppConfig {
   /// Longest sentence context stored with an entry, in characters.
   static const int maxContextLength = 400;
 
+  // AI enrichment (OpenRouter, bring your own key).
+  /// Base URL of the OpenRouter API. Requests go only here, authenticated
+  /// with the user's own key.
+  static const String openRouterBaseUrl = 'https://openrouter.ai/api/v1';
+
+  /// Where users create their own OpenRouter API key.
+  static const String openRouterKeysUrl = 'https://openrouter.ai/keys';
+
+  /// Time limit for one enrichment request (including model generation).
+  static const Duration aiRequestTimeout = Duration(seconds: 45);
+
+  /// Time limit for the key check and the model-list check.
+  static const Duration aiCheckTimeout = Duration(seconds: 15);
+
+  /// Automatic retries after the first attempt, only for requests OpenRouter
+  /// rejected before any model ran (429, 503, 402 with `Retry-After`).
+  /// Timeouts and other ambiguous failures are retried only by the user.
+  static const int aiMaxRetries = 2;
+
+  /// Longest wait honoured from a `Retry-After` header.
+  static const Duration aiMaxRetryDelay = Duration(seconds: 20);
+
+  /// Most meanings accepted from one AI response.
+  static const int aiMaxMeanings = 5;
+
+  /// Most entries enriched in one batch run.
+  static const int aiMaxBatchSize = 50;
+
   /// File name (without extension) of the local SQLite database.
   static const String databaseName = 'ai_wortbox';
 }

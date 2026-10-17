@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Auto Backup on Android 11 and lower. The vocabulary database is backed
+     up as before; the encrypted OpenRouter key (flutter_secure_storage) is
+     excluded: it must never leave the device, and its Keystore key would not
+     be restored anyway. -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml"/>
+    <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml"/>
+    <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration.xml"/>
+    <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration:FlutterSecureStorage.xml"/>
+</full-backup-content>

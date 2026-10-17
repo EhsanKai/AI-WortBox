@@ -117,3 +117,81 @@ final class ScanException extends AppException {
   @override
   String toString() => 'ScanException($error)';
 }
+
+/// Why an AI enrichment request failed.
+enum EnrichmentError {
+  /// No API key is saved; no request was sent.
+  notConfigured,
+
+  /// The key was rejected (HTTP 401).
+  invalidKey,
+
+  /// The OpenRouter account or key has no credits left (HTTP 402).
+  insufficientCredits,
+
+  /// Blocked by permissions, a guardrail or moderation (HTTP 403).
+  forbidden,
+
+  /// Too many requests (HTTP 429), still failing after retries.
+  rateLimited,
+
+  /// The request took too long (client timeout or HTTP 408).
+  timeout,
+
+  /// No connection, DNS or TLS failure.
+  network,
+
+  /// The selected model is unavailable or no provider can serve it
+  /// (HTTP 502/503, unknown model).
+  modelUnavailable,
+
+  /// The request was rejected as invalid (HTTP 400).
+  badRequest,
+
+  /// Other server-side failures (HTTP 5xx).
+  server,
+
+  /// The response was not the structured result that was asked for.
+  malformedResponse,
+
+  /// The user cancelled.
+  cancelled,
+}
+
+/// A failed AI request.
+///
+/// Never contains the API key, request or response bodies, or vocabulary
+/// content: only the reason and the HTTP status, so it is safe to log.
+final class EnrichmentException extends AppException {
+  const EnrichmentException(this.error, {this.statusCode});
+
+  final EnrichmentError error;
+
+  /// HTTP status, when the server answered.
+  final int? statusCode;
+
+  /// Whether retrying later could succeed without the user changing
+  /// anything (key, credits, model).
+  bool get isTemporary => switch (error) {
+    EnrichmentError.rateLimited ||
+    EnrichmentError.timeout ||
+    EnrichmentError.network ||
+    EnrichmentError.server ||
+    EnrichmentError.modelUnavailable => true,
+    _ => false,
+  };
+
+  @override
+  String toString() => 'EnrichmentException($error, status: $statusCode)';
+}
+
+/// Entries changed after an enrichment proposal was made, so it was not
+/// saved (nothing was written).
+final class EnrichmentConflictException extends AppException {
+  const EnrichmentConflictException(this.entryIds);
+
+  final Set<String> entryIds;
+
+  @override
+  String toString() => 'EnrichmentConflictException(${entryIds.length})';
+}

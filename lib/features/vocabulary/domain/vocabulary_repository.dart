@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'duplicate_detection.dart';
+import 'enrichment_update.dart';
 import 'vocabulary_draft.dart';
 import 'vocabulary_entry.dart';
 
@@ -36,6 +37,18 @@ abstract interface class VocabularyRepository {
   /// Adds [draft]'s new meanings to entry [id] and fills its empty optional
   /// fields, without overwriting anything (see `mergeDrafts`).
   Future<VocabularyEntry> mergeIntoEntry(String id, VocabularyDraft draft);
+
+  /// Applies reviewed AI content in a single transaction: meanings are only
+  /// added (never removed or reordered), the given fields are set, the
+  /// status becomes `ready` when the entry has meanings, and the metadata is
+  /// stored. `userEditedAt` and review state are never changed.
+  ///
+  /// Throws [EnrichmentConflictException] (writing nothing) when any entry
+  /// changed since its proposal was made, and [NotFoundException] when one
+  /// was deleted.
+  Future<List<VocabularyEntry>> applyEnrichments(
+    List<EnrichmentUpdate> updates,
+  );
 
   /// Deletes the entry, its meanings and its flashcards.
   Future<void> deleteEntry(String id);

@@ -15,9 +15,9 @@ them with FSRS spaced repetition.
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Foundation, navigation, Drift database, decks | **Complete** (`73fa370`) |
-| 2 | Manual vocabulary entry, CSV import | **Implemented — awaiting commit** |
-| 3 | Photo/gallery input, German OCR, word selection | **Implemented — awaiting commit** |
-| 4 | AI enrichment via secure backend (OpenRouter) | Planned |
+| 2 | Manual vocabulary entry, CSV import | **Complete** (`bbc9877`) |
+| 3 | Photo/gallery input, German OCR, word selection | **Complete** (`77287d7`) |
+| 4 | AI enrichment with your own OpenRouter key | **Implemented — awaiting commit** (live API and device checks outstanding) |
 | 5 | FSRS review and release preparation | Planned |
 
 Additional features (search filters, tags, backup/restore, reminders,
@@ -29,7 +29,7 @@ They are not implemented and will not be without explicit approval.
 See [docs/implementation-plan.md](docs/implementation-plan.md) and
 [docs/claude-phase-instructions.md](docs/claude-phase-instructions.md).
 
-## What works today (Phases 1–2)
+## What works today (Phases 1–3)
 
 - Persian, right-to-left UI with five tabs: Today (مرور امروز), My Words
   (لغات من), Add Vocabulary (افزودن لغت), Statistics (آمار), Settings (تنظیمات).
@@ -48,7 +48,7 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
   transactional import.
 - Review state (flashcards) is never modified by editing vocabulary.
 
-### Phase 3 — implemented, awaiting commit
+### Page scanning (Phase 3)
 
 - Scan a book page: take a photo or choose one from the gallery; German text
   is recognized **on the device** (Google ML Kit, no internet, the photo is
@@ -62,6 +62,20 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
 - Typed-text fallback when OCR fails, finds nothing or is unavailable.
 - Saves only confirmed items, to a chosen deck, in one transaction, with the
   same duplicate rules as CSV import.
+
+### Phase 4 — implemented, awaiting commit
+
+- AI suggestions with **your own OpenRouter key** (bring your own key):
+  usage is billed to your OpenRouter account. The key is stored only in the
+  device's secure storage (iOS Keychain / Android Keystore-protected
+  storage), and the app calls OpenRouter directly over HTTPS. There is no
+  backend or proxy.
+- Suggestions for a deck's words without meanings, or for one word on
+  request: Persian meanings using the sentence context, a German example with
+  Persian translation, grammar notes, an optional base form. Nothing is saved
+  until you review it; existing meanings and review state are never changed.
+- Only tested with mocked HTTP so far: **no live OpenRouter call and no
+  real-device test has been made yet.**
 
 ## Platform build status
 
@@ -133,6 +147,8 @@ See [docs/testing.md](docs/testing.md) for what is covered.
 
 ## Privacy
 
-All data is stored on the device. No account is required. AI enrichment
-(Phase 4) will send only selected words and their sentence context to a
-backend you control; API keys never ship in the app.
+All data is stored on the device. No account is required. AI suggestions
+(Phase 4) are optional: only when you ask, the app sends the selected word,
+its sentence context and its existing meanings directly to OpenRouter, using
+your own key from the device's secure storage. No API key ships in the
+app.

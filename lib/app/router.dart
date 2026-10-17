@@ -6,6 +6,8 @@ import '../features/csv_import/presentation/csv_import_screen.dart';
 import '../features/dashboard/presentation/today_screen.dart';
 import '../features/decks/presentation/deck_detail_screen.dart';
 import '../features/decks/presentation/decks_screen.dart';
+import '../features/enrichment/presentation/ai_settings_screen.dart';
+import '../features/enrichment/presentation/enrichment_screen.dart';
 import '../features/scan/presentation/scan_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/statistics/presentation/statistics_screen.dart';
@@ -23,6 +25,7 @@ abstract final class AppRoutes {
   static const manualEntry = '$add/manual';
   static const csvImport = '$add/csv';
   static const scan = '$add/scan';
+  static const aiSettings = '$settings/ai';
 
   static String deck(String id) => '$words/decks/${Uri.encodeComponent(id)}';
 
@@ -31,6 +34,11 @@ abstract final class AppRoutes {
   static String deckImport(String deckId) => '${deck(deckId)}/import';
 
   static String deckScan(String deckId) => '${deck(deckId)}/scan';
+
+  static String deckEnrich(String deckId) => '${deck(deckId)}/enrich';
+
+  static String entryEnrich(String deckId, String entryId) =>
+      '${entry(deckId, entryId)}/enrich';
 
   static String entry(String deckId, String entryId) =>
       '${deck(deckId)}/entries/${Uri.encodeComponent(entryId)}';
@@ -72,6 +80,12 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                       ),
                     ),
                     GoRoute(
+                      path: 'enrich',
+                      builder: (_, state) => EnrichmentScreen(
+                        deckId: state.pathParameters['deckId']!,
+                      ),
+                    ),
+                    GoRoute(
                       path: 'import',
                       builder: (_, state) => CsvImportScreen(
                         initialDeckId: state.pathParameters['deckId'],
@@ -91,6 +105,13 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                         entryId: state.pathParameters['entryId']!,
                       ),
                       routes: [
+                        GoRoute(
+                          path: 'enrich',
+                          builder: (_, state) => EnrichmentScreen(
+                            deckId: state.pathParameters['deckId']!,
+                            entryId: state.pathParameters['entryId'],
+                          ),
+                        ),
                         GoRoute(
                           path: 'edit',
                           builder: (_, state) => VocabularyFormScreen(
@@ -146,6 +167,12 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
             GoRoute(
               path: AppRoutes.settings,
               builder: (_, _) => const SettingsScreen(),
+              routes: [
+                GoRoute(
+                  path: 'ai',
+                  builder: (_, _) => const AiSettingsScreen(),
+                ),
+              ],
             ),
           ],
         ),

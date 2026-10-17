@@ -119,6 +119,8 @@ void main() {
       'statistics': () => '/statistics',
       'settings': () => '/settings',
       'scan capture': () => '/add/scan?deckId=${deck.id}',
+      'ai settings': () => '/settings/ai',
+      'ai suggestions (no key)': () => '/words/decks/${deck.id}/enrich',
     };
     for (final textScale in [1.5, 2.0]) {
       for (final brightness in Brightness.values) {

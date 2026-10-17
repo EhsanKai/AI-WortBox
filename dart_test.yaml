@@ -1,0 +1,5 @@
+# Tests tagged `live` call real services; they also skip themselves unless
+# a key is provided in the environment.
+tags:
+  live:
+    description: Opt-in tests against the real OpenRouter API.

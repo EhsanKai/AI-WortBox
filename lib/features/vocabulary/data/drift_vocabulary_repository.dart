@@ -8,6 +8,7 @@ import '../../../core/language/language.dart';
 import '../../../core/time/clock.dart';
 import '../../../data/database/app_database.dart';
 import '../domain/duplicate_detection.dart';
+import '../domain/enrichment_update.dart';
 import '../domain/vocabulary_draft.dart';
 import '../domain/vocabulary_entry.dart';
 import '../domain/vocabulary_repository.dart';
@@ -159,6 +160,60 @@ class DriftVocabularyRepository implements VocabularyRepository {
           userEdited: true,
         );
         return (await getEntry(id))!;
+      });
+    });
+  }
+
+  @override
+  Future<List<VocabularyEntry>> applyEnrichments(
+    List<EnrichmentUpdate> updates,
+  ) {
+    if (updates.isEmpty) return Future.value(const []);
+    return _guard('applyEnrichments', () {
+      return _db.transaction(() async {
+        // Check every entry before writing anything.
+        final current = <String, VocabularyEntry>{};
+        final conflicts = <String>{};
+        for (final update in updates) {
+          final entry = await _requireEntry(update.entryId);
+          if (!entry.updatedAt.isAtSameMomentAs(update.expectedUpdatedAt)) {
+            conflicts.add(entry.id);
+          }
+          current[entry.id] = entry;
+        }
+        if (conflicts.isNotEmpty) throw EnrichmentConflictException(conflicts);
+
+        final now = _clock.nowUtc();
+        for (final update in updates) {
+          final existing = current[update.entryId]!;
+          final deck = await _requireDeck(existing.deckId);
+          final base = VocabularyDraft.fromEntry(existing);
+          // Original, notes, source context and source type are kept as is.
+          final merged = VocabularyDraft(
+            deckId: base.deckId,
+            original: base.original,
+            meanings: [...base.meanings, ...update.addMeanings],
+            lemma: update.lemma ?? base.lemma,
+            partOfSpeech: update.partOfSpeech ?? base.partOfSpeech,
+            exampleSentence: update.exampleSentence ?? base.exampleSentence,
+            exampleTranslation:
+                update.exampleTranslation ?? base.exampleTranslation,
+            grammarInfo: update.grammarInfo ?? base.grammarInfo,
+            notes: base.notes,
+            sourceContext: base.sourceContext,
+            sourceType: base.sourceType,
+          ).cleaned();
+          _throwIfInvalid(merged);
+          await _writeContent(existing, deck, merged, now, userEdited: false);
+          await (_db.update(
+            _entries,
+          )..where((e) => e.id.equals(existing.id))).write(
+            VocabularyEntriesCompanion(
+              enrichmentMetadata: Value(jsonEncode(update.metadata.toJson())),
+            ),
+          );
+        }
+        return [for (final u in updates) (await getEntry(u.entryId))!];
       });
     });
   }

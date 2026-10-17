@@ -648,5 +648,165 @@
   "scanWordTapToDeselect": "لغو انتخاب",
   "@scanWordTapToDeselect": {
     "description": "Screen-reader hint for a selected word on the scanned page."
-  }
+  },
+  "settingsAi": "هوش مصنوعی",
+  "settingsAiConfigured": "فعال — کلید OpenRouter شما ذخیره شده است",
+  "settingsAiNotConfigured": "غیرفعال — کلید OpenRouter تنظیم نشده",
+  "aiSettingsTitle": "هوش مصنوعی",
+  "aiIntroTitle": "با حساب OpenRouter خودتان",
+  "aiIntroBody": "برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. هزینهٔ هر درخواست از اعتبار حساب OpenRouter شما کم می‌شود. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.",
+  "aiGetKey": "دریافت کلید در openrouter.ai/keys",
+  "aiKeyLabel": "کلید API",
+  "aiKeyNewLabel": "کلید API جدید",
+  "aiKeyShow": "نمایش کلید",
+  "aiKeyHide": "پنهان کردن کلید",
+  "aiKeySave": "ذخیره و بررسی",
+  "aiKeySaved": "کلید ذخیره‌شده: ••••{suffix}",
+  "@aiKeySaved": {
+    "placeholders": {
+      "suffix": {
+        "type": "String"
+      }
+    }
+  },
+  "aiKeySavedNote": "کلید کامل دیگر نمایش داده نمی‌شود.",
+  "aiKeyTest": "بررسی کلید",
+  "aiKeyReplace": "جایگزینی کلید",
+  "aiKeyRemove": "حذف کلید",
+  "aiKeyRemoveTitle": "کلید حذف شود؟",
+  "aiKeyRemoveBody": "کلید از حافظهٔ امن این دستگاه حذف می‌شود. لغت‌ها و معنی‌های ذخیره‌شده دست نمی‌خورند. کلید در حساب OpenRouter شما همچنان فعال است؛ برای باطل کردن آن به openrouter.ai بروید.",
+  "aiKeyRemoved": "کلید حذف شد.",
+  "aiKeySaveFailed": "کلید در فضای امن این دستگاه ذخیره نشد. دوباره تلاش کنید.",
+  "aiKeyRemoveFailed": "کلید از فضای امن این دستگاه حذف نشد. دوباره تلاش کنید.",
+  "aiModelSaveFailed": "انتخاب مدل ذخیره نشد. دوباره تلاش کنید.",
+  "aiKeyProblemEmpty": "کلید را وارد کنید.",
+  "aiKeyProblemWhitespace": "کلید نباید فاصله یا خط جدید داشته باشد.",
+  "aiKeyProblemShort": "این کلید خیلی کوتاه است.",
+  "aiKeyProblemLong": "این کلید خیلی بلند است.",
+  "aiCheckRunning": "در حال بررسی کلید…",
+  "aiCheckPassed": "کلید معتبر است و هوش مصنوعی آماده است.",
+  "aiCheckUsage": "اعتبار مصرف‌شده با این کلید (گزارش OpenRouter): {amount} دلار",
+  "@aiCheckUsage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "aiCheckRemaining": "باقی‌ماندهٔ سقف این کلید: {amount} دلار",
+  "@aiCheckRemaining": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "aiCheckModelUnavailable": "مدل انتخاب‌شده اکنون در OpenRouter با خروجی ساختاریافته در دسترس نیست. مدل دیگری انتخاب کنید.",
+  "aiCheckModelUnknown": "فهرست مدل‌ها بارگیری نشد؛ در دسترس بودن مدل بررسی نشد.",
+  "aiModelLabel": "مدل",
+  "aiModelHelper": "فهرستی منتخب از مدل‌های کم‌هزینه که خروجی ساختاریافته دارند. قیمت‌ها در openrouter.ai آمده است.",
+  "aiPrivacyTitle": "حریم خصوصی و اتصال",
+  "aiPrivacyBody": "فقط وقتی شما درخواست کنید، لغت، جملهٔ آن و معنی‌های فعلی‌اش به OpenRouter و ارائه‌دهندهٔ مدل فرستاده می‌شود. این متن از دستگاه خارج می‌شود و سیاست‌های آن‌ها بر آن اعمال می‌شود. پیشنهاد هوش مصنوعی به اینترنت نیاز دارد؛ بقیهٔ برنامه بدون اینترنت کار می‌کند.",
+  "aiSecurityTitle": "نگهداری کلید",
+  "aiSecurityBody": "کلید در حافظهٔ امن سیستم (Keychain در iOS، Keystore در اندروید) نگه داشته می‌شود؛ هرگز نمایش داده نمی‌شود و در پایگاه داده، گزارش‌ها یا پشتیبان قرار نمی‌گیرد. این کار خطر را کم می‌کند، اما روی دستگاهی آلوده یا دستکاری‌شده، استخراج کلید ناممکن نیست. در OpenRouter برای این کلید سقف اعتبار تعیین کنید.",
+  "enrichTitle": "پیشنهادهای هوش مصنوعی",
+  "enrichAction": "پیشنهاد هوش مصنوعی",
+  "enrichDeckAction": "پیشنهاد برای لغت‌های بدون معنی",
+  "enrichNotConfiguredTitle": "هوش مصنوعی تنظیم نشده است",
+  "enrichNotConfiguredBody": "کلید API حساب OpenRouter خودتان را در تنظیمات وارد کنید. بدون کلید هیچ درخواستی فرستاده نمی‌شود.",
+  "enrichOpenSettings": "تنظیمات هوش مصنوعی",
+  "enrichEmptyTitle": "لغتی برای تکمیل نیست",
+  "enrichEmptyBody": "فقط لغت‌های بدون معنی گروهی پیشنهاد می‌گیرند. برای لغتی که معنی دارد، از صفحهٔ همان لغت درخواست کنید.",
+  "enrichReadyBatch": "{count, plural, other{{count} لغت بدون معنی به OpenRouter فرستاده می‌شود.}} پیش از ذخیره، همهٔ پیشنهادها را بررسی می‌کنید.",
+  "@enrichReadyBatch": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichReadySingle": "این لغت و جملهٔ آن به OpenRouter فرستاده می‌شود. معنی‌ها و اطلاعات فعلی بدون تأیید شما تغییر نمی‌کنند.",
+  "enrichModel": "مدل: {model}",
+  "@enrichModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "enrichStart": "دریافت پیشنهادها",
+  "enrichProgress": "{done} از {total}",
+  "@enrichProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichCancel": "توقف",
+  "enrichStatusQueued": "در صف",
+  "enrichStatusRunning": "در حال دریافت…",
+  "enrichStatusProposed": "پیشنهاد هوش مصنوعی — بررسی کنید",
+  "enrichStatusFailed": "ناموفق",
+  "enrichStatusSkipped": "پیشنهاد تازه‌ای نبود",
+  "enrichNewMeanings": "معنی‌های پیشنهادی",
+  "enrichExistingKept": "معنی‌های فعلی دست نمی‌خورند؛ موارد انتخاب‌شده اضافه می‌شوند.",
+  "enrichDetails": "جزئیات پیشنهادی",
+  "enrichReplaces": "به جای: {current}",
+  "@enrichReplaces": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "enrichAmbiguous": "بدون جملهٔ کامل‌تر، معنی قطعی نیست؛ با دقت بررسی کنید.",
+  "enrichSave": "{count, plural, other{ذخیرهٔ {count} لغت}}",
+  "@enrichSave": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichNothingSelected": "چیزی برای ذخیره انتخاب نشده است.",
+  "enrichRetry": "تلاش دوباره برای موارد ناموفق",
+  "enrichSavedTitle": "پیشنهادها ذخیره شد",
+  "enrichSavedCount": "{count, plural, other{{count} لغت به‌روز شد}}",
+  "@enrichSavedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichCost": "هزینهٔ گزارش‌شده توسط OpenRouter: {amount} دلار",
+  "@enrichCost": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "enrichConflict": "برخی لغت‌ها در این فاصله تغییر کرده‌اند، پس چیزی ذخیره نشد. دوباره پیشنهاد بگیرید.",
+  "aiErrorNotConfigured": "کلید OpenRouter تنظیم نشده است.",
+  "aiErrorInvalidKey": "OpenRouter این کلید را نپذیرفت. کلید را بررسی یا جایگزین کنید.",
+  "aiErrorCredits": "اعتبار حساب یا سقف این کلید در OpenRouter تمام شده است. در openrouter.ai اعتبار اضافه کنید.",
+  "aiErrorForbidden": "OpenRouter یا ارائه‌دهندهٔ مدل این درخواست را رد کرد.",
+  "aiErrorRateLimited": "تعداد درخواست‌ها زیاد است. کمی بعد دوباره امتحان کنید.",
+  "aiErrorTimeout": "پاسخ به‌موقع نرسید. ممکن است OpenRouter درخواست را پردازش کرده و هزینه‌اش را حساب کرده باشد؛ فقط در صورت نیاز دوباره امتحان کنید.",
+  "aiErrorNetwork": "اتصال به اینترنت برقرار نیست. پیشنهاد هوش مصنوعی به اینترنت نیاز دارد.",
+  "aiErrorModel": "مدل انتخاب‌شده در دسترس نیست. مدل دیگری در تنظیمات انتخاب کنید.",
+  "aiErrorBadRequest": "OpenRouter درخواست را نپذیرفت. مدل دیگری را امتحان کنید.",
+  "aiErrorServer": "OpenRouter خطا داد. کمی بعد دوباره امتحان کنید.",
+  "aiErrorMalformed": "پاسخ مدل قابل استفاده نبود. دوباره امتحان کنید یا مدل دیگری انتخاب کنید.",
+  "aiErrorCancelled": "متوقف شد."
 }

@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/widgets/action_tile.dart';
 import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../enrichment/presentation/ai_settings_controller.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     const sectionGap = SizedBox(height: AppSpace.xl);
@@ -45,6 +49,17 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          sectionGap,
+          SectionHeader(l10n.settingsAi),
+          ActionTile(
+            key: const Key('settings.ai'),
+            icon: Icons.auto_awesome_outlined,
+            title: 'OpenRouter',
+            description: ref.watch(aiConfiguredProvider)
+                ? l10n.settingsAiConfigured
+                : l10n.settingsAiNotConfigured,
+            onTap: () => context.go(AppRoutes.aiSettings),
           ),
           sectionGap,
           SectionHeader(l10n.settingsPrivacy),

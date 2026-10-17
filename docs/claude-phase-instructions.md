@@ -6,8 +6,9 @@ phase. They complement the product specification and
 
 ## Approval gates
 
-1. Work only on the phase that is currently approved. Approved now:
-   **Phase 3** (after Phase 2 has been committed separately).
+1. Work only on the phase that is currently approved. Current state:
+   **Phase 4** is implemented and awaiting the product owner's review and
+   commit. Phase 5 is not approved.
 2. At the end of each phase: report and **stop**. Do not start the next phase
    without explicit approval.
 3. Items in the proposed-feature register (P1–P13, Anki `.apkg`) are
@@ -67,9 +68,12 @@ and must be reported that way until real builds run.
 - **Phase 3:** never save every recognized word; do not upload page images;
   explain that OCR can be wrong; provide a typed-text fallback; verify ML Kit
   German support on both platforms before relying on it.
-- **Phase 4:** provider-neutral enrichment interface; secure backend holds the
-  OpenRouter key; mock mode clearly labelled; never claim real AI works when
-  only mocks ran; protect user-edited content.
+- **Phase 4:** provider-neutral enrichment interface; bring your own key
+  (D27/D28): each user's OpenRouter key lives only in OS secure storage and
+  the app calls OpenRouter directly over HTTPS — there is no backend or proxy
+  (a backend is a possible future alternative, not current scope); no request
+  without a saved key and an explicit user action; never claim real AI works
+  when only mocks ran; protect user-edited content.
 - **Phase 5:** use a verified FSRS implementation or document the
   limitation; do not market a simplified scheduler as FSRS; inject a clock;
   do not claim words are permanently learned.

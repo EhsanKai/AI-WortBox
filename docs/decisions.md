@@ -213,3 +213,122 @@ are saved in one transaction, and never overwrite existing meanings. Imports
 do not set `userEditedAt`; meanings typed on the review screen are user
 content either way (entries with meanings are `ready` and are not candidates
 for AI enrichment).
+
+## D27 — Bring your own OpenRouter key; no shared backend (2026-10-16)
+
+Status: accepted (Phase 4, product owner decision). Supersedes the planned
+"minimal backend that holds the OpenRouter key" (architecture/roadmap text
+written before this decision).
+
+- Every user uses their own OpenRouter account and key, so AI usage is
+  billed to that account. There is no developer-owned key, no shared proxy
+  and no fallback key.
+- The app calls the documented OpenRouter API directly
+  (`https://openrouter.ai/api/v1`): `POST /chat/completions`, `GET /key`
+  (key check and reported usage), public `GET /models` (model check, sent
+  without the key). Verified against the official documentation on
+  2026-10-16; no live call has been made from this project.
+- No request is sent without a saved key, and only on an explicit user
+  action ("Get suggestions", "Test key").
+- The integration sits behind `VocabularyEnrichmentService`; a backend-based
+  implementation is a possible future alternative that could replace
+  `OpenRouterEnrichmentService` without changing the review/save logic or
+  the UI. It is not part of the current implementation.
+
+## D28 — The key lives only in OS secure storage (2026-10-16)
+
+Status: accepted (Phase 4).
+
+- `flutter_secure_storage` 11.2.0 (steenbakker.dev, 160/160 pub points;
+  Android minSdk 23, Flutter's default here is 24). iOS: Keychain with
+  `unlocked_this_device` (not synced to iCloud Keychain, not restored to
+  another device). Android: AES-GCM values with the key protected by the
+  Android Keystore (plugin defaults).
+- Android Auto Backup and device transfer exclude exactly the plugin's
+  SharedPreferences files (`res/xml/backup_rules.xml`,
+  `res/xml/data_extraction_rules.xml`); the vocabulary database is still
+  backed up as before.
+- Never in SQLite, ordinary preferences, logs or exceptions
+  (`EnrichmentException` carries only a reason and HTTP status; OpenRouter
+  error messages are not stored). The UI keeps only the last four
+  characters; the full key is never shown after saving. The key field
+  disables autocorrect, suggestions and IME learning.
+- The non-secret model id is stored next to the key to avoid a second
+  storage mechanism.
+- Limitation, also shown in the app: secure storage reduces exposure but a
+  compromised or instrumented device can still extract the key; users are
+  advised to set a credit limit on the key. On iOS, Keychain items can
+  survive app deletion; "Remove key" deletes it explicitly.
+
+## D29 — Structured output and a curated model list (2026-10-16)
+
+Status: accepted (Phase 4).
+
+- Requests use `response_format: json_schema` (strict) and
+  `provider.require_parameters: true`, so OpenRouter routes only to
+  endpoints that support structured outputs. The response is still treated
+  as untrusted and validated (`EnrichmentParser`).
+- Curated models, all listed with `structured_outputs` and without an
+  expiry date in the public model list on 2026-10-16:
+  `anthropic/claude-haiku-5.5` (default), `google/gemini-3.5-flash-lite`,
+  `openai/gpt-5-mini`, `openai/gpt-4o-mini`,
+  `mistralai/mistral-small-3.2-24b-instruct`. "Test key" checks the selected
+  model against the live list. No live model picker in Phase 4.
+- Costs: only the `usage.cost` OpenRouter reports per response and the key
+  usage from `GET /key` are shown. Nothing is estimated.
+
+## D30 — Review before save; additions only; no migration (2026-10-16)
+
+Status: accepted (Phase 4).
+
+- Nothing is written until the user reviews the proposal. Existing meanings
+  are never removed or changed; only new meanings can be added. Empty fields
+  are preselected for filling; fields with content are offered only as
+  explicit replacements (never preselected). For entries that already have
+  meanings, nothing is preselected.
+- Batches include only entries without meanings (`missing`/`failed`, at most
+  50). Entries with meanings are enriched only on request from their own
+  page.
+- Saving uses `VocabularyRepository.applyEnrichments`: one transaction,
+  optimistic check of each entry's `updatedAt` (any change since the
+  proposal aborts the whole save), additions/fills only, `enrichmentStatus`
+  `ready`, metadata (provider, model, time, ambiguity) in the existing
+  `enrichment_metadata` column. `userEditedAt` and flashcards are never
+  touched. Failed or cancelled requests write nothing (status is not set to
+  `pending`/`failed` in the database).
+- The v1 schema already had every needed column; no migration.
+
+## D31 — `http` and `url_launcher` (2026-10-16)
+
+Status: accepted (Phase 4).
+
+- `http` 1.6.0 (dart.dev, 160/160): HTTPS client; `MockClient` makes every
+  automated test network-free. Was already a transitive dependency.
+- `url_launcher` 6.3.x (flutter.dev, Flutter Favorite): opens
+  `https://openrouter.ai/keys` in the browser. Android 11+ needs the
+  `<queries>` entry for https added to the manifest.
+- The release Android manifest now declares `INTERNET` (Flutter adds it only
+  to debug/profile builds).
+
+## D32 — No automatic retry of possibly billed requests; visible storage errors (2026-10-17)
+
+Status: accepted (Phase 4 hardening).
+
+- Generation is billed per request. A client timeout, a dropped
+  connection, HTTP 408/500/502, or a 200 response carrying an `error`
+  object do not prove that nothing was generated, so repeating them
+  automatically could bill the user twice. These fail at once; the item is
+  marked failed and the user can choose "Retry failed items". The timeout
+  message says the request may already have been processed and charged.
+- Automatic retries (at most 2, backoff or capped `Retry-After`) remain only
+  for statuses with which OpenRouter refuses a request before routing it to
+  a model: 429 (rate limit), 503 (no provider meets the routing
+  requirements) and 402 with `Retry-After` (temporary in-flight budget).
+  This classification follows OpenRouter's documented error codes; whether
+  OpenRouter bills any failed request has not been verified with a live
+  account.
+- The key check (`GET /key`) and model list are free and not retried.
+- Secure-storage failures when saving, replacing or removing the key, or
+  saving the model, are shown in Settings → AI. No success state is shown
+  unless the write succeeded; after a failure the screen re-reads the stored
+  key. Errors carry only the platform error code, never the key.

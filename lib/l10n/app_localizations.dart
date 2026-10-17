@@ -1609,6 +1609,498 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'لغو انتخاب'**
   String get scanWordTapToDeselect;
+
+  /// No description provided for @settingsAi.
+  ///
+  /// In fa, this message translates to:
+  /// **'هوش مصنوعی'**
+  String get settingsAi;
+
+  /// No description provided for @settingsAiConfigured.
+  ///
+  /// In fa, this message translates to:
+  /// **'فعال — کلید OpenRouter شما ذخیره شده است'**
+  String get settingsAiConfigured;
+
+  /// No description provided for @settingsAiNotConfigured.
+  ///
+  /// In fa, this message translates to:
+  /// **'غیرفعال — کلید OpenRouter تنظیم نشده'**
+  String get settingsAiNotConfigured;
+
+  /// No description provided for @aiSettingsTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'هوش مصنوعی'**
+  String get aiSettingsTitle;
+
+  /// No description provided for @aiIntroTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'با حساب OpenRouter خودتان'**
+  String get aiIntroTitle;
+
+  /// No description provided for @aiIntroBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. هزینهٔ هر درخواست از اعتبار حساب OpenRouter شما کم می‌شود. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.'**
+  String get aiIntroBody;
+
+  /// No description provided for @aiGetKey.
+  ///
+  /// In fa, this message translates to:
+  /// **'دریافت کلید در openrouter.ai/keys'**
+  String get aiGetKey;
+
+  /// No description provided for @aiKeyLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید API'**
+  String get aiKeyLabel;
+
+  /// No description provided for @aiKeyNewLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید API جدید'**
+  String get aiKeyNewLabel;
+
+  /// No description provided for @aiKeyShow.
+  ///
+  /// In fa, this message translates to:
+  /// **'نمایش کلید'**
+  String get aiKeyShow;
+
+  /// No description provided for @aiKeyHide.
+  ///
+  /// In fa, this message translates to:
+  /// **'پنهان کردن کلید'**
+  String get aiKeyHide;
+
+  /// No description provided for @aiKeySave.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره و بررسی'**
+  String get aiKeySave;
+
+  /// No description provided for @aiKeySaved.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید ذخیره‌شده: ••••{suffix}'**
+  String aiKeySaved(String suffix);
+
+  /// No description provided for @aiKeySavedNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید کامل دیگر نمایش داده نمی‌شود.'**
+  String get aiKeySavedNote;
+
+  /// No description provided for @aiKeyTest.
+  ///
+  /// In fa, this message translates to:
+  /// **'بررسی کلید'**
+  String get aiKeyTest;
+
+  /// No description provided for @aiKeyReplace.
+  ///
+  /// In fa, this message translates to:
+  /// **'جایگزینی کلید'**
+  String get aiKeyReplace;
+
+  /// No description provided for @aiKeyRemove.
+  ///
+  /// In fa, this message translates to:
+  /// **'حذف کلید'**
+  String get aiKeyRemove;
+
+  /// No description provided for @aiKeyRemoveTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید حذف شود؟'**
+  String get aiKeyRemoveTitle;
+
+  /// No description provided for @aiKeyRemoveBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید از حافظهٔ امن این دستگاه حذف می‌شود. لغت‌ها و معنی‌های ذخیره‌شده دست نمی‌خورند. کلید در حساب OpenRouter شما همچنان فعال است؛ برای باطل کردن آن به openrouter.ai بروید.'**
+  String get aiKeyRemoveBody;
+
+  /// No description provided for @aiKeyRemoved.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید حذف شد.'**
+  String get aiKeyRemoved;
+
+  /// No description provided for @aiKeySaveFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید در فضای امن این دستگاه ذخیره نشد. دوباره تلاش کنید.'**
+  String get aiKeySaveFailed;
+
+  /// No description provided for @aiKeyRemoveFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید از فضای امن این دستگاه حذف نشد. دوباره تلاش کنید.'**
+  String get aiKeyRemoveFailed;
+
+  /// No description provided for @aiModelSaveFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب مدل ذخیره نشد. دوباره تلاش کنید.'**
+  String get aiModelSaveFailed;
+
+  /// No description provided for @aiKeyProblemEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید را وارد کنید.'**
+  String get aiKeyProblemEmpty;
+
+  /// No description provided for @aiKeyProblemWhitespace.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید نباید فاصله یا خط جدید داشته باشد.'**
+  String get aiKeyProblemWhitespace;
+
+  /// No description provided for @aiKeyProblemShort.
+  ///
+  /// In fa, this message translates to:
+  /// **'این کلید خیلی کوتاه است.'**
+  String get aiKeyProblemShort;
+
+  /// No description provided for @aiKeyProblemLong.
+  ///
+  /// In fa, this message translates to:
+  /// **'این کلید خیلی بلند است.'**
+  String get aiKeyProblemLong;
+
+  /// No description provided for @aiCheckRunning.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال بررسی کلید…'**
+  String get aiCheckRunning;
+
+  /// No description provided for @aiCheckPassed.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید معتبر است و هوش مصنوعی آماده است.'**
+  String get aiCheckPassed;
+
+  /// No description provided for @aiCheckUsage.
+  ///
+  /// In fa, this message translates to:
+  /// **'اعتبار مصرف‌شده با این کلید (گزارش OpenRouter): {amount} دلار'**
+  String aiCheckUsage(String amount);
+
+  /// No description provided for @aiCheckRemaining.
+  ///
+  /// In fa, this message translates to:
+  /// **'باقی‌ماندهٔ سقف این کلید: {amount} دلار'**
+  String aiCheckRemaining(String amount);
+
+  /// No description provided for @aiCheckModelUnavailable.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل انتخاب‌شده اکنون در OpenRouter با خروجی ساختاریافته در دسترس نیست. مدل دیگری انتخاب کنید.'**
+  String get aiCheckModelUnavailable;
+
+  /// No description provided for @aiCheckModelUnknown.
+  ///
+  /// In fa, this message translates to:
+  /// **'فهرست مدل‌ها بارگیری نشد؛ در دسترس بودن مدل بررسی نشد.'**
+  String get aiCheckModelUnknown;
+
+  /// No description provided for @aiModelLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل'**
+  String get aiModelLabel;
+
+  /// No description provided for @aiModelHelper.
+  ///
+  /// In fa, this message translates to:
+  /// **'فهرستی منتخب از مدل‌های کم‌هزینه که خروجی ساختاریافته دارند. قیمت‌ها در openrouter.ai آمده است.'**
+  String get aiModelHelper;
+
+  /// No description provided for @aiPrivacyTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'حریم خصوصی و اتصال'**
+  String get aiPrivacyTitle;
+
+  /// No description provided for @aiPrivacyBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط وقتی شما درخواست کنید، لغت، جملهٔ آن و معنی‌های فعلی‌اش به OpenRouter و ارائه‌دهندهٔ مدل فرستاده می‌شود. این متن از دستگاه خارج می‌شود و سیاست‌های آن‌ها بر آن اعمال می‌شود. پیشنهاد هوش مصنوعی به اینترنت نیاز دارد؛ بقیهٔ برنامه بدون اینترنت کار می‌کند.'**
+  String get aiPrivacyBody;
+
+  /// No description provided for @aiSecurityTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'نگهداری کلید'**
+  String get aiSecurityTitle;
+
+  /// No description provided for @aiSecurityBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید در حافظهٔ امن سیستم (Keychain در iOS، Keystore در اندروید) نگه داشته می‌شود؛ هرگز نمایش داده نمی‌شود و در پایگاه داده، گزارش‌ها یا پشتیبان قرار نمی‌گیرد. این کار خطر را کم می‌کند، اما روی دستگاهی آلوده یا دستکاری‌شده، استخراج کلید ناممکن نیست. در OpenRouter برای این کلید سقف اعتبار تعیین کنید.'**
+  String get aiSecurityBody;
+
+  /// No description provided for @enrichTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیشنهادهای هوش مصنوعی'**
+  String get enrichTitle;
+
+  /// No description provided for @enrichAction.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیشنهاد هوش مصنوعی'**
+  String get enrichAction;
+
+  /// No description provided for @enrichDeckAction.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیشنهاد برای لغت‌های بدون معنی'**
+  String get enrichDeckAction;
+
+  /// No description provided for @enrichNotConfiguredTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'هوش مصنوعی تنظیم نشده است'**
+  String get enrichNotConfiguredTitle;
+
+  /// No description provided for @enrichNotConfiguredBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید API حساب OpenRouter خودتان را در تنظیمات وارد کنید. بدون کلید هیچ درخواستی فرستاده نمی‌شود.'**
+  String get enrichNotConfiguredBody;
+
+  /// No description provided for @enrichOpenSettings.
+  ///
+  /// In fa, this message translates to:
+  /// **'تنظیمات هوش مصنوعی'**
+  String get enrichOpenSettings;
+
+  /// No description provided for @enrichEmptyTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغتی برای تکمیل نیست'**
+  String get enrichEmptyTitle;
+
+  /// No description provided for @enrichEmptyBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط لغت‌های بدون معنی گروهی پیشنهاد می‌گیرند. برای لغتی که معنی دارد، از صفحهٔ همان لغت درخواست کنید.'**
+  String get enrichEmptyBody;
+
+  /// No description provided for @enrichReadyBatch.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت بدون معنی به OpenRouter فرستاده می‌شود.}} پیش از ذخیره، همهٔ پیشنهادها را بررسی می‌کنید.'**
+  String enrichReadyBatch(int count);
+
+  /// No description provided for @enrichReadySingle.
+  ///
+  /// In fa, this message translates to:
+  /// **'این لغت و جملهٔ آن به OpenRouter فرستاده می‌شود. معنی‌ها و اطلاعات فعلی بدون تأیید شما تغییر نمی‌کنند.'**
+  String get enrichReadySingle;
+
+  /// No description provided for @enrichModel.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل: {model}'**
+  String enrichModel(String model);
+
+  /// No description provided for @enrichStart.
+  ///
+  /// In fa, this message translates to:
+  /// **'دریافت پیشنهادها'**
+  String get enrichStart;
+
+  /// No description provided for @enrichProgress.
+  ///
+  /// In fa, this message translates to:
+  /// **'{done} از {total}'**
+  String enrichProgress(int done, int total);
+
+  /// No description provided for @enrichCancel.
+  ///
+  /// In fa, this message translates to:
+  /// **'توقف'**
+  String get enrichCancel;
+
+  /// No description provided for @enrichStatusQueued.
+  ///
+  /// In fa, this message translates to:
+  /// **'در صف'**
+  String get enrichStatusQueued;
+
+  /// No description provided for @enrichStatusRunning.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال دریافت…'**
+  String get enrichStatusRunning;
+
+  /// No description provided for @enrichStatusProposed.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیشنهاد هوش مصنوعی — بررسی کنید'**
+  String get enrichStatusProposed;
+
+  /// No description provided for @enrichStatusFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'ناموفق'**
+  String get enrichStatusFailed;
+
+  /// No description provided for @enrichStatusSkipped.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیشنهاد تازه‌ای نبود'**
+  String get enrichStatusSkipped;
+
+  /// No description provided for @enrichNewMeanings.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی‌های پیشنهادی'**
+  String get enrichNewMeanings;
+
+  /// No description provided for @enrichExistingKept.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی‌های فعلی دست نمی‌خورند؛ موارد انتخاب‌شده اضافه می‌شوند.'**
+  String get enrichExistingKept;
+
+  /// No description provided for @enrichDetails.
+  ///
+  /// In fa, this message translates to:
+  /// **'جزئیات پیشنهادی'**
+  String get enrichDetails;
+
+  /// No description provided for @enrichReplaces.
+  ///
+  /// In fa, this message translates to:
+  /// **'به جای: {current}'**
+  String enrichReplaces(String current);
+
+  /// No description provided for @enrichAmbiguous.
+  ///
+  /// In fa, this message translates to:
+  /// **'بدون جملهٔ کامل‌تر، معنی قطعی نیست؛ با دقت بررسی کنید.'**
+  String get enrichAmbiguous;
+
+  /// No description provided for @enrichSave.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{ذخیرهٔ {count} لغت}}'**
+  String enrichSave(int count);
+
+  /// No description provided for @enrichNothingSelected.
+  ///
+  /// In fa, this message translates to:
+  /// **'چیزی برای ذخیره انتخاب نشده است.'**
+  String get enrichNothingSelected;
+
+  /// No description provided for @enrichRetry.
+  ///
+  /// In fa, this message translates to:
+  /// **'تلاش دوباره برای موارد ناموفق'**
+  String get enrichRetry;
+
+  /// No description provided for @enrichSavedTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیشنهادها ذخیره شد'**
+  String get enrichSavedTitle;
+
+  /// No description provided for @enrichSavedCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت به‌روز شد}}'**
+  String enrichSavedCount(int count);
+
+  /// No description provided for @enrichCost.
+  ///
+  /// In fa, this message translates to:
+  /// **'هزینهٔ گزارش‌شده توسط OpenRouter: {amount} دلار'**
+  String enrichCost(String amount);
+
+  /// No description provided for @enrichConflict.
+  ///
+  /// In fa, this message translates to:
+  /// **'برخی لغت‌ها در این فاصله تغییر کرده‌اند، پس چیزی ذخیره نشد. دوباره پیشنهاد بگیرید.'**
+  String get enrichConflict;
+
+  /// No description provided for @aiErrorNotConfigured.
+  ///
+  /// In fa, this message translates to:
+  /// **'کلید OpenRouter تنظیم نشده است.'**
+  String get aiErrorNotConfigured;
+
+  /// No description provided for @aiErrorInvalidKey.
+  ///
+  /// In fa, this message translates to:
+  /// **'OpenRouter این کلید را نپذیرفت. کلید را بررسی یا جایگزین کنید.'**
+  String get aiErrorInvalidKey;
+
+  /// No description provided for @aiErrorCredits.
+  ///
+  /// In fa, this message translates to:
+  /// **'اعتبار حساب یا سقف این کلید در OpenRouter تمام شده است. در openrouter.ai اعتبار اضافه کنید.'**
+  String get aiErrorCredits;
+
+  /// No description provided for @aiErrorForbidden.
+  ///
+  /// In fa, this message translates to:
+  /// **'OpenRouter یا ارائه‌دهندهٔ مدل این درخواست را رد کرد.'**
+  String get aiErrorForbidden;
+
+  /// No description provided for @aiErrorRateLimited.
+  ///
+  /// In fa, this message translates to:
+  /// **'تعداد درخواست‌ها زیاد است. کمی بعد دوباره امتحان کنید.'**
+  String get aiErrorRateLimited;
+
+  /// No description provided for @aiErrorTimeout.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ به‌موقع نرسید. ممکن است OpenRouter درخواست را پردازش کرده و هزینه‌اش را حساب کرده باشد؛ فقط در صورت نیاز دوباره امتحان کنید.'**
+  String get aiErrorTimeout;
+
+  /// No description provided for @aiErrorNetwork.
+  ///
+  /// In fa, this message translates to:
+  /// **'اتصال به اینترنت برقرار نیست. پیشنهاد هوش مصنوعی به اینترنت نیاز دارد.'**
+  String get aiErrorNetwork;
+
+  /// No description provided for @aiErrorModel.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل انتخاب‌شده در دسترس نیست. مدل دیگری در تنظیمات انتخاب کنید.'**
+  String get aiErrorModel;
+
+  /// No description provided for @aiErrorBadRequest.
+  ///
+  /// In fa, this message translates to:
+  /// **'OpenRouter درخواست را نپذیرفت. مدل دیگری را امتحان کنید.'**
+  String get aiErrorBadRequest;
+
+  /// No description provided for @aiErrorServer.
+  ///
+  /// In fa, this message translates to:
+  /// **'OpenRouter خطا داد. کمی بعد دوباره امتحان کنید.'**
+  String get aiErrorServer;
+
+  /// No description provided for @aiErrorMalformed.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ مدل قابل استفاده نبود. دوباره امتحان کنید یا مدل دیگری انتخاب کنید.'**
+  String get aiErrorMalformed;
+
+  /// No description provided for @aiErrorCancelled.
+  ///
+  /// In fa, this message translates to:
+  /// **'متوقف شد.'**
+  String get aiErrorCancelled;
 }
 
 class _AppLocalizationsDelegate

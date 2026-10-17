@@ -4,11 +4,15 @@ import 'package:ai_wortbox/core/id/id_generator.dart';
 import 'package:ai_wortbox/core/time/clock.dart';
 import 'package:ai_wortbox/data/database/app_database.dart';
 import 'package:ai_wortbox/features/csv_import/data/csv_file_source.dart';
+import 'package:ai_wortbox/features/enrichment/data/ai_settings_store.dart';
 import 'package:ai_wortbox/features/scan/data/scan_image_source.dart';
 import 'package:ai_wortbox/features/scan/data/text_recognition_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+
+import 'ai_fakes.dart';
 
 /// Returns a fixed file, or null to simulate cancelling the picker.
 class FakeCsvFileSource implements CsvFileSource {
@@ -31,6 +35,9 @@ Future<void> pumpApp(
   CsvFileSource? fileSource,
   ScanImageSource? imageSource,
   TextRecognitionEngine? recognitionEngine,
+  AiSettingsStore? aiSettings,
+  http.Client? httpClient,
+  List<Uri>? launchedUrls,
   Size size = const Size(390, 844),
   double textScale = 1,
   Brightness brightness = Brightness.light,
@@ -59,6 +66,15 @@ Future<void> pumpApp(
           scanImageSourceProvider.overrideWithValue(imageSource),
         if (recognitionEngine != null)
           textRecognitionEngineProvider.overrideWithValue(recognitionEngine),
+        // Never the real Keychain/Keystore or the network in tests.
+        aiSettingsStoreProvider.overrideWithValue(
+          aiSettings ?? InMemoryAiSettingsStore(),
+        ),
+        httpClientProvider.overrideWithValue(httpClient ?? noNetworkClient),
+        urlLauncherProvider.overrideWithValue((uri) async {
+          launchedUrls?.add(uri);
+          return true;
+        }),
       ],
       retry: (_, _) => null,
       child: AiWortBoxApp(initialLocation: initialLocation),

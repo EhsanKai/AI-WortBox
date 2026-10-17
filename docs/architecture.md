@@ -132,7 +132,7 @@ database state, so the result does not depend on a stale preview. Any failure
 rolls back the whole import. Files above 256 KB are parsed on a background
 isolate.
 
-## Page scanning (Phase 3 — implemented, awaiting commit)
+## Page scanning (Phase 3)
 
 Photo or gallery image → on-device OCR → word/expression selection →
 review and correction → transactional save. No schema change (uses the v1
@@ -208,11 +208,56 @@ ScanReviewItem.toDraft          ─▶ VocabularyRepository.importEntries
 - `main.dart` installs `FlutterError.onError` / `PlatformDispatcher.onError`
   handlers that log locally only.
 
-## Security (planned for Phase 4)
+## AI enrichment (Phase 4 — implemented, awaiting commit)
 
-The app never contains OpenRouter credentials. A minimal backend holds the key
-and exposes `POST /api/v1/vocabulary/enrich`; the app sends only the selected
-words and their sentence context.
+Bring your own key: each user's OpenRouter key in OS secure storage, direct
+HTTPS calls from the app, no backend or proxy (D27, D28). A backend is a
+possible future alternative behind `VocabularyEnrichmentService`; it is not
+implemented.
+
+```
+EnrichmentScreen ── EnrichmentController ── VocabularyRepository.applyEnrichments
+                         │                     (one transaction, additions only)
+                         ├─ EnrichmentPlan (review rules)
+                         └─ VocabularyEnrichmentService (interface)
+                                └─ OpenRouterEnrichmentService
+                                     ├─ AiSettingsStore (key + model, OS secure storage)
+                                     └─ OpenRouterClient ──HTTPS──▶ openrouter.ai/api/v1
+```
+
+- **Domain** (`features/enrichment/domain`): `EnrichmentRequest` (word,
+  sentence context, existing meanings — nothing else is sent),
+  `EnrichmentProposal`, the strict JSON schema and `EnrichmentParser`
+  (Persian meanings, German example + Persian translation as a pair,
+  German lemma, length limits, control characters removed),
+  `EnrichmentPlan` (what may be added or filled, defaults), the curated
+  `AiModelCatalog`.
+- **Data** (`features/enrichment/data`): `OpenRouterClient` maps the
+  documented statuses (400/401/402/403/408/429/502/503, and 200 with an
+  `error` body). It retries automatically only requests OpenRouter rejected
+  before any model ran (429, 503, 402 with `Retry-After`), at most twice,
+  with backoff or `Retry-After` (capped at 20 s). Client timeouts (45 s),
+  network failures, 408/500/502 and 200-with-error fail at once and are
+  retried only by the user (D32). Supports cancellation.
+  `SecureAiSettingsStore` wraps `flutter_secure_storage`; a failed key or
+  model write is shown in Settings → AI, and the screen then shows the key
+  that is actually stored.
+- **Presentation**: Settings → AI (explanation, link to openrouter.ai/keys,
+  hidden key field, test, replace, remove, model, privacy and security
+  notes); AI suggestions from a deck (entries without meanings) or from one
+  entry; review with per-meaning and per-field checkboxes.
+- **Offline**: nothing AI-related runs without a user action; without a
+  connection requests fail with a network message and nothing changes. All
+  other features are unaffected.
+
+## Security
+
+- No API key in the source, assets, build configuration or the app bundle.
+  The user's key is stored only in OS secure storage (D28), sent only in the
+  `Authorization` header to `openrouter.ai`, and never logged or put into
+  exceptions.
+- Only the selected word, its sentence context and its current meanings are
+  sent, and only when the user asks.
 
 ## Planned extension points (proposed — not approved)
 
