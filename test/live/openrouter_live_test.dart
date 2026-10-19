@@ -1,10 +1,9 @@
 // Opt-in live test against the real OpenRouter API. Skipped unless the
-// environment provides a key; it spends a small amount of that account's
-// credits. Never commit a key.
+// environment provides a key. It runs in free-only mode (the default), so
+// it uses free models only and costs nothing, but it counts against the
+// account's daily free requests. Never commit a key.
 //
 //   OPENROUTER_API_KEY=sk-or-... flutter test test/live/openrouter_live_test.dart
-//
-// Optional: OPENROUTER_MODEL=<catalog model id>.
 @Tags(['live'])
 library;
 

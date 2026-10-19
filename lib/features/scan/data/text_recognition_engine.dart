@@ -4,6 +4,7 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 
 import '../../../core/error/app_exception.dart';
 import '../domain/scan_text.dart';
+import 'image_cropper.dart';
 import 'scan_image_source.dart';
 
 /// On-device text recognition. Abstracted so the engine can be replaced and
@@ -39,14 +40,42 @@ class MlKitTextRecognitionEngine implements TextRecognitionEngine {
       final result = await recognizer.processImage(
         InputImage.fromFilePath(image.path),
       );
-      return ScanText.fromRecognizedBlocks([
-        for (final block in result.blocks)
-          [for (final line in block.lines) (line.text, line.boundingBox)],
-      ], rawText: result.text);
+      return ScanText.fromOcrLayout(
+        [
+          for (final block in result.blocks)
+            [
+              for (final line in block.lines)
+                OcrLine(
+                  line.text,
+                  box: line.boundingBox,
+                  elements: [
+                    for (final element in line.elements)
+                      OcrElement(
+                        element.text,
+                        element.boundingBox,
+                        confidence: element.confidence,
+                      ),
+                  ],
+                ),
+            ],
+        ],
+        rawText: result.text,
+        imageSize: await _imageSize(image),
+      );
     } on PlatformException catch (e) {
       throw ScanException(ScanError.ocrFailed, e);
     } on MissingPluginException catch (e) {
       throw ScanException(ScanError.ocrUnavailable, e);
+    }
+  }
+
+  /// Without the size, words cannot be placed on the photo; the text view
+  /// still works.
+  Future<Size?> _imageSize(PickedImage image) async {
+    try {
+      return await readImageSize(image.path);
+    } on Object {
+      return null;
     }
   }
 

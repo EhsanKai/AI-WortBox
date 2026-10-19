@@ -8,11 +8,16 @@ import '../features/decks/presentation/deck_detail_screen.dart';
 import '../features/decks/presentation/decks_screen.dart';
 import '../features/enrichment/presentation/ai_settings_screen.dart';
 import '../features/enrichment/presentation/enrichment_screen.dart';
+import '../features/reminders/presentation/reminder_screen.dart';
+import '../features/review/presentation/practice_controller.dart';
+import '../features/review/presentation/practice_screen.dart';
 import '../features/scan/presentation/scan_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/statistics/presentation/statistics_screen.dart';
+import '../features/tags/presentation/tags_screen.dart';
 import '../features/vocabulary/presentation/entry_detail_screen.dart';
 import '../features/vocabulary/presentation/vocabulary_form_screen.dart';
+import '../features/vocabulary/presentation/vocabulary_search_screen.dart';
 import 'shell.dart';
 
 abstract final class AppRoutes {
@@ -26,6 +31,26 @@ abstract final class AppRoutes {
   static const csvImport = '$add/csv';
   static const scan = '$add/scan';
   static const aiSettings = '$settings/ai';
+  static const reminders = '$settings/reminder';
+  static const ankiImport = '$add/anki';
+  static const search = '$words/search';
+  static const tags = '$words/tags';
+  static const practice = '$today/practice';
+
+  /// A scheduled (FSRS) review session, or free practice with [free] or
+  /// [difficultOnly].
+  static String practiceSession({
+    String? deckId,
+    bool difficultOnly = false,
+    bool free = false,
+  }) => Uri(
+    path: '$practice/session',
+    queryParameters: {
+      'deckId': ?deckId,
+      if (difficultOnly) 'difficult': '1',
+      if (free) 'free': '1',
+    },
+  ).toString();
 
   static String deck(String id) => '$words/decks/${Uri.encodeComponent(id)}';
 
@@ -59,6 +84,25 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
             GoRoute(
               path: AppRoutes.today,
               builder: (_, _) => const TodayScreen(),
+              routes: [
+                GoRoute(
+                  path: 'practice',
+                  builder: (_, _) => const PracticeSetupScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'session',
+                      builder: (_, state) => PracticeSessionScreen(
+                        config: PracticeConfig(
+                          deckId: state.uri.queryParameters['deckId'],
+                          difficultOnly:
+                              state.uri.queryParameters['difficult'] == '1',
+                          scheduled: state.uri.queryParameters['free'] != '1',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -68,6 +112,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
               path: AppRoutes.words,
               builder: (_, _) => const DecksScreen(),
               routes: [
+                GoRoute(
+                  path: 'search',
+                  builder: (_, _) => const VocabularySearchScreen(),
+                ),
+                GoRoute(path: 'tags', builder: (_, _) => const TagsScreen()),
                 GoRoute(
                   path: 'decks/:deckId',
                   builder: (_, state) =>
@@ -150,6 +199,13 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                     initialDeckId: state.uri.queryParameters['deckId'],
                   ),
                 ),
+                GoRoute(
+                  path: 'anki',
+                  builder: (_, state) => CsvImportScreen(
+                    initialDeckId: state.uri.queryParameters['deckId'],
+                    anki: true,
+                  ),
+                ),
               ],
             ),
           ],
@@ -171,6 +227,10 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                 GoRoute(
                   path: 'ai',
                   builder: (_, _) => const AiSettingsScreen(),
+                ),
+                GoRoute(
+                  path: 'reminder',
+                  builder: (_, _) => const ReminderScreen(),
                 ),
               ],
             ),

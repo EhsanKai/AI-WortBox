@@ -43,6 +43,14 @@ class AddVocabularyScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpace.md),
           ActionTile(
+            key: const Key('add.anki'),
+            icon: Icons.style_outlined,
+            title: l10n.ankiImportTitle,
+            description: l10n.ankiImportDescription,
+            onTap: () => context.go(AppRoutes.ankiImport),
+          ),
+          const SizedBox(height: AppSpace.md),
+          ActionTile(
             key: const Key('add.scan'),
             icon: Icons.document_scanner_outlined,
             title: l10n.addScan,

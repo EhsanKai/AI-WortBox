@@ -73,19 +73,35 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             _ => l10n.scanTitle,
           }),
           actions: [
+            if (state.step == ScanStep.select && state.canShowImage)
+              IconButton(
+                key: const Key('scan.toggleView'),
+                tooltip: state.view == ScanView.image
+                    ? l10n.scanViewText
+                    : l10n.scanViewImage,
+                icon: Icon(
+                  state.view == ScanView.image
+                      ? Icons.notes
+                      : Icons.image_outlined,
+                ),
+                onPressed: () => controller.setView(
+                  state.view == ScanView.image ? ScanView.text : ScanView.image,
+                ),
+              ),
             if (state.step == ScanStep.select &&
                 (state.document?.hasWords ?? false)) ...[
-              IconButton(
-                key: const Key('scan.editText'),
-                tooltip: l10n.scanEditText,
-                icon: const Icon(Icons.edit_note),
-                onPressed: () => _editText(context, state),
-              ),
+              if (state.view == ScanView.text || !state.canShowImage)
+                IconButton(
+                  key: const Key('scan.editText'),
+                  tooltip: l10n.scanEditText,
+                  icon: const Icon(Icons.edit_note),
+                  onPressed: () => _editText(context, state),
+                ),
               IconButton(
                 key: const Key('scan.clearSelection'),
                 tooltip: l10n.scanClearSelection,
                 icon: const Icon(Icons.deselect),
-                onPressed: state.selection.isEmpty
+                onPressed: state.selectedCount == 0
                     ? null
                     : controller.clearSelection,
               ),

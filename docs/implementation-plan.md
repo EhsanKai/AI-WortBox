@@ -27,7 +27,7 @@ to formatting, static analysis and host-side automated tests.
 | 2 | Vocabulary management and CSV import | **Complete** (`bbc9877`) |
 | 3 | Photo/gallery input, German OCR, word and expression selection | **Complete** (`77287d7`) |
 | 4 | AI enrichment with the user's own OpenRouter key (BYOK) | **Complete** (`eaa0278`); live OpenRouter and real-device/platform verification outstanding |
-| 5 | FSRS review, release preparation | Planned (original specification), plus proposed extensions |
+| 5 | Search, tags, export, Anki, TTS, reminders, practice and statistics (scope selected by the product owner) | **Implemented — awaiting commit**; platform builds and real-device checks outstanding |
 
 ## Phase 1 — Foundation and local persistence — Complete (`73fa370`)
 
@@ -132,52 +132,59 @@ Proposed extensions in this phase (not approved): improved lemma and
 inflected-form duplicate handling (P4), rich editable grammar data (P11),
 user-added images and image suggestions (P13). See the register below.
 
-## Phase 5 — FSRS review and release preparation
+## Phase 5 — Selected features — Implemented, awaiting commit
 
-Planned (original specification):
+The product owner selected the Phase 5 scope explicitly: proposals P1, P2,
+P3 (CSV export only), P6, P7, P8, P9, P10 and Anki import/export. They are
+implemented as described below and in `docs/architecture.md` (decisions
+D33–D40). Schema **v2** (one additive migration with tests from real v1
+data).
 
-- Scheduler adapter around a verified Dart FSRS implementation (`fsrs` 2.x
-  inspected in Phase 1); new/learning/review/relearning, lapses, overdue
-  cards, interrupted sessions, deterministic due dates with an injected clock.
-- Daily queue respecting each deck's new-card limit; review UI (German first,
-  reveal Persian; Again/Hard/Good/Easy with Persian labels); completion
-  summary; duplicate-submission protection.
-- Review log table (schema v2 migration) and basic statistics (totals, new,
-  due, reviews, progress over time), without claiming words are permanently
-  learned.
-- Creation of flashcards for existing entries (D16).
-- Final end-to-end QA, offline/restart/RTL checks, platform build checks where
-  toolchains exist, complete README.
+| Feature | What is implemented |
+| --- | --- |
+| A — Search and filters (P1) | Search across all decks or within a deck, on the German word, base form and Persian meanings, in the database (`search_key`, `instr()`); filters for tag and difficult words; clear and no-result states. |
+| B — Tags (P2) | Create, rename, delete (assignments removed, words kept), several tags per word, case/space-insensitive uniqueness, tag filter; CSV and Anki imports create and assign tags. |
+| C — CSV export (P3, export part) | Per deck, UTF-8 with BOM, importer-compatible headers, tags included; saved with the system save dialog. **Not a backup** (see README). |
+| D — German TTS (P6) | System text-to-speech (`de-DE`) for the word and example sentence; missing voices and engine errors are reported. |
+| E — Study reminder (P7) | One daily local notification at a chosen time; permission asked only when turned on; inexact on Android; settings stored locally; re-created at app start. |
+| F — Statistics and streaks (P8) | Totals, recorded answers, sessions, study days, current and longest streak, last 14 days — only from recorded practice answers, with a documented local-day policy. |
+| G — Difficult words (P9, manual part) | Manual mark per word, list badge, filters, difficult-only practice. No automatic detection. |
+| H — Reverse practice (P10, as free practice) | Persian → German: meaning first, reveal, "remembered"/"not remembered" recorded as review events. Not scheduled: no FSRS state is read or written. Superseded for scheduled review by D42–D43 (FSRS, direction setting); free practice keeps this behaviour. |
+| I — Anki | Import of `.apkg` (modern `collection.anki21b` and legacy `collection.anki21`/`.anki2`) through the import preview; export of `.apkg` (legacy schema 11) verified with the official Anki importer (see `docs/testing.md`). |
 
-Proposed extensions in this phase (not approved): reverse-direction cards
-(P10, see note), local reminders (P7), streaks and progress statistics (P8),
-difficult-word review (P9), search and filters (P1), tags (P2), CSV export
-and backup/restore (P3), Anki interoperability (see below), German
-text-to-speech (P6).
+Added after the Phase 5 scope on the product owner's request (D42–D47):
+FSRS-scheduled review with a daily due queue and lazily created cards
+(fulfilling D16), the review-direction setting, answers hidden in decks,
+word selection on the page photo, the iOS speech fix and bulk delete.
 
-## Proposed feature register (not approved)
+Still **not implemented**: full backup/restore (P3 backup part); automatic difficult-word
+detection; media in Anki import/export. iOS/Android builds and real-device
+checks remain outstanding (no Android SDK or full Xcode on the development
+machine).
 
-Every item in this section is **Proposed — not approved**. Nothing here may
-be implemented, and no dependency or schema change may be made for it, until
-the product owner explicitly authorizes that specific feature. The phase
-column is the intended placement if approved.
+## Proposed feature register
 
-| ID | Feature | Intended phase |
-| --- | --- | --- |
-| P1 | Search and filters (German/Persian, deck, learning status) | 5 |
-| P2 | Tags and categories | 5 |
-| P3 | CSV export and full local backup/restore | 5 |
-| P4 | Lemma / inflected-form duplicate detection | 4 (local hints from 3) |
-| P5 | Extended preservation of book sentences and source | 3 (metadata part) |
-| P6 | German text-to-speech | 5 |
-| P7 | User-configurable local daily reminders | 5 |
-| P8 | Streaks and progress statistics (no excessive gamification) | 5 |
-| P9 | Difficult words and targeted review | 5 |
-| P10 | Reverse-direction flashcards | 5 |
-| P11 | Rich editable grammar data | 4 |
-| P12 | Full offline access (principle) | Cross-cutting |
-| P13 | Images: user-added, suggestions, AI-generated | 4 (user-added, suggestions); AI-generated unscheduled |
-| — | Anki interoperability beyond CSV | 5 (evaluation first) |
+Items are **Proposed — not approved** unless the status column says
+otherwise. Nothing proposed may be implemented, and no dependency or schema
+change may be made for it, until the product owner explicitly authorizes
+that specific feature. The phase column is the intended placement.
+
+| ID | Feature | Intended phase | Status |
+| --- | --- | --- | --- |
+| P1 | Search and filters (German/Persian, deck, learning status) | 5 | Implemented in Phase 5 (text, deck, tag, difficult; no learning-status filter — there is no scheduler) |
+| P2 | Tags and categories | 5 | Implemented in Phase 5 (flat tags) |
+| P3 | CSV export and full local backup/restore | 5 | CSV export implemented in Phase 5; **backup/restore not approved** |
+| P4 | Lemma / inflected-form duplicate detection | 4 (local hints from 3) | Proposed — not approved |
+| P5 | Extended preservation of book sentences and source | 3 (metadata part) | Proposed — not approved |
+| P6 | German text-to-speech | 5 | Implemented in Phase 5 (system TTS) |
+| P7 | User-configurable local daily reminders | 5 | Implemented in Phase 5 (one daily reminder) |
+| P8 | Streaks and progress statistics (no excessive gamification) | 5 | Implemented in Phase 5 (from practice answers) |
+| P9 | Difficult words and targeted review | 5 | Manual mark and difficult-only practice implemented in Phase 5; automatic detection not approved |
+| P10 | Reverse-direction flashcards | 5 | Implemented: FSRS-scheduled per direction with a German → Persian / Persian → German / both setting (D42, D43) |
+| P11 | Rich editable grammar data | 4 | Proposed — not approved |
+| P12 | Full offline access (principle) | Cross-cutting | Principle (all Phase 5 features work offline) |
+| P13 | Images: user-added, suggestions, AI-generated | 4 (user-added, suggestions); AI-generated unscheduled | Proposed — not approved |
+| — | Anki interoperability beyond CSV | 5 (evaluation first) | Evaluated and implemented in Phase 5 (see below) |
 
 ### P1 — Search and filters
 
@@ -360,27 +367,30 @@ Three separate capabilities, each requiring its own approval:
 
 ## Anki interoperability
 
-Two different levels, which must not be confused:
+Evaluated and implemented in Phase 5 (product owner selection), D39–D40.
 
-1. **CSV/text exchange (low risk).** Import already exists (Phase 2). A
-   proposed export (P3) can produce UTF-8 text that Anki's "Import File"
-   accepts (fields, optional tags column). This exchanges *content only*: no
-   note types/templates, no media, no scheduling.
-2. **`.apkg` package compatibility (unapproved, evaluation first).** An
-   `.apkg` is a ZIP containing an Anki collection database (format varies by
-   Anki version, newer versions use a compressed format), a media manifest and
-   media files. Full compatibility requires mapping and testing:
-   - notes and note types (fields, templates, CSS),
-   - deck structure (nested decks),
-   - tags,
-   - media files and references inside fields,
-   - cards per template and their scheduling state and review history
-     (Anki's own SM-2 or FSRS fields).
-
-**No promise of complete `.apkg` compatibility is made.** Before any `.apkg`
-work, an evaluation must define the supported Anki versions, the supported
-subset, what is lost in each direction, and test against real exported
-packages. Only then can a scope be proposed for approval.
+- **Import (`.apkg`, also `.colpkg`):** notes of every note type are read as
+  plain text (HTML to text, `[sound:…]` and images dropped, cloze markers
+  reduced to their text) with their tags, and go through the normal import
+  preview (column mapping, duplicate strategy, one transaction). Supported
+  collection files: `collection.anki21b` (zstd-compressed SQLite, schema 18,
+  the default since Anki 2.1.50), `collection.anki21` and `collection.anki2`
+  (schema 11). The placeholder `collection.anki2` that new packages contain
+  ("please update Anki") is rejected, never imported. Tested with packages
+  written by the official Anki library 26.09.3 (fixtures in
+  `test/fixtures/anki/`).
+- **Export (`.apkg`):** `collection.anki2` (schema 11) with the note type
+  "AI WortBox (German → Persian)" (fields German, Meaning, Lemma, Part of
+  speech, Grammar, Example, Example translation, Notes, Context), one
+  "German → Persian" card per note, tags, stable note GUIDs. Verified by
+  importing it with the official Anki importer (26.09.3): all notes, fields
+  and tags matched, and a second import was recognized as duplicates.
+- **Not supported:** media (images, audio) in either direction; Anki
+  scheduling and review history (exported cards are new); deck hierarchy
+  (the user picks one target deck); exporting the reverse card template.
+  Not tested in the Anki desktop GUI or AnkiDroid apps themselves — only with
+  the official Anki library that those apps' import is built on (desktop)
+  and the documented legacy format (AnkiDroid).
 
 ## Backup and restore requirements (for P3, not approved)
 
@@ -409,7 +419,8 @@ packages. Only then can a scope be proposed for approval.
 
 ## Schema change and migration policy
 
-The current schema is **v1** (Phase 1); Phase 2 made no schema changes.
+The current schema is **v2** (Phase 5, D33); Phases 2–4 made no schema
+changes.
 Before any schema change:
 
 1. Confirm the change is needed for an approved feature (no speculative
@@ -421,6 +432,7 @@ Before any schema change:
    data.
 4. Keep backup compatibility in mind once a backup format exists.
 
-Known upcoming change: schema v2 in Phase 5 for the review log. Proposed
-features P2, P4, P5, P9, P10, P11 and P13 would each require further
-migrations if approved.
+Schema v2 (Phase 5) added `tags`, `entry_tags`, `review_events`,
+`app_settings` and the entry columns `marked_difficult_at` and `search_key`.
+FSRS (D42) needed no further migration. Proposed features P4, P5, P11 and
+P13 would each require further migrations if approved.

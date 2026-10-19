@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/error/app_exception.dart';
 import '../../../core/language/language.dart';
 
 /// What is sent for one entry: only the word, its sentence context and the
@@ -62,6 +63,7 @@ class EnrichmentProposal {
     this.exampleTranslation,
     this.isAmbiguous = false,
     this.costUsd,
+    this.fromCache = false,
   });
 
   /// At least one, in the definition language; the first matches the
@@ -93,6 +95,28 @@ class EnrichmentProposal {
   /// Cost reported by the provider for this request, if it reported one.
   /// Never estimated.
   final double? costUsd;
+
+  /// Reused from the local cache: nothing was sent for it.
+  final bool fromCache;
+}
+
+/// The result for one word of a batch.
+sealed class EnrichmentOutcome {
+  const EnrichmentOutcome();
+}
+
+final class EnrichmentSucceeded extends EnrichmentOutcome {
+  const EnrichmentSucceeded(this.proposal);
+
+  final EnrichmentProposal proposal;
+}
+
+/// This word alone failed (e.g. its item was missing or invalid); the
+/// other words of the batch are unaffected.
+final class EnrichmentFailed extends EnrichmentOutcome {
+  const EnrichmentFailed(this.error);
+
+  final EnrichmentException error;
 }
 
 /// Lets the user stop a running request or batch.
@@ -119,6 +143,15 @@ class EnrichmentCancellation {
 abstract interface class VocabularyEnrichmentService {
   Future<EnrichmentProposal> enrich(
     EnrichmentRequest request, {
+    EnrichmentCancellation? cancellation,
+  });
+
+  /// Enriches several words together (one request where possible).
+  /// Returns one outcome per request, in order: a word whose answer was
+  /// missing or invalid fails alone. Throws `EnrichmentException` for
+  /// failures of the whole batch (no key, invalid key, quota, cancelled…).
+  Future<List<EnrichmentOutcome>> enrichBatch(
+    List<EnrichmentRequest> requests, {
     EnrichmentCancellation? cancellation,
   });
 }

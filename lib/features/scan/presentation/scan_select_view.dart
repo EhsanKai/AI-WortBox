@@ -12,9 +12,11 @@ import '../data/scan_image_source.dart';
 import '../domain/scan_document.dart';
 import '../domain/text_tokenizer.dart';
 import 'scan_controller.dart';
+import 'scan_image_select_view.dart';
 
-/// Shows the recognized German text and lets the user select words and
-/// contiguous expressions.
+/// Shows the page — the photo with selectable words when OCR placed them,
+/// otherwise the recognized German text — and lets the user select words
+/// and contiguous expressions.
 class ScanSelectView extends ConsumerWidget {
   const ScanSelectView({super.key, required this.initialDeckId});
 
@@ -54,6 +56,10 @@ class ScanSelectView extends ConsumerWidget {
       );
     }
 
+    if (state.view == ScanView.image && state.canShowImage) {
+      return ScanImageSelectView(initialDeckId: initialDeckId);
+    }
+
     final (notice, noticeTone) = switch (state.notice) {
       SelectionNotice.pickExpressionEnd => (
         l10n.scanExpressionPickEnd,
@@ -65,6 +71,11 @@ class ScanSelectView extends ConsumerWidget {
       ),
       SelectionNotice.selectionsDropped => (
         l10n.scanSelectionsDropped(state.droppedCount),
+        StatusTone.warning,
+      ),
+      SelectionNotice.regionEmpty => (l10n.scanRegionEmpty, StatusTone.warning),
+      SelectionNotice.regionFailed => (
+        l10n.scanRegionFailed,
         StatusTone.warning,
       ),
       null => (null, StatusTone.neutral),
@@ -181,7 +192,7 @@ class ScanSelectView extends ConsumerWidget {
                     // Repeats the button's count, so one line is enough even
                     // with large text.
                     child: Text(
-                      l10n.scanSelectedCount(state.selection.length),
+                      l10n.scanSelectedCount(state.selectedCount),
                       key: const Key('scan.selectedCount'),
                       textAlign: TextAlign.center,
                       maxLines: 1,
@@ -192,10 +203,10 @@ class ScanSelectView extends ConsumerWidget {
                   const SizedBox(height: AppSpace.sm),
                   FilledButton(
                     key: const Key('scan.review'),
-                    onPressed: state.selection.isEmpty
+                    onPressed: state.selectedCount == 0
                         ? null
                         : controller.goToReview,
-                    child: Text(l10n.scanReviewButton(state.selection.length)),
+                    child: Text(l10n.scanReviewButton(state.selectedCount)),
                   ),
                 ],
               ),

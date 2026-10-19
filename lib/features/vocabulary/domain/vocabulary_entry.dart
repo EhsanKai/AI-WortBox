@@ -109,6 +109,7 @@ class VocabularyEntry {
     this.sourceContext,
     this.enrichmentMetadata,
     this.userEditedAt,
+    this.markedDifficultAt,
   });
 
   final String id;
@@ -159,6 +160,12 @@ class VocabularyEntry {
   /// UTC.
   final DateTime updatedAt;
 
+  /// UTC time the user marked this word as difficult; null when not marked.
+  /// Not content: changing it does not change [updatedAt].
+  final DateTime? markedDifficultAt;
+
+  bool get isDifficult => markedDifficultAt != null;
+
   bool get hasMeanings => meanings.isNotEmpty;
 
   bool get isMultiWordExpression => original.trim().contains(' ');
@@ -185,7 +192,8 @@ class VocabularyEntry {
       other.enrichmentMetadata == enrichmentMetadata &&
       other.userEditedAt == userEditedAt &&
       other.createdAt == createdAt &&
-      other.updatedAt == updatedAt;
+      other.updatedAt == updatedAt &&
+      other.markedDifficultAt == markedDifficultAt;
 
   @override
   int get hashCode => Object.hashAll([
@@ -209,6 +217,7 @@ class VocabularyEntry {
     userEditedAt,
     createdAt,
     updatedAt,
+    markedDifficultAt,
   ]);
 
   @override

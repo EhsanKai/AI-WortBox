@@ -1,5 +1,14 @@
 import 'package:flutter/foundation.dart';
 
+/// Where a table came from.
+enum CsvTableSource {
+  csv,
+
+  /// Notes of an Anki package (see `AnkiPackageReader`); no delimiter or
+  /// encoding applies.
+  ankiPackage,
+}
+
 /// Text encoding a CSV file was read with.
 enum CsvTextEncoding { utf8, utf8Bom, utf16le, utf16be }
 
@@ -36,6 +45,7 @@ class CsvTable {
     required this.delimiter,
     required this.encoding,
     required this.delimiterWasDetected,
+    this.source = CsvTableSource.csv,
   });
 
   final List<CsvRecord> records;
@@ -44,6 +54,8 @@ class CsvTable {
 
   /// False when the delimiter was chosen by the user or by a `sep=` line.
   final bool delimiterWasDetected;
+
+  final CsvTableSource source;
 
   /// Number of columns of the widest record.
   int get columnCount =>

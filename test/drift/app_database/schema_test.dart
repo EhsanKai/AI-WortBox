@@ -14,12 +14,12 @@ void main() {
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  test('current schema matches exported schema v1', () async {
-    final connection = await verifier.startAt(1);
+  test('a fresh install matches exported schema v2', () async {
+    final connection = await verifier.startAt(2);
     final db = AppDatabase(connection);
     addTearDown(db.close);
 
-    await verifier.migrateAndValidate(db, 1);
+    await verifier.migrateAndValidate(db, 2);
   });
 
   test('latest exported schema equals the app schema version', () async {

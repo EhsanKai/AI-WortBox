@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:ai_wortbox/core/error/app_exception.dart';
 import 'package:ai_wortbox/core/language/language.dart';
 import 'package:ai_wortbox/core/time/clock.dart';
+import 'package:ai_wortbox/features/enrichment/data/ai_local_store.dart';
 import 'package:ai_wortbox/features/enrichment/data/openrouter_client.dart';
 import 'package:ai_wortbox/features/enrichment/data/openrouter_enrichment_service.dart';
 import 'package:ai_wortbox/features/enrichment/domain/enrichment.dart';
@@ -19,16 +20,24 @@ void main() {
   late InMemoryAiSettingsStore store;
   late List<Duration> sleeps;
 
+  // These tests cover the paid (free-only off) behaviour, which the user
+  // must opt into; free-only mode is covered in free_enrichment_test.dart.
   OpenRouterEnrichmentService service({
     Duration timeout = const Duration(seconds: 45),
   }) => OpenRouterEnrichmentService(
     client: OpenRouterClient(
       api.client,
       requestTimeout: timeout,
+      clock: FixedClock(now),
+      random: ZeroRandom(),
       sleep: (d) async => sleeps.add(d),
     ),
     settings: store,
     clock: FixedClock(now),
+    localState: AiLocalState(
+      InMemoryAiKeyValueStore()..values['ai.freeOnly'] = 'false',
+      clock: FixedClock(now),
+    ),
   );
 
   const request = EnrichmentRequest(
@@ -222,13 +231,26 @@ void main() {
       expect(sleeps, [const Duration(seconds: 3)]);
     });
 
-    test('Retry-After is capped', () async {
+    test('a Retry-After beyond the wait limit is honoured: no early retry, '
+        'the error says when to try again', () async {
       api.completions = [
         errorResponse(503, headers: {'retry-after': '3600'}),
         completionResponse(enrichmentContent()),
       ];
-      await service().enrich(request);
-      expect(sleeps, [const Duration(seconds: 20)]);
+      await expectLater(
+        service().enrich(request),
+        throwsA(
+          isA<EnrichmentException>()
+              .having((e) => e.error, 'error', EnrichmentError.modelUnavailable)
+              .having(
+                (e) => e.retryAt,
+                'retryAt',
+                now.add(const Duration(hours: 1)),
+              ),
+        ),
+      );
+      expect(api.completionCalls, 1);
+      expect(sleeps, isEmpty);
     });
 
     test('repeated 429 gives up after the retry limit with backoff', () async {

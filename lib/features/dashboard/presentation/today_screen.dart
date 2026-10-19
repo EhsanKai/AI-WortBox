@@ -5,8 +5,8 @@ import 'package:intl/intl.dart' show NumberFormat;
 
 import '../../../app/router.dart';
 import '../../../core/design/tokens.dart';
+import '../../../core/widgets/action_tile.dart';
 import '../../../core/widgets/brand_mark.dart';
-import '../../../core/widgets/info_banner.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
@@ -14,8 +14,12 @@ import '../../decks/domain/deck.dart';
 import '../../decks/presentation/deck_providers.dart';
 import '../../decks/presentation/deck_tile.dart';
 import '../../decks/presentation/decks_screen.dart';
+import '../../review/presentation/practice_screen.dart'
+    show reviewDirectionLabel;
+import '../../review/presentation/review_providers.dart';
+import '../../statistics/presentation/statistics_providers.dart';
 
-/// "Today": the dashboard. Daily review is added in Phase 5.
+/// "Today": the dashboard, with the daily (FSRS) review first.
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
@@ -38,21 +42,17 @@ class TodayScreen extends ConsumerWidget {
   }
 }
 
-class _Dashboard extends StatelessWidget {
+class _Dashboard extends ConsumerWidget {
   const _Dashboard({required this.summaries});
 
   final List<DeckSummary> summaries;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final numbers = NumberFormat.decimalPattern(l10n.localeName);
     final wordCount = summaries.fold<int>(0, (sum, s) => sum + s.entryCount);
-    final reviewNote = InfoBanner(
-      icon: Icons.schedule,
-      message: l10n.dashboardReviewPending,
-    );
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -101,8 +101,9 @@ class _Dashboard extends StatelessWidget {
               label: Text(l10n.actionCreateDeck),
             ),
           ),
-          reviewNote,
         ] else ...[
+          const _ReviewCard(),
+          const SizedBox(height: AppSpace.md),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -126,7 +127,19 @@ class _Dashboard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpace.md),
-          reviewNote,
+          ActionTile(
+            key: const Key('today.practice'),
+            icon: Icons.style_outlined,
+            title: l10n.practiceTitle,
+            description: switch (ref
+                .watch(studyStatisticsProvider)
+                .value
+                ?.currentStreak) {
+              final streak? when streak > 0 => l10n.practiceTileStreak(streak),
+              _ => l10n.practiceTileDescription,
+            },
+            onTap: () => context.go(AppRoutes.practice),
+          ),
           const SizedBox(height: AppSpace.xl),
           SectionHeader(l10n.dashboardYourDecks),
           for (final summary in summaries.take(5)) ...[
@@ -138,6 +151,59 @@ class _Dashboard extends StatelessWidget {
           ],
         ],
       ],
+    );
+  }
+}
+
+/// Cards due across all decks for the chosen direction, and the way in.
+class _ReviewCard extends ConsumerWidget {
+  const _ReviewCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final due = ref.watch(dueCountProvider(null)).value;
+    final direction = ref.watch(reviewDirectionProvider).value;
+    return Card(
+      key: const Key('today.review'),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpace.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.event_repeat, color: theme.colorScheme.primary),
+                const SizedBox(width: AppSpace.sm),
+                Expanded(
+                  child: Text(
+                    due == null ? l10n.reviewStart : l10n.reviewDueCount(due),
+                    key: const Key('today.dueCount'),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+              ],
+            ),
+            if (direction != null) ...[
+              const SizedBox(height: AppSpace.xxs),
+              Text(
+                reviewDirectionLabel(l10n, direction),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+            const SizedBox(height: AppSpace.md),
+            FilledButton.icon(
+              key: const Key('today.startReview'),
+              onPressed: () => context.go(AppRoutes.practiceSession()),
+              icon: const Icon(Icons.play_arrow),
+              label: Text(l10n.reviewStart),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

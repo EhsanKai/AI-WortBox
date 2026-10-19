@@ -4,23 +4,36 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
 import '../../../core/design/tokens.dart';
-import '../../../core/text/text_normalizer.dart';
+import '../../../core/error/app_exception.dart';
 import '../../../core/widgets/auto_direction_text.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../vocabulary/domain/vocabulary_entry.dart';
-import '../../vocabulary/presentation/entry_tile.dart';
+import '../../export/presentation/deck_exporter.dart';
+import '../../review/presentation/review_providers.dart';
+import '../../vocabulary/presentation/vocabulary_browser.dart';
 import '../../vocabulary/presentation/vocabulary_providers.dart';
 import '../domain/deck.dart';
 import 'deck_providers.dart';
 
-class DeckDetailScreen extends ConsumerWidget {
+/// A deck's words. Meanings are hidden until the learner asks to see them,
+/// so opening a deck does not give away the answers; reviewing happens one
+/// card at a time after "Start review".
+class DeckDetailScreen extends ConsumerStatefulWidget {
   const DeckDetailScreen({super.key, required this.deckId});
 
   final String deckId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DeckDetailScreen> createState() => _DeckDetailScreenState();
+}
+
+class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
+  bool _showMeanings = false;
+
+  String get deckId => widget.deckId;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final deck = ref.watch(deckProvider(deckId));
 
@@ -37,6 +50,17 @@ class DeckDetailScreen extends ConsumerWidget {
         actions: [
           if (deck.value != null)
             IconButton(
+              key: const Key('deck.toggleMeanings'),
+              tooltip: _showMeanings
+                  ? l10n.deckHideMeanings
+                  : l10n.deckShowMeanings,
+              isSelected: _showMeanings,
+              icon: const Icon(Icons.visibility_off_outlined),
+              selectedIcon: const Icon(Icons.visibility_outlined),
+              onPressed: () => setState(() => _showMeanings = !_showMeanings),
+            ),
+          if (deck.value != null)
+            IconButton(
               key: const Key('deck.enrich'),
               tooltip: l10n.enrichDeckAction,
               icon: const Icon(Icons.auto_awesome_outlined),
@@ -49,12 +73,42 @@ class DeckDetailScreen extends ConsumerWidget {
               icon: const Icon(Icons.document_scanner_outlined),
               onPressed: () => context.push(AppRoutes.deckScan(deckId)),
             ),
-          if (deck.value != null)
-            IconButton(
-              key: const Key('deck.importCsv'),
-              tooltip: l10n.deckImportCsv,
-              icon: const Icon(Icons.upload_file_outlined),
-              onPressed: () => context.push(AppRoutes.deckImport(deckId)),
+          if (deck.value case final d?)
+            PopupMenuButton<String>(
+              key: const Key('deck.menu'),
+              tooltip: l10n.deckMoreActions,
+              onSelected: (action) => switch (action) {
+                'import' => context.push(AppRoutes.deckImport(deckId)),
+                'csv' => _export(context, ref, d, ExportFormat.csv),
+                'anki' => _export(context, ref, d, ExportFormat.ankiPackage),
+                _ => null,
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  key: const Key('deck.importCsv'),
+                  value: 'import',
+                  child: ListTile(
+                    leading: const Icon(Icons.upload_file_outlined),
+                    title: Text(l10n.deckImportFile),
+                  ),
+                ),
+                PopupMenuItem(
+                  key: const Key('deck.exportCsv'),
+                  value: 'csv',
+                  child: ListTile(
+                    leading: const Icon(Icons.table_view_outlined),
+                    title: Text(l10n.exportCsv),
+                  ),
+                ),
+                PopupMenuItem(
+                  key: const Key('deck.exportAnki'),
+                  value: 'anki',
+                  child: ListTile(
+                    leading: const Icon(Icons.style_outlined),
+                    title: Text(l10n.exportAnki),
+                  ),
+                ),
+              ],
             ),
         ],
       ),
@@ -71,7 +125,10 @@ class DeckDetailScreen extends ConsumerWidget {
           icon: Icons.search_off,
           title: l10n.deckNotFound,
         ),
-        AsyncData(value: final d?) => _DeckEntries(deck: d),
+        AsyncData(value: final d?) => _DeckEntries(
+          deck: d,
+          showMeanings: _showMeanings,
+        ),
         AsyncError(:final error) => ErrorStateView(
           error: error,
           onRetry: () => ref.invalidate(deckProvider(deckId)),
@@ -82,137 +139,109 @@ class DeckDetailScreen extends ConsumerWidget {
   }
 }
 
-class _DeckEntries extends ConsumerStatefulWidget {
-  const _DeckEntries({required this.deck});
+class _DeckEntries extends ConsumerWidget {
+  const _DeckEntries({required this.deck, required this.showMeanings});
 
   final Deck deck;
+  final bool showMeanings;
 
   @override
-  ConsumerState<_DeckEntries> createState() => _DeckEntriesState();
-}
-
-class _DeckEntriesState extends ConsumerState<_DeckEntries> {
-  String _query = '';
-
-  bool _matches(VocabularyEntry entry, String query) =>
-      entry.normalized.contains(TextNormalizer.vocabularyKey(query)) ||
-      entry.meanings.any(
-        (m) =>
-            TextNormalizer.meaningKey(m.text)
-                .contains(TextNormalizer.meaningKey(query)),
-      );
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final deck = widget.deck;
-    final entries = ref.watch(deckEntriesProvider(deck.id));
+    final count = ref.watch(deckEntriesProvider(deck.id)).value?.length ?? 0;
 
-    final header = Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpace.gutter,
-        AppSpace.xs,
-        AppSpace.gutter,
-        AppSpace.md,
-      ),
-      child: Text(
-        [
-          l10n.deckLanguagePair(
-            deck.sourceLanguage.nativeName,
-            deck.definitionLanguage.nativeName,
-          ),
-          l10n.deckWordCount(entries.value?.length ?? 0),
-          l10n.deckDailyLimit(deck.dailyNewCardLimit),
-        ].join(' · '),
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
+    final due = ref.watch(dueCountProvider(deck.id)).value;
+    return VocabularyBrowser(
+      deckId: deck.id,
+      showMeanings: showMeanings,
+      header: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.gutter,
+          AppSpace.xs,
+          AppSpace.gutter,
+          AppSpace.md,
         ),
-      ),
-    );
-
-    return switch (entries) {
-      AsyncData(:final value) when value.isEmpty => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          header,
-          Expanded(
-            child: EmptyStateView(
-              icon: Icons.menu_book_outlined,
-              title: l10n.deckNoEntriesTitle,
-              message: l10n.deckNoEntriesBody,
-            ),
-          ),
-        ],
-      ),
-      AsyncData(:final value) => _buildList(context, header, value),
-      AsyncError(:final error) => ErrorStateView(
-        error: error,
-        onRetry: () => ref.invalidate(deckEntriesProvider(deck.id)),
-      ),
-      _ => const LoadingView(),
-    };
-  }
-
-  Widget _buildList(
-    BuildContext context,
-    Widget header,
-    List<VocabularyEntry> all,
-  ) {
-    final l10n = AppLocalizations.of(context);
-    final query = _query.trim();
-    final visible = query.isEmpty
-        ? all
-        : all.where((e) => _matches(e, query)).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        header,
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpace.gutter,
-            0,
-            AppSpace.gutter,
-            AppSpace.md,
-          ),
-          child: TextField(
-            key: const Key('deck.search'),
-            textInputAction: TextInputAction.search,
-            decoration: InputDecoration(
-              hintText: l10n.searchHint,
-              prefixIcon: const Icon(Icons.search),
-            ),
-            onChanged: (value) => setState(() => _query = value),
-          ),
-        ),
-        Expanded(
-          child: visible.isEmpty
-              ? EmptyStateView(
-                  icon: Icons.search_off,
-                  title: l10n.searchNoResults,
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpace.gutter,
-                    0,
-                    AppSpace.gutter,
-                    AppSpace.fabClearance,
-                  ),
-                  itemCount: visible.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(height: AppSpace.sm),
-                  itemBuilder: (context, index) {
-                    final entry = visible[index];
-                    return EntryTile(
-                      entry: entry,
-                      onTap: () =>
-                          context.push(AppRoutes.entry(entry.deckId, entry.id)),
-                    );
-                  },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              [
+                l10n.deckLanguagePair(
+                  deck.sourceLanguage.nativeName,
+                  deck.definitionLanguage.nativeName,
                 ),
+                l10n.deckWordCount(count),
+                l10n.deckDailyLimit(deck.dailyNewCardLimit),
+              ].join(' · '),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            if (count > 0) ...[
+              const SizedBox(height: AppSpace.sm),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      key: const Key('deck.startReview'),
+                      onPressed: () => context.push(
+                        AppRoutes.practiceSession(deckId: deck.id),
+                      ),
+                      icon: const Icon(Icons.play_arrow),
+                      label: Text(
+                        due == null
+                            ? l10n.reviewStart
+                            : '${l10n.reviewStart} · ${l10n.reviewDueShort(due)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpace.xs),
+                  IconButton.outlined(
+                    key: const Key('deck.freePractice'),
+                    tooltip: l10n.practiceFreeInstead,
+                    icon: const Icon(Icons.shuffle),
+                    onPressed: () => context.push(
+                      AppRoutes.practiceSession(deckId: deck.id, free: true),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
         ),
-      ],
+      ),
+      emptyDeck: EmptyStateView(
+        icon: Icons.menu_book_outlined,
+        title: l10n.deckNoEntriesTitle,
+        message: l10n.deckNoEntriesBody,
+      ),
     );
   }
+}
+
+/// Exports [deck] in [format] through the platform save dialog and reports
+/// the outcome.
+Future<void> _export(
+  BuildContext context,
+  WidgetRef ref,
+  Deck deck,
+  ExportFormat format,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  String message;
+  try {
+    final saved = await ref.read(deckExporterProvider).export(deck, format);
+    message = saved ? l10n.exportSaved : l10n.exportCancelled;
+  } on AppException catch (e) {
+    message = errorMessage(l10n, e);
+  }
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message)));
 }

@@ -20,6 +20,7 @@ void main() {
       overrides: [
         aiSettingsStoreProvider.overrideWithValue(store),
         httpClientProvider.overrideWithValue(api.client),
+        aiKeyValueStoreProvider.overrideWithValue(InMemoryAiKeyValueStore()),
       ],
       retry: (_, _) => null,
     );
@@ -41,7 +42,8 @@ void main() {
   test('saving stores the trimmed key, keeps only its last four '
       'characters in state and tests it', () async {
     api.keyInfo = keyInfoResponse(usage: 0.5, remaining: 4.5);
-    api.models = modelsResponse(['anthropic/claude-haiku-5.5']);
+    // Free-only (default): the free route must be listed as free.
+    api.models = modelsResponse(['openrouter/free']);
     await current();
     await controller().saveKey('  $testApiKey \n');
 

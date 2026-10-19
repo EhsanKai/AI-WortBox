@@ -121,6 +121,12 @@ void main() {
       'scan capture': () => '/add/scan?deckId=${deck.id}',
       'ai settings': () => '/settings/ai',
       'ai suggestions (no key)': () => '/words/decks/${deck.id}/enrich',
+      'search all words': () => '/words/search',
+      'tags': () => '/words/tags',
+      'anki import': () => '/add/anki?deckId=${deck.id}',
+      'reminder': () => '/settings/reminder',
+      'practice setup': () => '/today/practice',
+      'practice session': () => '/today/practice/session',
     };
     for (final textScale in [1.5, 2.0]) {
       for (final brightness in Brightness.values) {
@@ -404,6 +410,8 @@ void main() {
       tester,
     ) async {
       await pumpApp(tester, db, initialLocation: '/words/decks/${deck.id}');
+      await tester.tap(find.byKey(const Key('deck.toggleMeanings')));
+      await tester.pumpAndSettle();
       final word = textOf(tester, 'Straße');
       expect(word.textDirection, TextDirection.ltr);
       expect(word.style?.fontFamily, AppFonts.german);

@@ -9,7 +9,6 @@
   "navSettings": "تنظیمات",
   "dashboardDecks": "دسته‌ها",
   "dashboardWords": "لغات",
-  "dashboardReviewPending": "مرور روزانه با الگوریتم FSRS در نسخه‌های بعدی فعال می‌شود.",
   "dashboardYourDecks": "دسته‌های شما",
   "emptyDecksTitle": "هنوز دسته‌ای نساخته‌اید",
   "emptyDecksBody": "برای شروع، یک دستهٔ لغت بسازید. هر دسته زبان‌ها و محدودیت روزانهٔ خودش را دارد.",
@@ -141,7 +140,7 @@
   "entryNotes": "یادداشت",
   "entrySource": "منبع",
   "sourceManual": "ورود دستی",
-  "sourceCsv": "فایل CSV",
+  "sourceCsv": "وارد شده از فایل (CSV یا Anki)",
   "sourceImage": "اسکن کتاب",
   "entryStatus": "وضعیت معنی",
   "entryStatusMissing": "منتظر معنی",
@@ -654,7 +653,7 @@
   "settingsAiNotConfigured": "غیرفعال — کلید OpenRouter تنظیم نشده",
   "aiSettingsTitle": "هوش مصنوعی",
   "aiIntroTitle": "با حساب OpenRouter خودتان",
-  "aiIntroBody": "برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. هزینهٔ هر درخواست از اعتبار حساب OpenRouter شما کم می‌شود. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.",
+  "aiIntroBody": "برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. به‌طور پیش‌فرض فقط مدل‌های رایگان استفاده می‌شوند و هزینه‌ای کم نمی‌شود؛ مدل‌های رایگان سقف روزانه دارند. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.",
   "aiGetKey": "دریافت کلید در openrouter.ai/keys",
   "aiKeyLabel": "کلید API",
   "aiKeyNewLabel": "کلید API جدید",
@@ -704,11 +703,136 @@
   "aiCheckModelUnavailable": "مدل انتخاب‌شده اکنون در OpenRouter با خروجی ساختاریافته در دسترس نیست. مدل دیگری انتخاب کنید.",
   "aiCheckModelUnknown": "فهرست مدل‌ها بارگیری نشد؛ در دسترس بودن مدل بررسی نشد.",
   "aiModelLabel": "مدل",
-  "aiModelHelper": "فهرستی منتخب از مدل‌های کم‌هزینه که خروجی ساختاریافته دارند. قیمت‌ها در openrouter.ai آمده است.",
+  "aiModelHelper": "فهرستی منتخب از مدل‌های کم‌هزینه با خروجی ساختاریافته که فقط وقتی «فقط مدل‌های رایگان» خاموش است استفاده می‌شود. قیمت‌ها در openrouter.ai آمده است.",
   "aiPrivacyTitle": "حریم خصوصی و اتصال",
   "aiPrivacyBody": "فقط وقتی شما درخواست کنید، لغت، جملهٔ آن و معنی‌های فعلی‌اش به OpenRouter و ارائه‌دهندهٔ مدل فرستاده می‌شود. این متن از دستگاه خارج می‌شود و سیاست‌های آن‌ها بر آن اعمال می‌شود. پیشنهاد هوش مصنوعی به اینترنت نیاز دارد؛ بقیهٔ برنامه بدون اینترنت کار می‌کند.",
   "aiSecurityTitle": "نگهداری کلید",
   "aiSecurityBody": "کلید در حافظهٔ امن سیستم (Keychain در iOS، Keystore در اندروید) نگه داشته می‌شود؛ هرگز نمایش داده نمی‌شود و در پایگاه داده، گزارش‌ها یا پشتیبان قرار نمی‌گیرد. این کار خطر را کم می‌کند، اما روی دستگاهی آلوده یا دستکاری‌شده، استخراج کلید ناممکن نیست. در OpenRouter برای این کلید سقف اعتبار تعیین کنید.",
+  "aiFreeTitle": "استفادهٔ رایگان",
+  "aiFreeOnly": "فقط مدل‌های رایگان",
+  "aiFreeOnlyOn": "هیچ درخواستی هزینه ندارد: فقط مدل‌هایی که رایگان بودنشان تأیید شده استفاده می‌شوند و از OpenRouter خواسته می‌شود هر مورد پولی را رد کند.",
+  "aiFreeOnlyOff": "خاموش: مدل زیر استفاده می‌شود و هزینه‌اش از اعتبار OpenRouter شما کم می‌شود.",
+  "aiPaidConfirmTitle": "از مدل‌های پولی استفاده شود؟",
+  "aiPaidConfirmBody": "در این صورت هزینهٔ هر درخواست از اعتبار OpenRouter شما کم می‌شود. مدل‌های رایگان معمولاً برای واژگان کافی‌اند.",
+  "aiPaidConfirm": "استفاده از مدل‌های پولی",
+  "aiRoutingAuto": "رایگان خودکار",
+  "aiRoutingQuality": "رایگان باکیفیت",
+  "aiRoutingAutoHelp": "مسیریاب رایگان OpenRouter یکی از مدل‌های رایگانِ در دسترس را انتخاب می‌کند.",
+  "aiRoutingQualityHelp": "ابتدا مدل‌های رایگانِ با امتیاز بالاتر و سپس مسیریاب رایگان امتحان می‌شوند. فهرست مدل‌های رایگان پیش از استفاده در OpenRouter بررسی می‌شود.",
+  "aiQualityUnverified": "فهرست مدل‌های رایگان هنوز تأیید نشده است، پس از مسیریاب رایگان استفاده می‌شود. برای بررسی، وضعیت را به‌روز کنید.",
+  "aiFreeModelsVerified": "{count, plural, other{{count} مدل رایگان تأیید شد}}",
+  "@aiFreeModelsVerified": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "aiCurrentModel": "مدل فعلی: {model}",
+  "@aiCurrentModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiLastModel": "آخرین پاسخ از: {model}",
+  "@aiLastModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiLastModelNone": "هنوز درخواستی فرستاده نشده است.",
+  "aiBatchSize": "تعداد لغت در هر درخواست",
+  "aiBatchSizeHelp": "درخواست کمتر یعنی مصرف کمتر از سهمیهٔ رایگان روزانه؛ دسته‌های کوچک‌تر مطمئن‌ترند.",
+  "aiQuotaRemaining": "حدود {remaining} از {limit} درخواست رایگان امروز باقی مانده است",
+  "@aiQuotaRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "limit": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "aiQuotaRemainingNoLimit": "حدود {remaining} درخواست رایگان امروز باقی مانده است",
+  "@aiQuotaRemainingNoLimit": {
+    "placeholders": {
+      "remaining": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "aiQuotaUnknown": "درخواست‌های رایگان باقی‌ماندهٔ امروز: هنوز بررسی نشده است. کلید را آزمایش یا وضعیت را به‌روز کنید.",
+  "aiQuotaSentToday": "فرستاده‌شده از این برنامه در امروز: {count}",
+  "@aiQuotaSentToday": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "aiRateReady": "آماده",
+  "aiRateCooling": "محدودیت تعداد درخواست — منتظر تا {time}",
+  "@aiRateCooling": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "aiRatePaused": "سهمیهٔ رایگان روزانه تمام شده — متوقف تا {time}",
+  "@aiRatePaused": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "aiRatePacing": "هر بار یک درخواست، با دست‌کم {seconds} ثانیه فاصله.",
+  "@aiRatePacing": {
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "aiCacheStats": "{count, plural, other{{count} نتیجهٔ ذخیره‌شدهٔ هوش مصنوعی}}",
+  "@aiCacheStats": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "aiCacheUsage": "{hits} بار استفادهٔ دوباره · {misses} بار درخواست",
+  "@aiCacheUsage": {
+    "placeholders": {
+      "hits": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "misses": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "aiCacheClear": "پاک کردن نتایج ذخیره‌شده",
+  "aiCacheCleared": "نتایج ذخیره‌شده پاک شد.",
+  "aiRefreshUsage": "به‌روزرسانی وضعیت",
+  "aiUsageRefreshFailed": "وضعیت از OpenRouter دریافت نشد.",
+  "aiPrefsSaveFailed": "تنظیم ذخیره نشد. دوباره امتحان کنید.",
   "enrichTitle": "پیشنهادهای هوش مصنوعی",
   "enrichAction": "پیشنهاد هوش مصنوعی",
   "enrichDeckAction": "پیشنهاد برای لغت‌های بدون معنی",
@@ -796,6 +920,18 @@
       }
     }
   },
+  "enrichNoCost": "مدل‌های رایگان — بدون هزینه",
+  "enrichFreeOnly": "فقط مدل‌های رایگان — بدون هزینه.",
+  "enrichResume": "{count, plural, other{یک اجرای ناتمام پیدا شد: {count} لغت باقی مانده است. لغت‌های انجام‌شده حفظ شده‌اند.}}",
+  "@enrichResume": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichFromCache": "نتیجهٔ ذخیره‌شده — چیزی فرستاده نشد",
   "enrichConflict": "برخی لغت‌ها در این فاصله تغییر کرده‌اند، پس چیزی ذخیره نشد. دوباره پیشنهاد بگیرید.",
   "aiErrorNotConfigured": "کلید OpenRouter تنظیم نشده است.",
   "aiErrorInvalidKey": "OpenRouter این کلید را نپذیرفت. کلید را بررسی یا جایگزین کنید.",
@@ -808,5 +944,285 @@
   "aiErrorBadRequest": "OpenRouter درخواست را نپذیرفت. مدل دیگری را امتحان کنید.",
   "aiErrorServer": "OpenRouter خطا داد. کمی بعد دوباره امتحان کنید.",
   "aiErrorMalformed": "پاسخ مدل قابل استفاده نبود. دوباره امتحان کنید یا مدل دیگری انتخاب کنید.",
-  "aiErrorCancelled": "متوقف شد."
+  "aiErrorCancelled": "متوقف شد.",
+  "aiErrorDailyQuota": "درخواست‌های رایگان امروزِ حساب OpenRouter شما تمام شده است. هوش مصنوعی تا بازنشانی روزانه (ساعت ۰۰:۰۰ UTC) متوقف می‌ماند و تا آن زمان چیزی فرستاده نمی‌شود.",
+  "aiErrorPaidBlocked": "برای رایگان ماندن متوقف شد: OpenRouter با مدل یا هزینه‌ای پاسخ داد که رایگان بودنش تأیید نشد. درخواست دیگری فرستاده نشد.",
+  "actionBack": "بازگشت",
+  "csvFieldTags": "برچسب‌ها",
+  "deckImportFile": "وارد کردن فایل (CSV یا Anki)",
+  "deckMoreActions": "کارهای بیشتر",
+  "searchAllTitle": "جستجو در همه لغت‌ها",
+  "searchClear": "پاک کردن متن جستجو",
+  "searchLimited": "فقط {count} نتیجهٔ اول نمایش داده می‌شود؛ جستجو را دقیق‌تر کنید.",
+  "@searchLimited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filterDifficult": "لغت‌های دشوار",
+  "filterTag": "برچسب",
+  "filterAllTags": "همه برچسب‌ها",
+  "filterClear": "حذف فیلترها",
+  "entryInDeck": "در دستهٔ {deck}",
+  "@entryInDeck": {
+    "placeholders": {
+      "deck": {
+        "type": "String"
+      }
+    }
+  },
+  "entryDifficult": "دشوار",
+  "entryMarkDifficult": "علامت‌گذاری به‌عنوان دشوار",
+  "entryUnmarkDifficult": "برداشتن علامت دشوار",
+  "tagsTitle": "برچسب‌ها",
+  "tagsSettingsDescription": "ساختن، تغییر نام و حذف برچسب‌ها",
+  "tagsEmptyTitle": "هنوز برچسبی ندارید",
+  "tagsEmptyHint": "با برچسب‌هایی مثل «B1» یا «سفر» لغت‌ها را دسته‌بندی کنید.",
+  "tagsAdd": "افزودن برچسب",
+  "tagsEdit": "ویرایش برچسب‌ها",
+  "tagsEditTitle": "برچسب‌های این لغت",
+  "tagNewLabel": "برچسب تازه",
+  "tagNameLabel": "نام برچسب",
+  "tagCreate": "برچسب تازه",
+  "tagRename": "تغییر نام برچسب",
+  "tagWordCount": "{count, plural, other{{count} لغت}}",
+  "@tagWordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tagDeleteTitle": "برچسب «{name}» حذف شود؟",
+  "@tagDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tagDeleteBody": "{count, plural, =0{این برچسب به هیچ لغتی داده نشده است.} other{برچسب از {count} لغت برداشته می‌شود. خود لغت‌ها حذف نمی‌شوند.}}",
+  "@tagDeleteBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tagErrorEmpty": "نام برچسب را بنویسید.",
+  "tagErrorTooLong": "نام برچسب حداکثر {max} نویسه است.",
+  "@tagErrorTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "tagErrorDuplicate": "برچسبی با همین نام وجود دارد.",
+  "exportCsv": "خروجی CSV",
+  "exportAnki": "خروجی برای Anki (‎.apkg‎)",
+  "exportSaved": "فایل ذخیره شد.",
+  "exportCancelled": "ذخیرهٔ فایل لغو شد.",
+  "exportEmpty": "این دسته لغتی برای خروجی ندارد.",
+  "exportWriteFailed": "فایل ذخیره نشد. جای دیگری را امتحان کنید.",
+  "ankiImportTitle": "وارد کردن از Anki",
+  "ankiImportDescription": "یک بستهٔ ‎.apkg‎ از Anki انتخاب کنید",
+  "ankiImportIntro": "در Anki یک دسته را با قالب «Anki Deck Package (‎.apkg‎)» خروجی بگیرید و اینجا انتخاب کنید. فیلدهای یادداشت‌ها را به لغت و معنی وصل کنید.",
+  "ankiImportNote": "فقط متن یادداشت‌ها و برچسب‌ها وارد می‌شود؛ تصویر، صدا و سابقهٔ مرور Anki وارد نمی‌شود.",
+  "ankiNoteCount": "{count, plural, other{{count} یادداشت Anki}}",
+  "@ankiNoteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ankiErrorNotPackage": "این فایل بستهٔ Anki (‎.apkg‎) نیست یا آسیب دیده است.",
+  "ankiErrorUnsupported": "قالب این بستهٔ Anki پشتیبانی نمی‌شود.",
+  "ankiErrorNoNotes": "این بستهٔ Anki هیچ یادداشتی ندارد.",
+  "ankiErrorTooLarge": "بستهٔ Anki بزرگ‌تر از {size} مگابایت است.",
+  "@ankiErrorTooLarge": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "speakWord": "تلفظ لغت",
+  "speakExample": "خواندن جملهٔ مثال",
+  "speechVoiceUnavailable": "صدای آلمانی روی این دستگاه نصب نیست. در تنظیمات «تبدیل متن به گفتار» دستگاه آن را نصب کنید.",
+  "speechFailed": "پخش تلفظ ممکن نشد.",
+  "settingsStudy": "مطالعه",
+  "reminderTitle": "یادآور مطالعه",
+  "reminderIntro": "هر روز در ساعتی که انتخاب می‌کنید یک اعلان روی همین دستگاه نمایش داده می‌شود. هیچ سروری استفاده نمی‌شود.",
+  "reminderEnabled": "یادآور روزانه",
+  "reminderTime": "ساعت یادآوری",
+  "reminderOff": "خاموش",
+  "reminderOnAt": "هر روز ساعت {time}",
+  "@reminderOnAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNote": "برای روشن کردن یادآور، اجازهٔ نمایش اعلان خواسته می‌شود. در اندروید ممکن است اعلان چند دقیقه دیرتر برسد و برخی گوشی‌ها برای صرفه‌جویی در باتری آن را متوقف کنند.",
+  "reminderPermissionDenied": "اجازهٔ اعلان داده نشد. آن را در تنظیمات دستگاه برای AI WortBox فعال کنید.",
+  "reminderSchedulingFailed": "یادآور تنظیم نشد. دوباره تلاش کنید.",
+  "reminderNotificationTitle": "وقت مرور لغت‌هاست",
+  "reminderNotificationBody": "چند دقیقه با لغت‌های آلمانی خود تمرین کنید.",
+  "practiceTitle": "مرور لغت‌ها",
+  "practiceTileDescription": "جهت مرور، دسته و تمرین آزاد را انتخاب کنید",
+  "practiceTileStreak": "{count, plural, other{{count} روز پیاپی تمرین}}",
+  "@practiceTileStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceIntro": "در هر کارت فقط یک طرف نمایش داده می‌شود. پاسخ را به یاد بیاورید، سپس آن را ببینید و بگویید به یاد آوردید یا نه.",
+  "practiceNotSrs": "این تمرین آزاد است و زمان‌بندی مرور (FSRS) را تغییر نمی‌دهد. فقط نتیجهٔ شما برای آمار ثبت می‌شود.",
+  "practiceWordsFrom": "لغت‌ها از",
+  "practiceAllDecks": "همه دسته‌ها",
+  "practiceDifficultOnly": "فقط لغت‌های دشوار",
+  "practiceStart": "شروع تمرین",
+  "practiceEnd": "پایان تمرین",
+  "practiceProgress": "{current} از {total}",
+  "@practiceProgress": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "practicePrompt": "لغت آلمانی این معنی چیست؟",
+  "practiceReveal": "نمایش پاسخ",
+  "practiceAsk": "آن را به یاد آوردید؟",
+  "practiceRemembered": "به یاد آوردم",
+  "practiceForgotten": "به یاد نیاوردم",
+  "practiceEmptyTitle": "لغتی برای تمرین نیست",
+  "practiceEmptyBody": "برای این تمرین لغت‌هایی لازم است که معنی فارسی دارند.",
+  "practiceEmptyDifficult": "هیچ لغت دشواری با معنی فارسی پیدا نشد. در صفحهٔ هر لغت می‌توانید آن را دشوار علامت بزنید.",
+  "practiceDoneTitle": "تمرین تمام شد",
+  "practiceRememberedCount": "{count, plural, other{{count} لغت را به یاد آوردید}}",
+  "@practiceRememberedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceForgottenCount": "{count, plural, other{{count} لغت را به یاد نیاوردید}}",
+  "@practiceForgottenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceFinish": "بازگشت به امروز",
+  "practiceSeeStatistics": "دیدن آمار",
+  "statsWords": "لغت‌ها",
+  "statsDifficult": "لغت‌های دشوار",
+  "statsReviews": "پاسخ‌های ثبت‌شده",
+  "statsRemembered": "به یاد آورده",
+  "statsSessions": "جلسه‌های تمرین",
+  "statsStudyDays": "روزهای تمرین",
+  "statsCurrentStreak": "روزهای پیاپی فعلی",
+  "statsLongestStreak": "طولانی‌ترین زنجیره",
+  "statsDays": "{count, plural, other{{count} روز}}",
+  "@statsDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsRecentDays": "پاسخ‌ها در ۱۴ روز اخیر",
+  "statsEmptyBody": "آمار تمرین از پاسخ‌هایی ساخته می‌شود که در تمرین ثبت می‌کنید. هنوز پاسخی ثبت نشده است.",
+  "statsPolicy": "فقط پاسخ‌هایی شمرده می‌شوند که پس از نمایش پاسخ ثبت کرده‌اید؛ باز کردن برنامه یا یک لغت شمرده نمی‌شود. هر روز طبق ساعت همین دستگاه از نیمه‌شب تا نیمه‌شب است. زنجیره تا وقتی ادامه دارد که دیروز یا امروز تمرین کرده باشید. این آمار به معنای به‌خاطرسپاری همیشگی نیست.",
+  "practiceScheduledNote": "مرور زمان‌بندی‌شده: فقط کارت‌هایی که موعدشان رسیده نمایش داده می‌شوند و هر پاسخ، زمان مرور بعدی را با الگوریتم FSRS تعیین می‌کند. لغت‌های جدید طبق سقف روزانهٔ هر دسته اضافه می‌شوند.",
+  "practiceFreeMode": "تمرین آزاد (زمان‌بندی تغییر نمی‌کند)",
+  "practicePromptMeaning": "معنی این لغت آلمانی چیست؟",
+  "practiceEmptyDueTitle": "فعلاً کارتی برای مرور نیست",
+  "practiceEmptyDueBody": "همهٔ کارت‌های موعددار مرور شده‌اند و کارت‌های بعدی در زمان خودشان برمی‌گردند. می‌توانید بدون تغییر زمان‌بندی، تمرین آزاد کنید.",
+  "practiceFreeInstead": "تمرین آزاد",
+  "practiceScheduledDone": "زمان مرور بعدی هر کارت ذخیره شد.",
+  "reviewDirectionTitle": "جهت مرور",
+  "reviewDirectionGermanToPersian": "آلمانی ← فارسی",
+  "reviewDirectionPersianToGerman": "فارسی ← آلمانی",
+  "reviewDirectionBoth": "هر دو جهت",
+  "reviewDirectionBothNote": "هر لغت دو کارت جدا با زمان‌بندی مستقل دارد. هر لغت در هر روز فقط در یک جهت پرسیده می‌شود؛ اول جهتی که موعدش زودتر است (در کارت‌های جدید، آلمانی ← فارسی).",
+  "reviewStart": "شروع مرور",
+  "reviewDueCount": "{count, plural, =0{فعلاً کارتی برای مرور نیست} other{{count} کارت برای مرور}}",
+  "@reviewDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "reviewDueShort": "{count, plural, other{{count} کارت}}",
+  "@reviewDueShort": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "deckShowMeanings": "نمایش معنی‌ها",
+  "deckHideMeanings": "پنهان کردن معنی‌ها",
+  "selectionCount": "{count, plural, other{{count} انتخاب‌شده}}",
+  "@selectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "selectionSelectAll": "انتخاب همه",
+  "selectionClear": "لغو همهٔ انتخاب‌ها",
+  "selectionExit": "خروج از حالت انتخاب",
+  "selectionDelete": "حذف انتخاب‌شده‌ها",
+  "bulkDeleteTitle": "{count, plural, other{{count} لغت حذف شود؟}}",
+  "@bulkDeleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "bulkDeleteBody": "معنی‌ها، برچسب‌ها و زمان‌بندی مرور این لغت‌ها هم حذف می‌شوند. پاسخ‌های ثبت‌شده برای آمار باقی می‌مانند. این کار برگشت‌پذیر نیست.",
+  "bulkDeleted": "{count, plural, other{{count} لغت حذف شد}}",
+  "@bulkDeleted": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanViewImage": "انتخاب روی عکس",
+  "scanViewText": "نمایش متن",
+  "scanImageHint": "روی لغت بزنید تا انتخاب شود. برای چند لغت پشت سر هم، روی اولی نگه دارید و تا آخری بکشید. با دو انگشت بزرگ‌نمایی کنید.",
+  "scanPageImageLabel": "عکس صفحه",
+  "scanRegionMode": "انتخاب ناحیه",
+  "scanRegionHint": "دور متنی که درست خوانده نشده یک کادر بکشید تا دوباره خوانده شود.",
+  "scanRegionTitle": "متن ناحیهٔ انتخاب‌شده",
+  "scanRegionHelper": "در صورت نیاز اصلاح کنید؛ فقط همین متن اضافه می‌شود.",
+  "scanRegionAdd": "افزودن",
+  "scanRegionEmpty": "در این ناحیه متنی پیدا نشد. کادر بزرگ‌تری بکشید.",
+  "scanRegionFailed": "خواندن این ناحیه ممکن نشد. دوباره تلاش کنید.",
+  "scanSplitWords": "جدا کردن به لغت‌های تکی",
+  "scanRemoveSelection": "حذف از انتخاب"
 }

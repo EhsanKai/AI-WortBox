@@ -27,9 +27,13 @@ import 'csv_import_controller.dart';
 const _previewLimit = 50;
 
 class CsvImportScreen extends ConsumerWidget {
-  const CsvImportScreen({super.key, this.initialDeckId});
+  const CsvImportScreen({super.key, this.initialDeckId, this.anki = false});
 
   final String? initialDeckId;
+
+  /// Opened as "import from Anki": only the title and the explanation
+  /// differ; any supported file (CSV or Anki package) is accepted.
+  final bool anki;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,7 +43,9 @@ class CsvImportScreen extends ConsumerWidget {
     final decks = ref.watch(deckSummariesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.addImportCsv)),
+      appBar: AppBar(
+        title: Text(anki ? l10n.ankiImportTitle : l10n.addImportCsv),
+      ),
       body: switch (decks) {
         AsyncData(:final value) when value.isEmpty => EmptyStateView(
           icon: Icons.inventory_2_outlined,
@@ -59,6 +65,7 @@ class CsvImportScreen extends ConsumerWidget {
         AsyncData(:final value) => _ImportForm(
           initialDeckId: initialDeckId,
           decks: [for (final s in value) s.deck],
+          anki: anki,
         ),
         AsyncError(:final error) => ErrorStateView(
           error: error,
@@ -71,10 +78,15 @@ class CsvImportScreen extends ConsumerWidget {
 }
 
 class _ImportForm extends ConsumerWidget {
-  const _ImportForm({required this.initialDeckId, required this.decks});
+  const _ImportForm({
+    required this.initialDeckId,
+    required this.decks,
+    this.anki = false,
+  });
 
   final String? initialDeckId;
   final List<Deck> decks;
+  final bool anki;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -107,7 +119,7 @@ class _ImportForm extends ConsumerWidget {
       ),
       children: [
         Text(
-          l10n.csvIntro,
+          anki ? l10n.ankiImportIntro : l10n.csvIntro,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -282,7 +294,21 @@ class _FileSection extends StatelessWidget {
             file == null ? l10n.csvChooseFile : l10n.csvChooseAnother,
           ),
         ),
-        if (file != null && table != null) ...[
+        if (file != null && table?.source == CsvTableSource.ankiPackage) ...[
+          const SizedBox(height: AppSpace.sm),
+          ListTile(
+            key: const Key('csv.ankiFile'),
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.style_outlined),
+            title: AutoDirectionText(
+              file.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(l10n.ankiNoteCount(table!.records.length - 1)),
+          ),
+          InfoBanner(icon: Icons.info_outline, message: l10n.ankiImportNote),
+        ] else if (file != null && table != null) ...[
           const SizedBox(height: AppSpace.sm),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -361,6 +387,7 @@ class _ColumnsSection extends StatelessWidget {
       ImportField.exampleTranslation => l10n.csvFieldExampleTranslation,
       ImportField.grammarInfo => l10n.csvFieldGrammar,
       ImportField.notes => l10n.csvFieldNotes,
+      ImportField.tags => l10n.csvFieldTags,
     };
 
     return Column(

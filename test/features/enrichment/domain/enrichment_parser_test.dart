@@ -165,7 +165,13 @@ void main() {
 
   test('unknown part of speech is dropped, known ones get German labels', () {
     expect(
-      parse(enrichmentContent(partOfSpeech: 'noun')).partOfSpeech,
+      parse(
+        enrichmentContent(
+          partOfSpeech: 'noun',
+          lemma: 'Haus',
+          grammarInfo: 'das Haus, -es, -¨er',
+        ),
+      ).partOfSpeech,
       'Nomen',
     );
     expect(
@@ -202,5 +208,191 @@ void main() {
         .toSet();
     expect(enrichmentResponseSchema['required'], unorderedEquals(properties));
     expect(enrichmentResponseSchema['additionalProperties'], isFalse);
+  });
+
+  group('grammar validation (no hallucinated grammar is kept)', () {
+    test('no grammar note without a word class', () {
+      final r = parse(enrichmentContent(partOfSpeech: null));
+      expect(r.grammarInfo, isNull);
+    });
+
+    test('a lower-case "noun" loses word class and grammar', () {
+      final r = parse(
+        enrichmentContent(
+          partOfSpeech: 'noun',
+          lemma: null,
+          grammarInfo: 'der Lauf, -(e)s, Läufe',
+        ),
+        original: 'laufen',
+      );
+      expect(r.partOfSpeech, isNull);
+      expect(r.grammarInfo, isNull);
+    });
+
+    test('a noun note must start with its article', () {
+      final ok = parse(
+        enrichmentContent(
+          partOfSpeech: 'noun',
+          lemma: null,
+          grammarInfo: 'die Mühe, -, -n',
+        ),
+        original: 'Mühe',
+      );
+      expect(ok.grammarInfo, 'die Mühe, -, -n');
+      final bad = parse(
+        enrichmentContent(
+          partOfSpeech: 'noun',
+          lemma: null,
+          grammarInfo: 'Plural: Mühen',
+        ),
+        original: 'Mühe',
+      );
+      expect(bad.partOfSpeech, 'Nomen');
+      expect(bad.grammarInfo, isNull);
+    });
+
+    test('a noun-style note on a verb is dropped', () {
+      final r = parse(
+        enrichmentContent(partOfSpeech: 'verb', grammarInfo: 'der Gang, -es'),
+      );
+      expect(r.partOfSpeech, 'Verb');
+      expect(r.grammarInfo, isNull);
+    });
+
+    test('a verb lemma must look like an infinitive', () {
+      expect(parse(enrichmentContent(lemma: 'ging')).lemma, isNull);
+      expect(parse(enrichmentContent(lemma: 'gehen')).lemma, 'gehen');
+      expect(
+        parse(
+          enrichmentContent(lemma: 'sich freuen'),
+          original: 'freute',
+        ).lemma,
+        'sich freuen',
+      );
+    });
+
+    test('grammar notes in Persian or overly long ones are dropped', () {
+      expect(
+        parse(enrichmentContent(grammarInfo: 'فعل بی‌قاعده')).grammarInfo,
+        isNull,
+      );
+      expect(
+        parse(enrichmentContent(grammarInfo: 'ging, ${'x' * 300}')).grammarInfo,
+        isNull,
+      );
+    });
+  });
+
+  group('batch JSON validation', () {
+    const words = [(id: '1', original: 'ging'), (id: '2', original: 'Mühe')];
+    Map<String, Object?> item(
+      String id,
+      String word, [
+      Map<String, Object?>? c,
+    ]) => {'id': id, 'word': word, ...(c ?? enrichmentContent())};
+    final muehe = enrichmentContent(
+      meanings: [
+        {'text': 'زحمت', 'explanation': null},
+      ],
+      partOfSpeech: 'noun',
+      grammarInfo: 'die Mühe, -, -n',
+      lemma: null,
+    );
+
+    test('the batch schema requires id, word and every field, strictly', () {
+      final itemSchema =
+          ((batchEnrichmentResponseSchema['properties']! as Map)['items']!
+                  as Map)['items']!
+              as Map;
+      expect(itemSchema['additionalProperties'], isFalse);
+      expect(
+        itemSchema['required'],
+        unorderedEquals([
+          'id',
+          'word',
+          ...enrichmentResponseSchema['required']! as List,
+        ]),
+      );
+    });
+
+    test('valid items are parsed per id; extra, unknown and duplicate items '
+        'are ignored', () {
+      final results = EnrichmentParser.parseBatch(
+        jsonEncode({
+          'items': [
+            item('2', 'Mühe', muehe),
+            item('1', 'ging'),
+            item(
+              '1',
+              'ging',
+              enrichmentContent(
+                meanings: [
+                  {'text': 'دوم', 'explanation': null},
+                ],
+              ),
+            ),
+            item('9', 'Haus'),
+            'garbage',
+          ],
+        }),
+        words,
+      );
+      expect(results.keys, unorderedEquals(['1', '2']));
+      expect((results['1']! as ParsedEnrichment).meanings.first.text, 'رفتن');
+      expect(
+        (results['2']! as ParsedEnrichment).grammarInfo,
+        'die Mühe, -, -n',
+      );
+    });
+
+    test('a missing, mismatched or invalid item fails alone', () {
+      final results = EnrichmentParser.parseBatch(
+        jsonEncode({
+          'items': [
+            item('1', 'gehen'), // the wrong word for id 1
+            item('2', 'Mühe', muehe),
+          ],
+        }),
+        words,
+      );
+      expect(results['1'], isA<EnrichmentException>());
+      expect(results['2'], isA<ParsedEnrichment>());
+    });
+
+    test('a bare array and items without ids (matched by word) are accepted; '
+        'a code fence is tolerated', () {
+      final results = EnrichmentParser.parseBatch(
+        '```json\n${jsonEncode([
+          {'word': 'ging', ...enrichmentContent()},
+          {'word': 'Mühe', ...muehe},
+        ])}\n```',
+        words,
+      );
+      expect(results.values.every((r) => r is ParsedEnrichment), isTrue);
+    });
+
+    test(
+      'a single-word answer without the wrapper is accepted for one word',
+      () {
+        final results = EnrichmentParser.parseBatch(
+          jsonEncode(enrichmentContent()),
+          [(id: '1', original: 'ging')],
+        );
+        expect(results['1'], isA<ParsedEnrichment>());
+      },
+    );
+
+    test('an answer with no usable item is malformed as a whole', () {
+      for (final content in [
+        'not json',
+        jsonEncode({'items': <Object>[]}),
+        jsonEncode({
+          'items': [item('1', 'Haus')],
+        }),
+        jsonEncode(enrichmentContent()), // two words requested
+      ]) {
+        expect(() => EnrichmentParser.parseBatch(content, words), malformed);
+      }
+    });
   });
 }

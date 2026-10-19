@@ -20,9 +20,10 @@ lib/
 ```
 
 Dependencies point inwards: presentation → domain ← data. Domain code does not
-import Drift or widgets. Scheduling (Phase 5), OCR (Phase 3), CSV parsing
-(Phase 2) and enrichment (Phase 4) will live in `domain`/`data` and stay
-independent of widgets.
+import Drift or widgets. OCR (Phase 3), CSV parsing (Phase 2), enrichment
+(Phase 4), and search keys, statistics, reminder times and Anki conversion
+(Phase 5) live in `domain`/`data` and stay independent of widgets. A future
+scheduler belongs there too.
 
 ## State management and dependency injection
 
@@ -56,11 +57,16 @@ keeps its own navigation stack.
 | `/add`, `/add/manual?deckId=`, `/add/csv?deckId=` | Add tab and its flows |
 | `/add/scan?deckId=`, `/words/decks/:deckId/scan` | Page scan flow (Phase 3) |
 | `/statistics`, `/settings` | Statistics, settings |
+| `/today/practice`, `/today/practice/session?deckId=&difficult=1&free=1` | Review setup; FSRS review session, or free practice with `free=1`/`difficult=1` (D42–D44) |
+| `/words/search`, `/words/tags` | Search all words, manage tags (Phase 5) |
+| `/add/anki?deckId=` | Import from Anki (the import flow in Anki mode) |
+| `/settings/reminder` | Study reminder (Phase 5) |
 
 ## Database
 
-Drift, schema version **1**. DateTimes are stored as ISO-8601 text and always
-written in UTC, so text comparisons on due dates are correct. Enum columns
+Drift, schema version **2** (v1 → v2 in Phase 5, D33). DateTimes are
+stored as ISO-8601 text and always written in UTC, so text comparisons on
+due dates are correct. Enum columns
 store the enum value's `name`. Foreign keys are enabled in `beforeOpen`.
 
 | Table | Purpose | Key constraints |
@@ -68,7 +74,14 @@ store the enum value's `name`. Foreign keys are enabled in `beforeOpen`.
 | `decks` | Name, language pair, daily new-card limit | PK `id`; `daily_new_card_limit` 0–1000 |
 | `vocabulary_entries` | Original text, normalized key, lemma, POS, examples, grammar, notes, source context, source type, enrichment status/metadata (JSON), `user_edited_at` | FK → decks (cascade); index `(deck_id, normalized)` (non-unique) |
 | `vocabulary_meanings` | Ordered meanings per entry | FK → entries (cascade); unique `(entry_id, position)` |
-| `flashcards` | Direction + FSRS state: state, step, stability, difficulty, due, last review, review/lapse counts, scheduler version | FK → entries (cascade); unique `(entry_id, direction)`; index `due` |
+| `flashcards` | Direction + FSRS state: state, step, stability, difficulty, due, last review, review/lapse counts, scheduler version; written by `StudyRepository.recordAnswer` (FSRS, D42), row created on the first scheduled answer | FK → entries (cascade); unique `(entry_id, direction)`; index `due` |
+| `tags` (v2) | Name as entered, case-insensitive `name_key` | PK `id`; unique `name_key` |
+| `entry_tags` (v2) | Tag assignments | PK `(entry_id, tag_id)`; FK → entries and tags (cascade); index `tag_id` |
+| `review_events` (v2) | Recorded practice answers: session, direction, outcome, UTC time, local day | FK → entries (**set null**: history is kept); index `local_day` |
+| `app_settings` (v2) | Non-secret key-value settings (study reminder) | PK `key` |
+
+`vocabulary_entries` gained `marked_difficult_at` (manual mark, not content:
+it does not change `updated_at`) and `search_key` (derived, D34) in v2.
 
 Vocabulary content and review state are in separate tables: editing an entry
 never writes to `flashcards`, so progress is never reset by a definition edit
@@ -83,7 +96,9 @@ never writes to `flashcards`, so progress is never reset by a definition edit
    `app_database.steps.dart` and migration tests under `test/drift/`.
 4. Implement `onUpgrade` with `stepByStep(...)`, run tests.
 
-The exported v1 schema is checked by `test/drift/app_database/schema_test.dart`.
+Exported schemas (v1, v2) are checked by
+`test/drift/app_database/schema_test.dart`; `migration_test.dart` migrates
+every version step and checks v1 data survives v1 → v2 unchanged.
 
 ## Vocabulary
 
@@ -180,8 +195,14 @@ ScanReviewItem.toDraft          ─▶ VocabularyRepository.importEntries
   `importEntries`, i.e. one transaction, the same duplicate rules and the
   same three `DuplicateStrategy` options as CSV import (default: skip).
   Items already in the deck are marked and not saved again.
-- **Privacy**: the picked photo is a temporary copy that is deleted right
-  after recognition (also on errors). Images are never uploaded or stored.
+- **Privacy**: the picked photo is a temporary copy, kept only while the
+  scan is open when words can be selected on it, otherwise deleted right
+  after recognition (also on errors); area crops are deleted after reading.
+  Images are never uploaded or stored (D46).
+- **Photo selection (D46)**: `ScanText.words` (character range, box,
+  confidence) and `imageSize`; `ScanDocument.tokenAt/boxesOf`; `ImageFit`
+  (contain-fit mapping); `ScanImageSelectView` (InteractiveViewer, tap,
+  long-press drag, area mode via `ImageCropper`).
 - **State**: `ScanController` (Riverpod, one per screen instance) drives the
   steps capture → (typing) → select → review → done inside one route; the
   back button returns to the previous step.
@@ -250,6 +271,50 @@ EnrichmentScreen ── EnrichmentController ── VocabularyRepository.applyEn
   connection requests fail with a network message and nothing changes. All
   other features are unaffected.
 
+## Phase 5 features (implemented, awaiting commit)
+
+```
+VocabularyBrowser ─ vocabularySearchProvider ─ VocabularyRepository.watchSearch
+                                                 (search_key + filters, SQL)
+EntryDetail ─ setDifficult · SpeakButton ─ SpeechService (flutter_tts)
+            └ EntryTagsSheet ─ TagRepository
+PracticeController ─ VocabularyRepository.search ─▶ ReviewRepository.record
+StatisticsScreen ─ studyStatisticsProvider ─ StudyStatistics.compute
+                     (watchCounts, watchDailyActivity, watchSessionCount)
+ReminderController ─ ReminderScheduler (flutter_local_notifications)
+                   └ SettingsStore (app_settings)
+DeckExporter ─ CsvExporter / AnkiPackageWriter ─▶ ExportFileSink (save dialog)
+CsvImportController ─ AnkiPackageReader (ZIP signature) or CsvParser ─▶ CsvTable
+```
+
+- **Search (D34):** `VocabularySearch.keyFor` builds the stored key;
+  `queryKeys` the German and Persian keys of a query. With a deck and no
+  filter the deck list stream is shown; otherwise the database search.
+- **Tags:** `TagNames` cleans, validates (1–40 characters) and keys names;
+  `addTagsByName` is used inside import transactions and only for rows that
+  create or merge an entry.
+- **Review and statistics (D42–D44, D36):** `buildDueQueue` (pure) and
+  `FsrsReviewScheduler` in the domain; `DriftStudyRepository` loads cards
+  and writes card state + event in one transaction; the direction setting
+  is `reviewDirectionProvider`. Free practice records events only;
+  `StudyStatistics` is pure Dart. `Clock.toLocal` provides the device local
+  time (tests use a fixed offset).
+- **Reminders (D37):** `nextReminderTime` (pure, DST-aware with `timezone`)
+  gives the first occurrence; the plugin repeats it daily. `main.dart` calls
+  `syncOnStartup` (no permission request).
+- **TTS (D38, D45):** `SpeechService` interface; `FlutterTtsSpeechService`
+  sets the iOS playback audio session once, checks the voice once per
+  language, serialises requests and interrupts playing speech.
+- **Export and Anki (D39, D40):** `CsvExporter` mirrors the importer's
+  headers. `AnkiPackageReader` turns notes into a `CsvTable`
+  (`source = ankiPackage`), so mapping, preview, duplicates and the
+  transactional import are shared with CSV. `withMemoryDatabase` opens Anki
+  collections in an in-memory SQLite VFS. Imported Anki words are stored with
+  `source_type = csv` (shown as "file import").
+- Tests replace every native service (`speechServiceProvider`,
+  `reminderSchedulerProvider`, `exportFileSinkProvider`) and the practice
+  order (`randomProvider`).
+
 ## Security
 
 - No API key in the source, assets, build configuration or the app bundle.
@@ -280,18 +345,18 @@ register in [implementation-plan.md](implementation-plan.md).
 
 | ID | Likely change | Migration notes |
 | --- | --- | --- |
-| P2 tags | `tags`, `entry_tags` tables | Additive; cascades on entry delete |
+| P2 tags | `tags`, `entry_tags` tables | **Done in v2** |
 | P4 lemma duplicates | `lemma_normalized` column + index | Backfill from `lemma`/`original` |
 | P5 sources | `sources` table and/or `entry_contexts` table | Move existing `source_context` into it, or keep column and add table |
-| P9 manual difficult mark | one boolean column | Additive, default false |
+| P9 manual difficult mark | one column | **Done in v2** (`marked_difficult_at`) |
 | P10 reverse cards per deck | one deck setting column | Additive; card rows already support `direction` |
 | P11 structured grammar | JSON column or `grammar_details` table | Keep existing `grammar_info` text |
 | P13 media | `media` table + files in documents dir | Backup must include files |
-| P7 reminders, P6 TTS | settings storage | Prefer a key-value settings table or platform preferences; decide once |
+| P7 reminders, P6 TTS | settings storage | **Done in v2** (`app_settings`) |
 | P1, P8, P12 | none expected | P1 may need FTS5 for large collections |
 
-Planned (original specification): schema v2 adds a review log table in
-Phase 5.
+FSRS (D42) needed no schema change: card state lives in `flashcards`
+and every answer is a `review_events` row (direction, outcome, time).
 
 ### Backup format boundary (P3)
 
@@ -315,9 +380,8 @@ Three independent interfaces, each enabled separately:
 Images are stored as local files referenced from a `media` table, never
 inside SQLite rows.
 
-### Anki boundary
+### Anki boundary (implemented in Phase 5)
 
-CSV/text exchange uses the existing CSV pipeline (import) and a future
-exporter. `.apkg` support would be a separate adapter, added only after the
-evaluation described in the roadmap; it must not shape the core data model
-before that evaluation.
+`.apkg` support is an adapter in `features/anki/data` that converts to and
+from the existing import table and vocabulary entries; it does not shape the
+core data model (no Anki ids are stored).

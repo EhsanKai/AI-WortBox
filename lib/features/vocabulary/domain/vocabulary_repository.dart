@@ -4,6 +4,7 @@ import 'duplicate_detection.dart';
 import 'enrichment_update.dart';
 import 'vocabulary_draft.dart';
 import 'vocabulary_entry.dart';
+import 'vocabulary_search.dart';
 
 /// Persistence boundary for vocabulary entries.
 ///
@@ -15,6 +16,20 @@ abstract interface class VocabularyRepository {
   Stream<List<VocabularyEntry>> watchEntries(String deckId);
 
   Stream<VocabularyEntry?> watchEntry(String id);
+
+  /// Entries matching [query], newest first, at most [limit]. Matching runs
+  /// in the database on stored search keys (see [VocabularySearch]).
+  Stream<List<VocabularyEntry>> watchSearch(VocabularyQuery query, {int limit});
+
+  /// Number of entries, and of entries marked difficult, in all decks.
+  Stream<({int total, int difficult})> watchCounts();
+
+  /// A one-time snapshot of [watchSearch].
+  Future<List<VocabularyEntry>> search(VocabularyQuery query, {int limit});
+
+  /// Marks or unmarks entry [id] as difficult. Content, `updatedAt` and
+  /// review state are not changed.
+  Future<void> setDifficult(String id, {required bool difficult});
 
   Future<List<VocabularyEntry>> getEntries(String deckId);
 
@@ -52,6 +67,12 @@ abstract interface class VocabularyRepository {
 
   /// Deletes the entry, its meanings and its flashcards.
   Future<void> deleteEntry(String id);
+
+  /// Deletes the entries [ids] in one transaction, with the same rules as
+  /// [deleteEntry]: meanings, tag assignments and scheduling state go with
+  /// them, review history is kept. Unknown ids are ignored. Returns the
+  /// number of entries deleted.
+  Future<int> deleteEntries(Iterable<String> ids);
 
   /// Imports [candidates] into [deckId] in a single transaction, using
   /// `planImport` against the deck's current entries. Either every write

@@ -15,6 +15,9 @@ import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../speech/presentation/speak_button.dart';
+import '../../tags/presentation/entry_tags_sheet.dart';
+import '../../tags/presentation/tag_providers.dart';
 import '../domain/vocabulary_entry.dart';
 import 'vocabulary_providers.dart';
 
@@ -69,6 +72,24 @@ class EntryDetailScreen extends ConsumerWidget {
     }
   }
 
+  Future<void> _toggleDifficult(
+    BuildContext context,
+    WidgetRef ref,
+    VocabularyEntry entry,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    // The flag icon and the "difficult" badge show the new state; a
+    // snackbar here would cover sheets opened right after.
+    try {
+      await ref
+          .read(vocabularyRepositoryProvider)
+          .setDifficult(entry.id, difficult: !entry.isDifficult);
+    } on AppException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(errorMessage(l10n, e))));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -79,6 +100,16 @@ class EntryDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         actions: [
           if (current != null) ...[
+            IconButton(
+              key: const Key('entryDetail.difficult'),
+              tooltip: current.isDifficult
+                  ? l10n.entryUnmarkDifficult
+                  : l10n.entryMarkDifficult,
+              isSelected: current.isDifficult,
+              icon: const Icon(Icons.flag_outlined),
+              selectedIcon: const Icon(Icons.flag),
+              onPressed: () => _toggleDifficult(context, ref, current),
+            ),
             IconButton(
               key: const Key('entryDetail.enrich'),
               tooltip: l10n.enrichAction,
@@ -118,14 +149,15 @@ class EntryDetailScreen extends ConsumerWidget {
   }
 }
 
-class _EntryDetails extends StatelessWidget {
+class _EntryDetails extends ConsumerWidget {
   const _EntryDetails({required this.entry});
 
   final VocabularyEntry entry;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final tags = ref.watch(entryTagsProvider(entry.id)).value ?? const [];
     final theme = Theme.of(context);
     final colors = context.colors;
     final muted = theme.colorScheme.onSurfaceVariant;
@@ -158,11 +190,34 @@ class _EntryDetails extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AutoDirectionText(
-                  entry.original,
-                  key: const Key('entryDetail.word'),
-                  style: AppTypography.headword,
+                Row(
+                  children: [
+                    Expanded(
+                      child: AutoDirectionText(
+                        entry.original,
+                        key: const Key('entryDetail.word'),
+                        style: AppTypography.headword,
+                      ),
+                    ),
+                    SpeakButton(
+                      key: const Key('entryDetail.speakWord'),
+                      text: entry.original,
+                      language: entry.sourceLanguage,
+                    ),
+                  ],
                 ),
+                if (entry.isDifficult) ...[
+                  const SizedBox(height: AppSpace.xs),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: StatusBadge(
+                      key: const Key('entryDetail.difficultBadge'),
+                      label: l10n.entryDifficult,
+                      tone: StatusTone.warning,
+                      icon: Icons.flag,
+                    ),
+                  ),
+                ],
                 if (grammar.isNotEmpty) ...[
                   const SizedBox(height: AppSpace.xs),
                   AutoDirectionText(
@@ -244,9 +299,22 @@ class _EntryDetails extends StatelessWidget {
             _QuoteBlock(
               children: [
                 if (entry.exampleSentence != null)
-                  AutoDirectionText(
-                    entry.exampleSentence!,
-                    style: AppTypography.germanBody,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: AutoDirectionText(
+                          entry.exampleSentence!,
+                          style: AppTypography.germanBody,
+                        ),
+                      ),
+                      SpeakButton(
+                        key: const Key('entryDetail.speakExample'),
+                        text: entry.exampleSentence!,
+                        language: entry.sourceLanguage,
+                        tooltip: l10n.speakExample,
+                      ),
+                    ],
                   ),
                 if (entry.exampleTranslation != null) ...[
                   const SizedBox(height: AppSpace.sm),
@@ -269,6 +337,31 @@ class _EntryDetails extends StatelessWidget {
               ],
             ),
           ]),
+        section(l10n.tagsTitle, [
+          Wrap(
+            spacing: AppSpace.sm,
+            runSpacing: AppSpace.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final tag in tags)
+                Chip(
+                  key: Key('entryDetail.tag.${tag.id}'),
+                  avatar: const Icon(Icons.label_outline, size: 18),
+                  label: Text(bidiIsolate(tag.name)),
+                ),
+              ActionChip(
+                key: const Key('entryDetail.editTags'),
+                avatar: const Icon(Icons.edit_outlined, size: 18),
+                label: Text(tags.isEmpty ? l10n.tagsAdd : l10n.tagsEdit),
+                onPressed: () => showEntryTagsSheet(
+                  context,
+                  entryId: entry.id,
+                  selected: {for (final t in tags) t.id},
+                ),
+              ),
+            ],
+          ),
+        ]),
         if (entry.notes != null)
           section(l10n.entryNotes, [
             AutoDirectionText(entry.notes!, style: theme.textTheme.bodyLarge),

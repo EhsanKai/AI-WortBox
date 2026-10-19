@@ -14,6 +14,8 @@ import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/ai_model_catalog.dart';
 import 'ai_settings_controller.dart';
+import 'free_usage_controller.dart';
+import 'free_usage_section.dart';
 
 /// Bring-your-own-key setup: explanation, key entry/replacement/removal,
 /// key test, model choice, privacy and security notes.
@@ -157,6 +159,10 @@ class _AiSettingsBodyState extends ConsumerState<_AiSettingsBody> {
     final theme = Theme.of(context);
     final state = widget.state;
     final showField = !state.isConfigured || _replacing;
+    // The paid model choice matters only with free-only mode off.
+    final freeOnly =
+        ref.watch(freeUsageControllerProvider).value?.preferences.freeOnly ??
+        true;
     const gap = SizedBox(height: AppSpace.xl);
 
     return ListView(
@@ -303,34 +309,38 @@ class _AiSettingsBodyState extends ConsumerState<_AiSettingsBody> {
         ],
         _CheckResult(check: state.check),
         gap,
-        SectionHeader(l10n.aiModelLabel),
-        // A failed change resets the field to the stored model.
-        KeyedSubtree(
-          key: ValueKey(_modelResets),
-          child: DropdownButtonFormField<String>(
-            key: const Key('ai.model'),
-            initialValue: state.model,
-            isExpanded: true,
-            decoration: InputDecoration(helperText: l10n.aiModelHelper),
-            items: [
-              for (final m in AiModelCatalog.models)
-                DropdownMenuItem(
-                  value: m.id,
-                  child: Text(m.label, textDirection: TextDirection.ltr),
-                ),
-            ],
-            onChanged: (id) {
-              if (id != null) _selectModel(id);
-            },
+        FreeUsageSection(paidModel: state.model),
+        if (!freeOnly) ...[
+          gap,
+          SectionHeader(l10n.aiModelLabel),
+          // A failed change resets the field to the stored model.
+          KeyedSubtree(
+            key: ValueKey(_modelResets),
+            child: DropdownButtonFormField<String>(
+              key: const Key('ai.model'),
+              initialValue: state.model,
+              isExpanded: true,
+              decoration: InputDecoration(helperText: l10n.aiModelHelper),
+              items: [
+                for (final m in AiModelCatalog.models)
+                  DropdownMenuItem(
+                    value: m.id,
+                    child: Text(m.label, textDirection: TextDirection.ltr),
+                  ),
+              ],
+              onChanged: (id) {
+                if (id != null) _selectModel(id);
+              },
+            ),
           ),
-        ),
-        if (_modelSaveFailed) ...[
-          const SizedBox(height: AppSpace.sm),
-          InfoBanner(
-            key: const Key('ai.modelError'),
-            tone: StatusTone.danger,
-            message: l10n.aiModelSaveFailed,
-          ),
+          if (_modelSaveFailed) ...[
+            const SizedBox(height: AppSpace.sm),
+            InfoBanner(
+              key: const Key('ai.modelError'),
+              tone: StatusTone.danger,
+              message: l10n.aiModelSaveFailed,
+            ),
+          ],
         ],
         gap,
         SectionHeader(l10n.aiPrivacyTitle),

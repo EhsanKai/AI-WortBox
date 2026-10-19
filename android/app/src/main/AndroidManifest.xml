@@ -1,6 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- AI suggestions call the OpenRouter API (only on the user's request). -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Study reminder (local notifications only, no server push).
+         POST_NOTIFICATIONS is requested at runtime on Android 13+ only when
+         the user turns the reminder on. RECEIVE_BOOT_COMPLETED lets the
+         plugin restore the scheduled reminder after a restart. No exact-alarm
+         permission: the reminder is scheduled as an inexact alarm. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:label="AI WortBox"
         android:name="${applicationName}"
@@ -29,6 +36,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- flutter_local_notifications: shows scheduled notifications and
+             reschedules them after a reboot or an app update. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -44,6 +66,11 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- German pronunciation (flutter_tts): find the system TTS engine on
+             Android 11+. -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE"/>
         </intent>
         <!-- Opening openrouter.ai/keys in the browser (url_launcher). -->
         <intent>

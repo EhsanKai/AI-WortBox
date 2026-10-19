@@ -4,8 +4,9 @@
 
 AI WortBox is a local-first iOS/Android app (Flutter) that helps Persian
 speakers learn German vocabulary: collect words from CSV files, manual entry or
-scanned book pages, enrich them with AI-generated Persian meanings, and review
-them with FSRS spaced repetition.
+scanned book pages or Anki packages, enrich them with AI-generated Persian
+meanings, and review them with FSRS spaced repetition (German → Persian by
+default, Persian → German or both).
 
 > The name "AI WortBox" has not been checked for trademark or app-store
 > availability.
@@ -18,18 +19,21 @@ them with FSRS spaced repetition.
 | 2 | Manual vocabulary entry, CSV import | **Complete** (`bbc9877`) |
 | 3 | Photo/gallery input, German OCR, word selection | **Complete** (`77287d7`) |
 | 4 | AI enrichment with your own OpenRouter key | **Complete** (`eaa0278`); live OpenRouter and real-device/platform verification outstanding |
-| 5 | FSRS review and release preparation | Planned |
+| 5 | Search, tags, CSV export, Anki import/export, German TTS, study reminder, practice, statistics, difficult words | **Implemented — awaiting commit**; platform builds and real-device checks outstanding |
 
-Additional features (search filters, tags, backup/restore, reminders,
-streaks, text-to-speech, images, Anki interoperability and more) are recorded
-as **proposed — not approved** in the
-[roadmap](docs/implementation-plan.md#proposed-feature-register-not-approved).
-They are not implemented and will not be without explicit approval.
+Since Phase 5: FSRS-scheduled review with a choice of direction, answers
+hidden until review, word selection directly on the page photo, reliable
+German pronunciation on iOS, and selecting/deleting several words
+(D42–D47).
+
+Not implemented: full backup/restore,
+images, and the other items recorded as **proposed — not approved** in the
+[roadmap](docs/implementation-plan.md#proposed-feature-register).
 
 See [docs/implementation-plan.md](docs/implementation-plan.md) and
 [docs/claude-phase-instructions.md](docs/claude-phase-instructions.md).
 
-## What works today (Phases 1–3)
+## What works today (Phases 1–5)
 
 - Persian, right-to-left UI with five tabs: Today (مرور امروز), My Words
   (لغات من), Add Vocabulary (افزودن لغت), Statistics (آمار), Settings (تنظیمات).
@@ -51,8 +55,11 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
 ### Page scanning (Phase 3)
 
 - Scan a book page: take a photo or choose one from the gallery; German text
-  is recognized **on the device** (Google ML Kit, no internet, the photo is
-  deleted right after recognition).
+  is recognized **on the device** (Google ML Kit, no internet). The photo is
+  kept only while the scan is open and then deleted.
+- Select words **directly on the photo**: tap words, touch-hold-and-drag
+  for an expression, pinch to zoom; or draw a box around badly recognized
+  text to read it again and correct it. A text view is still available.
 - Select single words or multi-word expressions in the recognized text
   (shown left-to-right inside the Persian UI); correct OCR mistakes; the
   original sentence is kept as context for each word.
@@ -77,6 +84,43 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
 - Only tested with mocked HTTP so far: **no live OpenRouter call and no
   real-device test has been made yet.**
 
+### Phase 5 — implemented, awaiting commit
+
+- **Search and filters:** search all words (My Words → search) or one deck by
+  German word, base form or Persian meaning; filter by tag and by difficult
+  words. Persian letter variants, diacritics and the ZWNJ are ignored.
+- **Tags:** several per word; create, rename and delete (deleting a tag never
+  deletes words). CSV and Anki imports bring their tags along.
+- **Difficult words:** mark a word on its page; badge in lists; filter;
+  practise only difficult words. Marking is manual only.
+- **Pronunciation:** play the German word and example with the device's own
+  text-to-speech voice (works offline if a German voice is installed).
+- **Review (FSRS):** due cards one at a time, prompt side only; reveal the
+  answer, then record "remembered" or "not remembered", which sets the next
+  review with FSRS. Direction: German → Persian (default), Persian →
+  German, or both. Free practice (all words or difficult words only) does
+  not change the schedule.
+- **Decks hide meanings** until you tap "show meanings"; long-press words to
+  select several and delete them after confirmation.
+- **Statistics:** words, difficult words, recorded answers, sessions, study
+  days, current and longest streak, the last 14 days — only from answers you
+  recorded in practice. A day is midnight to midnight on the device clock.
+- **Study reminder:** one daily local notification at a time you choose
+  (Settings → Study reminder). Permission is asked only when you turn it on.
+- **Export:** a deck as CSV or as an Anki package (`.apkg`), saved where you
+  choose.
+- **Anki import:** Add → Import from Anki (`.apkg`), through the same
+  preview and duplicate handling as CSV.
+
+### CSV export is not a backup
+
+The CSV file contains each word, its meanings, base form, part of speech,
+grammar, example and translation, notes and tags. It does **not** contain
+meaning explanations, sentence context, difficult marks, practice history and
+statistics, settings, or your API key (never exported). It is meant for
+spreadsheets, other apps and re-importing words; there is no full app backup
+yet.
+
 ## Platform build status
 
 iOS and Android builds are **not yet verified**. The development machine used
@@ -90,6 +134,11 @@ Phase 3 adds native plugins (`image_picker`, `google_mlkit_text_recognition`)
 and raises the iOS minimum to 15.5. Camera, gallery and OCR are tested only
 with fakes so far; they must be checked on real devices (see
 [docs/testing.md](docs/testing.md)).
+
+Phase 5 adds `flutter_tts`, `flutter_local_notifications` (Android: core
+library desugaring, notification permission and boot receiver; iOS:
+notification delegate) and `flutter_timezone`. Text-to-speech, notifications
+and the save dialogs are tested only with fakes; none has run on a device.
 
 ## CSV format
 
@@ -105,6 +154,31 @@ word,meaning,example,example translation
 Haus,خانه,Das Haus ist groß.,خانه بزرگ است.
 aufgeben,"تسلیم شدن؛ ترک کردن",Er gibt nie auf.,او هرگز تسلیم نمی‌شود.
 ```
+
+A `tags` column (several tags separated by `;`) is also recognized.
+
+**Export** (deck menu → Export as CSV) writes UTF-8 with BOM, comma-separated,
+with the columns `word, meaning, lemma, part of speech, grammar, example,
+example translation, notes, tags`; several meanings or tags are joined with
+`; `. Importing the file again maps every column automatically. A meaning
+that itself contains `;` is split into two meanings on re-import.
+
+## Anki
+
+- **Import** (Add → Import from Anki): `.apkg` packages from current Anki
+  (2.1.50 and later, including "support older Anki versions" exports) and
+  older/legacy packages. Every note's fields become columns you map to word,
+  meaning, etc. (`Front`/`Back` are mapped automatically); tags are kept.
+  Images, audio, scheduling and deck hierarchy are not imported. Limit: 50 MB
+  and 10,000 notes.
+- **Export** (deck menu → Export for Anki): an `.apkg` with the note type
+  "AI WortBox (German → Persian)" (one German → Persian card per word, tags
+  included, Persian right-to-left). Cards arrive as new cards; no scheduling
+  is exported. Exporting again later updates the same notes in Anki instead
+  of duplicating them.
+- Verified with the official Anki library 26.09.3 (see
+  [tool/anki/README.md](tool/anki/README.md)); the Anki desktop app,
+  AnkiDroid and AnkiMobile themselves have not been tested.
 
 ## Requirements
 
@@ -151,4 +225,6 @@ All data is stored on the device. No account is required. AI suggestions
 (Phase 4) are optional: only when you ask, the app sends the selected word,
 its sentence context and its existing meanings directly to OpenRouter, using
 your own key from the device's secure storage. No API key ships in the
-app.
+app. Phase 5 features (search, tags, practice, statistics, reminders,
+text-to-speech, export and Anki import) work entirely on the device;
+exported files contain no settings or keys.

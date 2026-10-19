@@ -21,7 +21,23 @@ class DecksScreen extends ConsumerWidget {
     final summaries = ref.watch(deckSummariesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navMyWords)),
+      appBar: AppBar(
+        title: Text(l10n.navMyWords),
+        actions: [
+          IconButton(
+            key: const Key('decks.search'),
+            tooltip: l10n.searchAllTitle,
+            icon: const Icon(Icons.search),
+            onPressed: () => context.go(AppRoutes.search),
+          ),
+          IconButton(
+            key: const Key('decks.tags'),
+            tooltip: l10n.tagsTitle,
+            icon: const Icon(Icons.label_outline),
+            onPressed: () => context.go(AppRoutes.tags),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('decks.create'),
         onPressed: () => createDeckAndAnnounce(context),

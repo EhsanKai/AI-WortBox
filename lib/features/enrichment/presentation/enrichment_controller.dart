@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers.dart';
 import '../../../core/error/app_exception.dart';
 import '../../vocabulary/domain/vocabulary_entry.dart';
+import '../data/ai_local_store.dart';
 import '../domain/enrichment.dart';
 import '../domain/enrichment_plan.dart';
+import 'free_usage_controller.dart';
 
 /// Which entries a session enriches: one entry (on request, even if it
 /// already has meanings) or the deck's entries without meanings.
@@ -75,6 +77,8 @@ class EnrichmentState {
     this.saveError,
     this.savedCount = 0,
     this.costUsd,
+    this.resumedCount,
+    this.freeOnly = true,
   });
 
   final EnrichmentPhase phase;
@@ -88,6 +92,19 @@ class EnrichmentState {
   /// Sum of the costs OpenRouter reported for this session's requests;
   /// null when none was reported.
   final double? costUsd;
+
+  /// Words left from an unfinished earlier run that this session resumes;
+  /// null for a new run.
+  final int? resumedCount;
+
+  /// Free-only mode was on when the session was loaded.
+  final bool freeOnly;
+
+  /// The run stopped for a reason that may pass by itself (an account
+  /// rate limit), so retrying later makes sense.
+  bool get canRetryAfterStop =>
+      stopError is EnrichmentException &&
+      (stopError! as EnrichmentException).error == EnrichmentError.rateLimited;
 
   int get doneCount => items
       .where(
@@ -113,6 +130,8 @@ class EnrichmentState {
     saveError: saveError != null ? saveError() : this.saveError,
     savedCount: savedCount ?? this.savedCount,
     costUsd: costUsd != null ? costUsd() : this.costUsd,
+    resumedCount: resumedCount,
+    freeOnly: freeOnly,
   );
 }
 
@@ -129,16 +148,37 @@ class EnrichmentController extends Notifier<EnrichmentState> {
     return const EnrichmentState(phase: EnrichmentPhase.ready);
   }
 
+  AiLocalState get _local => ref.read(aiLocalStateProvider);
+
   Future<void> _load() async {
     final repository = ref.read(vocabularyRepositoryProvider);
     final List<VocabularyEntry> entries;
+    int? resumed;
     if (target.entryId case final id?) {
       final entry = await repository.getEntry(id);
       entries = entry == null ? const [] : [entry];
     } else {
-      entries = batchCandidates(await repository.getEntries(target.deckId));
+      final all = await repository.getEntries(target.deckId);
+      // An unfinished earlier run continues with its own words; those
+      // already saved (or deleted) are no longer candidates.
+      final job = await _quietly(() => _local.readJob(target.deckId));
+      final pending = job == null
+          ? const <VocabularyEntry>[]
+          : batchCandidates([
+              for (final e in all)
+                if (job.contains(e.id)) e,
+            ]);
+      if (pending.isNotEmpty) {
+        entries = pending;
+        resumed = pending.length;
+      } else {
+        if (job != null) await _quietly(() => _local.clearJob(target.deckId));
+        entries = batchCandidates(all);
+      }
     }
     final key = await ref.read(aiSettingsStoreProvider).readApiKey();
+    final prefs =
+        await _quietly(_local.readPreferences) ?? const AiPreferences();
     if (!ref.mounted) return;
     state = EnrichmentState(
       phase: key == null || key.trim().isEmpty
@@ -147,13 +187,27 @@ class EnrichmentController extends Notifier<EnrichmentState> {
           ? EnrichmentPhase.empty
           : EnrichmentPhase.ready,
       items: [for (final e in entries) EnrichmentItem(entry: e)],
+      resumedCount: resumed,
+      freeOnly: prefs.freeOnly,
     );
+  }
+
+  /// Local bookkeeping (jobs, preferences) never blocks enrichment.
+  static Future<T?> _quietly<T>(Future<T> Function() body) async {
+    try {
+      return await body();
+    } on StorageException {
+      return null;
+    }
   }
 
   /// Re-checks the key, e.g. after returning from the settings screen.
   Future<void> reload() => _load();
 
-  /// Sends one request per queued item, one at a time.
+  /// Sends the queued items in batches of the configured size (one request
+  /// per batch, one request at a time). Words already answered come from
+  /// the cache without a request; a failed batch or word does not affect
+  /// the words already answered.
   Future<void> start() async {
     if (state.phase != EnrichmentPhase.ready &&
         state.phase != EnrichmentPhase.review) {
@@ -166,22 +220,83 @@ class EnrichmentController extends Notifier<EnrichmentState> {
       saveError: () => null,
     );
     final service = ref.read(enrichmentServiceProvider);
+    final prefs =
+        await _quietly(_local.readPreferences) ?? const AiPreferences();
+    if (target.entryId == null) {
+      // Remembered until saved, so an interrupted run can be resumed.
+      await _quietly(
+        () => _local.writeJob(target.deckId, [
+          for (final item in state.items)
+            if (item.status != ItemStatus.skipped) item.entry.id,
+        ]),
+      );
+    }
 
-    for (var i = 0; i < state.items.length; i++) {
-      if (!ref.mounted) return;
-      if (cancellation.isCancelled) break;
-      final item = state.items[i];
-      if (item.status != ItemStatus.queued) continue;
-      _update(i, item.copyWith(status: ItemStatus.running));
+    while (ref.mounted && !cancellation.isCancelled) {
+      final chunk = [
+        for (var i = 0; i < state.items.length; i++)
+          if (state.items[i].status == ItemStatus.queued) i,
+      ].take(prefs.wordsPerRequest).toList();
+      if (chunk.isEmpty) break;
+      for (final i in chunk) {
+        _update(i, state.items[i].copyWith(status: ItemStatus.running));
+      }
       try {
-        final proposal = await service.enrich(
-          requestFor(item.entry),
-          cancellation: cancellation,
-        );
+        final outcomes = await service.enrichBatch([
+          for (final i in chunk) requestFor(state.items[i].entry),
+        ], cancellation: cancellation);
         if (!ref.mounted) return;
+        for (final (n, i) in chunk.indexed) {
+          _apply(i, outcomes[n]);
+        }
+      } on EnrichmentException catch (e) {
+        if (!ref.mounted) return;
+        if (e.error == EnrichmentError.cancelled) {
+          for (final i in chunk) {
+            _update(i, state.items[i].copyWith(status: ItemStatus.queued));
+          }
+          break;
+        }
+        for (final i in chunk) {
+          _update(
+            i,
+            state.items[i].copyWith(status: ItemStatus.failed, error: () => e),
+          );
+        }
+        if (_stopsRun(e)) {
+          state = state.copyWith(stopError: () => e);
+          break;
+        }
+      }
+    }
+    if (!ref.mounted) return;
+    _cancellation = null;
+    state = state.copyWith(phase: EnrichmentPhase.review);
+    if (ref.exists(freeUsageControllerProvider)) {
+      ref.invalidate(freeUsageControllerProvider);
+    }
+  }
+
+  /// Failures that affect every further request: stop instead of failing
+  /// (or re-sending) each one. An account-level rate limit stops too, so
+  /// the limit is never worked around; a provider's own limit does not.
+  static bool _stopsRun(EnrichmentException e) => switch (e.error) {
+    EnrichmentError.notConfigured ||
+    EnrichmentError.invalidKey ||
+    EnrichmentError.insufficientCredits ||
+    EnrichmentError.dailyQuotaExhausted ||
+    EnrichmentError.paidModelBlocked => true,
+    EnrichmentError.rateLimited => !e.upstream,
+    _ => false,
+  };
+
+  void _apply(int index, EnrichmentOutcome outcome) {
+    final item = state.items[index];
+    switch (outcome) {
+      case EnrichmentSucceeded(:final proposal):
         final plan = EnrichmentPlan.build(item.entry, proposal);
         _update(
-          i,
+          index,
           item.copyWith(
             status: plan.hasSuggestions
                 ? ItemStatus.proposed
@@ -195,27 +310,12 @@ class EnrichmentController extends Notifier<EnrichmentState> {
         if (proposal.costUsd case final cost?) {
           state = state.copyWith(costUsd: () => (state.costUsd ?? 0) + cost);
         }
-      } on EnrichmentException catch (e) {
-        if (!ref.mounted) return;
-        if (e.error == EnrichmentError.cancelled) {
-          _update(i, item.copyWith(status: ItemStatus.queued));
-          break;
-        }
-        _update(i, item.copyWith(status: ItemStatus.failed, error: () => e));
-        // These affect every request: stop instead of failing each one.
-        if (const {
-          EnrichmentError.notConfigured,
-          EnrichmentError.invalidKey,
-          EnrichmentError.insufficientCredits,
-        }.contains(e.error)) {
-          state = state.copyWith(stopError: () => e);
-          break;
-        }
-      }
+      case EnrichmentFailed(:final error):
+        _update(
+          index,
+          item.copyWith(status: ItemStatus.failed, error: () => error),
+        );
     }
-    if (!ref.mounted) return;
-    _cancellation = null;
-    state = state.copyWith(phase: EnrichmentPhase.review);
   }
 
   void cancel() => _cancellation?.cancel();
@@ -262,6 +362,14 @@ class EnrichmentController extends Notifier<EnrichmentState> {
     );
     try {
       await ref.read(vocabularyRepositoryProvider).applyEnrichments(updates);
+      if (target.entryId == null &&
+          !state.items.any(
+            (i) =>
+                i.status == ItemStatus.failed || i.status == ItemStatus.queued,
+          )) {
+        // Every word of the run is finished.
+        await _quietly(() => _local.clearJob(target.deckId));
+      }
       if (!ref.mounted) return;
       state = state.copyWith(
         phase: EnrichmentPhase.done,

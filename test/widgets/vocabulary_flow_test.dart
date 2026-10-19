@@ -64,6 +64,10 @@ void main() {
     await scrollAndTap(tester, find.byKey(const Key('entryForm.save')));
 
     expect(find.text('Bank'), findsOneWidget);
+    // Meanings stay hidden in the deck until the learner shows them.
+    expect(find.text('بانک، نیمکت'), findsNothing);
+    await tester.tap(find.byKey(const Key('deck.toggleMeanings')));
+    await tester.pumpAndSettle();
     expect(find.text('بانک، نیمکت'), findsOneWidget);
 
     // German input fields are left-to-right inside the RTL UI.

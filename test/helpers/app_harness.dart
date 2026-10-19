@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:typed_data';
+
 import 'package:ai_wortbox/app/app.dart';
 import 'package:ai_wortbox/app/providers.dart';
 import 'package:ai_wortbox/core/id/id_generator.dart';
@@ -5,6 +8,7 @@ import 'package:ai_wortbox/core/time/clock.dart';
 import 'package:ai_wortbox/data/database/app_database.dart';
 import 'package:ai_wortbox/features/csv_import/data/csv_file_source.dart';
 import 'package:ai_wortbox/features/enrichment/data/ai_settings_store.dart';
+import 'package:ai_wortbox/features/scan/data/image_cropper.dart';
 import 'package:ai_wortbox/features/scan/data/scan_image_source.dart';
 import 'package:ai_wortbox/features/scan/data/text_recognition_engine.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +17,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
 import 'ai_fakes.dart';
+import 'phase5_fakes.dart';
+
+/// A valid 1×1 transparent PNG.
+final onePixelPng = Uint8List.fromList(const [
+  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, //
+  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+  0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
+  0x0D, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+  0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
+  0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+]);
 
 /// Returns a fixed file, or null to simulate cancelling the picker.
 class FakeCsvFileSource implements CsvFileSource {
@@ -35,9 +50,14 @@ Future<void> pumpApp(
   CsvFileSource? fileSource,
   ScanImageSource? imageSource,
   TextRecognitionEngine? recognitionEngine,
+  ImageCropper? imageCropper,
   AiSettingsStore? aiSettings,
   http.Client? httpClient,
   List<Uri>? launchedUrls,
+  FakeSpeechService? speech,
+  FakeReminderScheduler? reminders,
+  FakeExportSink? exportSink,
+  Clock? clock,
   Size size = const Size(390, 844),
   double textScale = 1,
   Brightness brightness = Brightness.light,
@@ -57,8 +77,18 @@ Future<void> pumpApp(
       overrides: [
         appDatabaseProvider.overrideWithValue(db),
         clockProvider.overrideWithValue(
-          FixedClock(DateTime.utc(2026, 10, 15, 8)),
+          clock ?? FixedClock(DateTime.utc(2026, 10, 15, 8)),
         ),
+        // Never the real TTS engine, notifications or save dialog in tests;
+        // practice order is deterministic.
+        speechServiceProvider.overrideWithValue(speech ?? FakeSpeechService()),
+        reminderSchedulerProvider.overrideWithValue(
+          reminders ?? FakeReminderScheduler(),
+        ),
+        exportFileSinkProvider.overrideWithValue(
+          exportSink ?? FakeExportSink(),
+        ),
+        randomProvider.overrideWithValue(Random(1)),
         idGeneratorProvider.overrideWithValue(SequentialIdGenerator()),
         if (fileSource != null)
           csvFileSourceProvider.overrideWithValue(fileSource),
@@ -66,11 +96,19 @@ Future<void> pumpApp(
           scanImageSourceProvider.overrideWithValue(imageSource),
         if (recognitionEngine != null)
           textRecognitionEngineProvider.overrideWithValue(recognitionEngine),
+        if (imageCropper != null)
+          imageCropperProvider.overrideWithValue(imageCropper),
+        // Page photos are never read from disk in tests.
+        scanPageImageProvider.overrideWithValue(
+          (_) => MemoryImage(onePixelPng),
+        ),
         // Never the real Keychain/Keystore or the network in tests.
         aiSettingsStoreProvider.overrideWithValue(
           aiSettings ?? InMemoryAiSettingsStore(),
         ),
         httpClientProvider.overrideWithValue(httpClient ?? noNetworkClient),
+        // Request spacing and backoff do not wait in tests.
+        aiSleepProvider.overrideWithValue((_) async {}),
         urlLauncherProvider.overrideWithValue((uri) async {
           launchedUrls?.add(uri);
           return true;

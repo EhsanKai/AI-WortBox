@@ -206,7 +206,36 @@ String errorMessage(AppLocalizations l10n, Object error) => switch (error) {
     EnrichmentError.server => l10n.aiErrorServer,
     EnrichmentError.malformedResponse => l10n.aiErrorMalformed,
     EnrichmentError.cancelled => l10n.aiErrorCancelled,
+    EnrichmentError.dailyQuotaExhausted => l10n.aiErrorDailyQuota,
+    EnrichmentError.paidModelBlocked => l10n.aiErrorPaidBlocked,
   },
   EnrichmentConflictException() => l10n.enrichConflict,
+  TagValidationException(:final error) => switch (error) {
+    TagValidationError.nameEmpty => l10n.tagErrorEmpty,
+    TagValidationError.nameTooLong => l10n.tagErrorTooLong(
+      AppConfig.maxTagNameLength,
+    ),
+    TagValidationError.nameDuplicate => l10n.tagErrorDuplicate,
+  },
+  SpeechException(:final error) => switch (error) {
+    SpeechError.voiceUnavailable => l10n.speechVoiceUnavailable,
+    SpeechError.failed => l10n.speechFailed,
+  },
+  ReminderException(:final error) => switch (error) {
+    ReminderError.permissionDenied => l10n.reminderPermissionDenied,
+    ReminderError.schedulingFailed => l10n.reminderSchedulingFailed,
+  },
+  ExportException(:final error) => switch (error) {
+    ExportError.empty => l10n.exportEmpty,
+    ExportError.writeFailed => l10n.exportWriteFailed,
+  },
+  AnkiImportException(:final error) => switch (error) {
+    AnkiImportError.notAnkiPackage => l10n.ankiErrorNotPackage,
+    AnkiImportError.unsupportedFormat => l10n.ankiErrorUnsupported,
+    AnkiImportError.noNotes => l10n.ankiErrorNoNotes,
+    AnkiImportError.tooLarge => l10n.ankiErrorTooLarge(
+      AppConfig.maxAnkiPackageBytes ~/ (1024 * 1024),
+    ),
+  },
   _ => l10n.errorGeneric,
 };

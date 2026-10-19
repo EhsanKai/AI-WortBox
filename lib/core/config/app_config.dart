@@ -29,9 +29,31 @@ abstract final class AppConfig {
   static const int maxMeaningsPerEntry = 20;
   static const int maxTextFieldLength = 2000;
 
+  /// Longest tag name, in characters.
+  static const int maxTagNameLength = 40;
+
+  /// Most entries shown for one search or filter; the user narrows the
+  /// query to see others.
+  static const int maxSearchResults = 300;
+
+  /// Most words in one unscheduled practice session.
+  static const int practiceSessionSize = 20;
+
+  /// Most cards in one scheduled (FSRS) review session; the rest stay due
+  /// for the next session.
+  static const int reviewSessionSize = 50;
+
+  /// A card in a (re)learning step is shown when it is due within this time,
+  /// so a forgotten word can come back in the same session.
+  static const Duration reviewLearnAhead = Duration(minutes: 20);
+
   // CSV import limits.
   static const int maxCsvBytes = 5 * 1024 * 1024;
   static const int maxCsvRows = 10000;
+
+  /// Largest Anki package accepted for import (media inside counts, even
+  /// though media is not imported).
+  static const int maxAnkiPackageBytes = 50 * 1024 * 1024;
 
   // Page scanning limits.
   /// Largest image file accepted for OCR (after the picker's downscaling).
@@ -73,6 +95,32 @@ abstract final class AppConfig {
 
   /// Most entries enriched in one batch run.
   static const int aiMaxBatchSize = 50;
+
+  // Free-only OpenRouter usage (see docs/decisions.md, D41).
+  /// OpenRouter's free router: picks one of the currently free models that
+  /// supports the request's features. The default model in free-only mode.
+  static const String aiFreeRouterModel = 'openrouter/free';
+
+  /// Words sent together in one request, by default and at most.
+  static const int aiDefaultWordsPerRequest = 5;
+  static const int aiMaxWordsPerRequest = 10;
+
+  /// Requests to OpenRouter running at the same time.
+  static const int aiMaxConcurrentRequests = 1;
+
+  /// Shortest gap between the start of two requests (the free tier allows
+  /// 20 requests per minute; this stays well below it).
+  static const Duration aiMinRequestSpacing = Duration(seconds: 4);
+
+  /// First backoff step; doubled per retry, plus up to 50 % random jitter.
+  static const Duration aiBackoffBase = Duration(seconds: 1);
+
+  /// How long a fetched and verified list of free models is reused.
+  static const Duration aiFreeCatalogTtl = Duration(hours: 1);
+
+  /// Validated AI results are reused for this long, up to this many words.
+  static const Duration aiCacheTtl = Duration(days: 90);
+  static const int aiMaxCacheEntries = 2000;
 
   /// File name (without extension) of the local SQLite database.
   static const String databaseName = 'ai_wortbox';

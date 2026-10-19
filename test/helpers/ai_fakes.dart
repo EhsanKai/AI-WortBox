@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:ai_wortbox/core/error/app_exception.dart';
+import 'package:ai_wortbox/features/enrichment/data/ai_local_store.dart';
 import 'package:ai_wortbox/features/enrichment/data/ai_settings_store.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -86,7 +88,7 @@ Map<String, Object?> enrichmentContent({
 /// An OpenRouter chat-completions response wrapping [content].
 http.Response completionResponse(
   Object content, {
-  String model = 'anthropic/claude-haiku-5.5',
+  String model = 'google/gemma-4-31b-it:free',
   double? cost,
   String finishReason = 'stop',
 }) => http.Response.bytes(
@@ -145,19 +147,81 @@ http.Response keyInfoResponse({double usage = 0.0123, double? remaining}) =>
       headers: {'content-type': 'application/json'},
     );
 
-http.Response modelsResponse(List<String> ids) => http.Response(
+/// A `GET /models` response. `:free` ids and the free router are listed
+/// with zero prices, others with token prices.
+http.Response modelsResponse(
+  List<String> ids, {
+  List<Map<String, Object?>> extra = const [],
+}) => http.Response(
   jsonEncode({
     'data': [
       for (final id in ids)
         {
           'id': id,
+          'pricing': id.endsWith(':free') || id == 'openrouter/free'
+              ? {'prompt': '0', 'completion': '0'}
+              : {'prompt': '0.0000008', 'completion': '0.000004'},
           'supported_parameters': ['response_format', 'structured_outputs'],
         },
+      ...extra,
     ],
   }),
   200,
   headers: {'content-type': 'application/json'},
 );
+
+/// In-memory replacement for the database-backed AI state.
+class InMemoryAiKeyValueStore implements AiKeyValueStore {
+  final Map<String, String> values = {};
+
+  /// Simulates a database failure of every operation.
+  bool failing = false;
+
+  void _check() {
+    if (failing) throw const StorageException('ai', 'test');
+  }
+
+  @override
+  Future<String?> read(String key) async {
+    _check();
+    return values[key];
+  }
+
+  @override
+  Future<Map<String, String>> readPrefix(String prefix) async {
+    _check();
+    return {
+      for (final e in values.entries)
+        if (e.key.startsWith(prefix)) e.key: e.value,
+    };
+  }
+
+  @override
+  Future<void> writeAll(Map<String, String?> changes) async {
+    _check();
+    for (final MapEntry(:key, :value) in changes.entries) {
+      value == null ? values.remove(key) : values[key] = value;
+    }
+  }
+
+  @override
+  Future<void> deletePrefix(String prefix) async {
+    _check();
+    values.removeWhere((k, _) => k.startsWith(prefix));
+  }
+}
+
+/// Jitter-free randomness: backoff delays are exactly base × 2^n.
+class ZeroRandom implements Random {
+  @override
+  bool nextBool() => false;
+
+  @override
+  double nextDouble() => 0;
+
+  @override
+  int nextInt(int max) => 0;
+}
 
 /// A scripted fake of the OpenRouter API. Records every request.
 class FakeOpenRouter {

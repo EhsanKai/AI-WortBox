@@ -16,8 +16,10 @@ import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/ai_model_catalog.dart';
 import '../domain/enrichment_plan.dart';
+import '../domain/free_model_policy.dart';
 import 'ai_settings_controller.dart';
 import 'enrichment_controller.dart';
+import 'free_usage_controller.dart';
 
 /// Request AI suggestions for one entry or a deck's entries without
 /// meanings, review them, and save the chosen parts.
@@ -71,7 +73,13 @@ class EnrichmentScreen extends ConsumerWidget {
                 l10n.enrichSavedCount(state.savedCount),
                 tone: StatusTone.success,
               ),
-              if (state.costUsd case final cost?)
+              if (state.freeOnly)
+                OutcomeLine(
+                  Icons.money_off_outlined,
+                  l10n.enrichNoCost,
+                  tone: StatusTone.success,
+                )
+              else if (state.costUsd case final cost?)
                 OutcomeLine(
                   Icons.receipt_long_outlined,
                   l10n.enrichCost(_money(l10n).format(cost)),
@@ -123,7 +131,12 @@ class _SessionView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final model = ref.watch(aiSettingsControllerProvider).value?.model;
+    final paidModel = ref.watch(aiSettingsControllerProvider).value?.model;
+    final free = ref.watch(freeUsageControllerProvider).value;
+    final model = paidModel == null
+        ? null
+        : free?.plannedModel(paidModel) ??
+              (state.freeOnly ? FreeModelPolicy.routerModel : paidModel);
     final phase = state.phase;
     final total = state.items.length;
 
@@ -140,6 +153,14 @@ class _SessionView extends ConsumerWidget {
             ),
             children: [
               if (phase == EnrichmentPhase.ready) ...[
+                if (state.resumedCount case final left?) ...[
+                  InfoBanner(
+                    key: const Key('enrich.resume'),
+                    icon: Icons.history,
+                    message: l10n.enrichResume(left),
+                  ),
+                  const SizedBox(height: AppSpace.sm),
+                ],
                 InfoBanner(
                   key: const Key('enrich.privacy'),
                   icon: Icons.public,
@@ -150,9 +171,13 @@ class _SessionView extends ConsumerWidget {
                 if (model != null) ...[
                   const SizedBox(height: AppSpace.sm),
                   Text(
-                    l10n.enrichModel(
-                      AiModelCatalog.byId(model)?.label ?? model,
-                    ),
+                    [
+                      if (state.freeOnly) l10n.enrichFreeOnly,
+                      l10n.enrichModel(
+                        AiModelCatalog.byId(model)?.label ?? model,
+                      ),
+                    ].join(' '),
+                    key: const Key('enrich.model'),
                     style: theme.textTheme.bodySmall,
                   ),
                 ],
@@ -247,7 +272,7 @@ class _SessionView extends ConsumerWidget {
                           : Text(l10n.enrichSave(state.selectedCount)),
                     ),
                     if (state.hasFailures &&
-                        state.stopError == null &&
+                        (state.stopError == null || state.canRetryAfterStop) &&
                         phase == EnrichmentPhase.review) ...[
                       const SizedBox(height: AppSpace.sm),
                       OutlinedButton(
@@ -346,6 +371,14 @@ class _ItemCard extends StatelessWidget {
                 ),
               ],
               if (plan != null && item.status == ItemStatus.proposed) ...[
+                if (plan.proposal.fromCache) ...[
+                  const SizedBox(height: AppSpace.xs),
+                  Text(
+                    l10n.enrichFromCache,
+                    key: Key('enrich.item.$id.cached'),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
                 if (plan.proposal.isAmbiguous) ...[
                   const SizedBox(height: AppSpace.sm),
                   InfoBanner(

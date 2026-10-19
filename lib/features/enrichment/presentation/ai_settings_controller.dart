@@ -5,6 +5,7 @@ import '../../../app/providers.dart';
 import '../../../core/error/app_exception.dart';
 import '../data/openrouter_client.dart';
 import '../domain/ai_model_catalog.dart';
+import 'free_usage_controller.dart';
 
 /// Problems with a key as typed (checked before it is saved).
 enum ApiKeyProblem { empty, containsWhitespace, tooShort, tooLong }
@@ -155,8 +156,11 @@ class AiSettingsController extends AsyncNotifier<AiSettingsState> {
     }
   }
 
-  /// Checks the saved key with OpenRouter and the selected model against
-  /// the public model list. Sends the key only to OpenRouter.
+  Future<bool> _freeOnly() => _freeOnlyFrom(ref);
+
+  /// Checks the saved key with OpenRouter and the model route against the
+  /// public model list (in free-only mode: that a verified free route
+  /// exists). Sends the key only to OpenRouter.
   Future<void> testKey() async {
     final key = (await ref.read(aiSettingsStoreProvider).readApiKey())?.trim();
     if (key == null || key.isEmpty) {
@@ -173,12 +177,24 @@ class AiSettingsController extends AsyncNotifier<AiSettingsState> {
     final client = ref.read(openRouterClientProvider);
     try {
       final info = await client.keyInfo(key);
+      await recordQuota(ref, info.freeDailyRemaining, info.freeDailyLimit);
       bool? modelAvailable;
       try {
-        modelAvailable = await client.supportsStructuredOutputs(_current.model);
+        modelAvailable = await _freeOnly()
+            // Free-only: a verified free route exists (the free router or
+            // at least one verified free model).
+            ? await ref
+                  .read(freeModelCatalogProvider)
+                  .load(refresh: true)
+                  .then((c) => c.routerListed || c.ranked.isNotEmpty)
+            : await client.supportsStructuredOutputs(_current.model);
       } on EnrichmentException {
         modelAvailable = null;
       }
+      if (ref.exists(freeUsageControllerProvider)) {
+        ref.invalidate(freeUsageControllerProvider);
+      }
+      if (!ref.mounted) return;
       state = AsyncData(
         _current.copyWith(
           check: AiKeyCheckPassed(info, modelAvailable: modelAvailable),
@@ -187,6 +203,14 @@ class AiSettingsController extends AsyncNotifier<AiSettingsState> {
     } on AppException catch (e) {
       state = AsyncData(_current.copyWith(check: AiKeyCheckFailed(e)));
     }
+  }
+}
+
+Future<bool> _freeOnlyFrom(Ref ref) async {
+  try {
+    return (await ref.read(aiLocalStateProvider).readPreferences()).freeOnly;
+  } on StorageException {
+    return true;
   }
 }
 

@@ -28,8 +28,17 @@ class FilePickerCsvFileSource implements CsvFileSource {
     final file = await FilePicker.pickFile(type: FileType.any);
     if (file == null) return null;
     final length = await file.length();
-    if (length != null && length > AppConfig.maxCsvBytes) {
-      throw const CsvFormatException(CsvFormatError.tooLarge);
+    final isAnki = RegExp(
+      r'\.(apkg|colpkg)$',
+      caseSensitive: false,
+    ).hasMatch(file.name);
+    if (length != null) {
+      if (isAnki && length > AppConfig.maxAnkiPackageBytes) {
+        throw const AnkiImportException(AnkiImportError.tooLarge);
+      }
+      if (!isAnki && length > AppConfig.maxCsvBytes) {
+        throw const CsvFormatException(CsvFormatError.tooLarge);
+      }
     }
     return PickedCsvFile(name: file.name, bytes: await file.readAsBytes());
   }

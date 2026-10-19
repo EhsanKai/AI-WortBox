@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/error/app_exception.dart';
+import '../../anki/data/anki_package_reader.dart';
 import '../../vocabulary/domain/duplicate_detection.dart';
 import '../../vocabulary/domain/vocabulary_repository.dart';
 import '../../vocabulary/presentation/vocabulary_providers.dart';
@@ -151,11 +152,14 @@ class CsvImportController extends Notifier<CsvImportState> {
     }
   }
 
+  /// CSV/TSV text, or an Anki package (recognized by its ZIP signature,
+  /// whatever the file name).
   static Future<CsvTable> _read(Uint8List bytes, String? delimiter) {
-    if (bytes.length < _backgroundParseThreshold) {
-      return Future.value(CsvParser.read(bytes, delimiter: delimiter));
-    }
-    return Isolate.run(() => CsvParser.read(bytes, delimiter: delimiter));
+    CsvTable parse() => AnkiPackageReader.looksLikePackage(bytes)
+        ? AnkiPackageReader.read(bytes)
+        : CsvParser.read(bytes, delimiter: delimiter);
+    if (bytes.length < _backgroundParseThreshold) return Future.sync(parse);
+    return Isolate.run(parse);
   }
 
   void setHasHeader(bool value) {

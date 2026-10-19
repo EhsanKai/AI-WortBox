@@ -49,6 +49,15 @@ dependencies:
   flutter_secure_storage: ^11.2.0
   url_launcher: ^6.3.2
   http: ^1.6.0
+  flutter_tts: ^4.2.5
+  flutter_local_notifications: ^22.3.2
+  timezone: ^0.11.2
+  flutter_timezone: ^5.1.1
+  archive: ^4.5.2
+  sqlite3: ^3.5.2
+  crypto: ^3.0.6
+  typed_data: ^1.4.0
+  fsrs: ^2.0.1
 
 dev_dependencies:
   flutter_test:

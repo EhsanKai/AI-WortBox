@@ -156,6 +156,14 @@ enum EnrichmentError {
 
   /// The user cancelled.
   cancelled,
+
+  /// The account's free-model requests for the current day are used up
+  /// (OpenRouter resets them daily). Requests are paused until [retryAt].
+  dailyQuotaExhausted,
+
+  /// Free-only mode: a request would (or did) use something that is not
+  /// verifiably free, so nothing more is sent.
+  paidModelBlocked,
 }
 
 /// A failed AI request.
@@ -163,12 +171,26 @@ enum EnrichmentError {
 /// Never contains the API key, request or response bodies, or vocabulary
 /// content: only the reason and the HTTP status, so it is safe to log.
 final class EnrichmentException extends AppException {
-  const EnrichmentException(this.error, {this.statusCode});
+  const EnrichmentException(
+    this.error, {
+    this.statusCode,
+    this.retryAt,
+    this.upstream = false,
+  });
 
   final EnrichmentError error;
 
   /// HTTP status, when the server answered.
   final int? statusCode;
+
+  /// UTC time before which the same request must not be sent again, when
+  /// OpenRouter said so (`Retry-After`, rate-limit reset).
+  final DateTime? retryAt;
+
+  /// The failure came from the model provider behind OpenRouter (e.g. a
+  /// provider's own rate limit), not from the user's OpenRouter account. A
+  /// different free model may succeed.
+  final bool upstream;
 
   /// Whether retrying later could succeed without the user changing
   /// anything (key, credits, model).
@@ -182,7 +204,9 @@ final class EnrichmentException extends AppException {
   };
 
   @override
-  String toString() => 'EnrichmentException($error, status: $statusCode)';
+  String toString() =>
+      'EnrichmentException($error, status: $statusCode'
+      '${upstream ? ', upstream' : ''})';
 }
 
 /// Entries changed after an enrichment proposal was made, so it was not
@@ -194,4 +218,95 @@ final class EnrichmentConflictException extends AppException {
 
   @override
   String toString() => 'EnrichmentConflictException(${entryIds.length})';
+}
+
+/// Reasons a tag name is rejected.
+enum TagValidationError { nameEmpty, nameTooLong, nameDuplicate }
+
+final class TagValidationException extends AppException {
+  const TagValidationException(this.error);
+
+  final TagValidationError error;
+
+  @override
+  String toString() => 'TagValidationException($error)';
+}
+
+/// Why text-to-speech could not play.
+enum SpeechError {
+  /// No voice for the language is installed on the device.
+  voiceUnavailable,
+
+  /// The speech engine is missing or failed.
+  failed,
+}
+
+final class SpeechException extends AppException {
+  const SpeechException(this.error);
+
+  final SpeechError error;
+
+  @override
+  String toString() => 'SpeechException($error)';
+}
+
+/// Why the study reminder could not be changed.
+enum ReminderError {
+  /// The user did not allow notifications.
+  permissionDenied,
+
+  /// The system refused to schedule or cancel the notification, or the
+  /// device time zone could not be determined.
+  schedulingFailed,
+}
+
+final class ReminderException extends AppException {
+  const ReminderException(this.error);
+
+  final ReminderError error;
+
+  @override
+  String toString() => 'ReminderException($error)';
+}
+
+/// Why a file could not be exported.
+enum ExportError {
+  /// There is nothing to export.
+  empty,
+
+  /// The file could not be written to the chosen place.
+  writeFailed,
+}
+
+final class ExportException extends AppException {
+  const ExportException(this.error);
+
+  final ExportError error;
+
+  @override
+  String toString() => 'ExportException($error)';
+}
+
+/// Why an Anki package could not be read.
+enum AnkiImportError {
+  /// Not a ZIP-based `.apkg` / `.colpkg`, or the archive is damaged.
+  notAnkiPackage,
+
+  /// The package uses a collection format this app cannot read.
+  unsupportedFormat,
+
+  /// The package contains no notes.
+  noNotes,
+
+  /// The package is larger than the import limit.
+  tooLarge,
+}
+
+final class AnkiImportException extends AppException {
+  const AnkiImportException(this.error);
+
+  final AnkiImportError error;
+
+  @override
+  String toString() => 'AnkiImportException($error)';
 }

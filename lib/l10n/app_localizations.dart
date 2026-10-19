@@ -152,12 +152,6 @@ abstract class AppLocalizations {
   /// **'لغات'**
   String get dashboardWords;
 
-  /// No description provided for @dashboardReviewPending.
-  ///
-  /// In fa, this message translates to:
-  /// **'مرور روزانه با الگوریتم FSRS در نسخه‌های بعدی فعال می‌شود.'**
-  String get dashboardReviewPending;
-
   /// No description provided for @dashboardYourDecks.
   ///
   /// In fa, this message translates to:
@@ -509,7 +503,7 @@ abstract class AppLocalizations {
   /// No description provided for @sourceCsv.
   ///
   /// In fa, this message translates to:
-  /// **'فایل CSV'**
+  /// **'وارد شده از فایل (CSV یا Anki)'**
   String get sourceCsv;
 
   /// No description provided for @sourceImage.
@@ -1643,7 +1637,7 @@ abstract class AppLocalizations {
   /// No description provided for @aiIntroBody.
   ///
   /// In fa, this message translates to:
-  /// **'برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. هزینهٔ هر درخواست از اعتبار حساب OpenRouter شما کم می‌شود. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.'**
+  /// **'برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. به‌طور پیش‌فرض فقط مدل‌های رایگان استفاده می‌شوند و هزینه‌ای کم نمی‌شود؛ مدل‌های رایگان سقف روزانه دارند. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.'**
   String get aiIntroBody;
 
   /// No description provided for @aiGetKey.
@@ -1817,7 +1811,7 @@ abstract class AppLocalizations {
   /// No description provided for @aiModelHelper.
   ///
   /// In fa, this message translates to:
-  /// **'فهرستی منتخب از مدل‌های کم‌هزینه که خروجی ساختاریافته دارند. قیمت‌ها در openrouter.ai آمده است.'**
+  /// **'فهرستی منتخب از مدل‌های کم‌هزینه با خروجی ساختاریافته که فقط وقتی «فقط مدل‌های رایگان» خاموش است استفاده می‌شود. قیمت‌ها در openrouter.ai آمده است.'**
   String get aiModelHelper;
 
   /// No description provided for @aiPrivacyTitle.
@@ -1843,6 +1837,204 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'کلید در حافظهٔ امن سیستم (Keychain در iOS، Keystore در اندروید) نگه داشته می‌شود؛ هرگز نمایش داده نمی‌شود و در پایگاه داده، گزارش‌ها یا پشتیبان قرار نمی‌گیرد. این کار خطر را کم می‌کند، اما روی دستگاهی آلوده یا دستکاری‌شده، استخراج کلید ناممکن نیست. در OpenRouter برای این کلید سقف اعتبار تعیین کنید.'**
   String get aiSecurityBody;
+
+  /// No description provided for @aiFreeTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'استفادهٔ رایگان'**
+  String get aiFreeTitle;
+
+  /// No description provided for @aiFreeOnly.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط مدل‌های رایگان'**
+  String get aiFreeOnly;
+
+  /// No description provided for @aiFreeOnlyOn.
+  ///
+  /// In fa, this message translates to:
+  /// **'هیچ درخواستی هزینه ندارد: فقط مدل‌هایی که رایگان بودنشان تأیید شده استفاده می‌شوند و از OpenRouter خواسته می‌شود هر مورد پولی را رد کند.'**
+  String get aiFreeOnlyOn;
+
+  /// No description provided for @aiFreeOnlyOff.
+  ///
+  /// In fa, this message translates to:
+  /// **'خاموش: مدل زیر استفاده می‌شود و هزینه‌اش از اعتبار OpenRouter شما کم می‌شود.'**
+  String get aiFreeOnlyOff;
+
+  /// No description provided for @aiPaidConfirmTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'از مدل‌های پولی استفاده شود؟'**
+  String get aiPaidConfirmTitle;
+
+  /// No description provided for @aiPaidConfirmBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'در این صورت هزینهٔ هر درخواست از اعتبار OpenRouter شما کم می‌شود. مدل‌های رایگان معمولاً برای واژگان کافی‌اند.'**
+  String get aiPaidConfirmBody;
+
+  /// No description provided for @aiPaidConfirm.
+  ///
+  /// In fa, this message translates to:
+  /// **'استفاده از مدل‌های پولی'**
+  String get aiPaidConfirm;
+
+  /// No description provided for @aiRoutingAuto.
+  ///
+  /// In fa, this message translates to:
+  /// **'رایگان خودکار'**
+  String get aiRoutingAuto;
+
+  /// No description provided for @aiRoutingQuality.
+  ///
+  /// In fa, this message translates to:
+  /// **'رایگان باکیفیت'**
+  String get aiRoutingQuality;
+
+  /// No description provided for @aiRoutingAutoHelp.
+  ///
+  /// In fa, this message translates to:
+  /// **'مسیریاب رایگان OpenRouter یکی از مدل‌های رایگانِ در دسترس را انتخاب می‌کند.'**
+  String get aiRoutingAutoHelp;
+
+  /// No description provided for @aiRoutingQualityHelp.
+  ///
+  /// In fa, this message translates to:
+  /// **'ابتدا مدل‌های رایگانِ با امتیاز بالاتر و سپس مسیریاب رایگان امتحان می‌شوند. فهرست مدل‌های رایگان پیش از استفاده در OpenRouter بررسی می‌شود.'**
+  String get aiRoutingQualityHelp;
+
+  /// No description provided for @aiQualityUnverified.
+  ///
+  /// In fa, this message translates to:
+  /// **'فهرست مدل‌های رایگان هنوز تأیید نشده است، پس از مسیریاب رایگان استفاده می‌شود. برای بررسی، وضعیت را به‌روز کنید.'**
+  String get aiQualityUnverified;
+
+  /// No description provided for @aiFreeModelsVerified.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} مدل رایگان تأیید شد}}'**
+  String aiFreeModelsVerified(int count);
+
+  /// No description provided for @aiCurrentModel.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل فعلی: {model}'**
+  String aiCurrentModel(String model);
+
+  /// No description provided for @aiLastModel.
+  ///
+  /// In fa, this message translates to:
+  /// **'آخرین پاسخ از: {model}'**
+  String aiLastModel(String model);
+
+  /// No description provided for @aiLastModelNone.
+  ///
+  /// In fa, this message translates to:
+  /// **'هنوز درخواستی فرستاده نشده است.'**
+  String get aiLastModelNone;
+
+  /// No description provided for @aiBatchSize.
+  ///
+  /// In fa, this message translates to:
+  /// **'تعداد لغت در هر درخواست'**
+  String get aiBatchSize;
+
+  /// No description provided for @aiBatchSizeHelp.
+  ///
+  /// In fa, this message translates to:
+  /// **'درخواست کمتر یعنی مصرف کمتر از سهمیهٔ رایگان روزانه؛ دسته‌های کوچک‌تر مطمئن‌ترند.'**
+  String get aiBatchSizeHelp;
+
+  /// No description provided for @aiQuotaRemaining.
+  ///
+  /// In fa, this message translates to:
+  /// **'حدود {remaining} از {limit} درخواست رایگان امروز باقی مانده است'**
+  String aiQuotaRemaining(int remaining, int limit);
+
+  /// No description provided for @aiQuotaRemainingNoLimit.
+  ///
+  /// In fa, this message translates to:
+  /// **'حدود {remaining} درخواست رایگان امروز باقی مانده است'**
+  String aiQuotaRemainingNoLimit(int remaining);
+
+  /// No description provided for @aiQuotaUnknown.
+  ///
+  /// In fa, this message translates to:
+  /// **'درخواست‌های رایگان باقی‌ماندهٔ امروز: هنوز بررسی نشده است. کلید را آزمایش یا وضعیت را به‌روز کنید.'**
+  String get aiQuotaUnknown;
+
+  /// No description provided for @aiQuotaSentToday.
+  ///
+  /// In fa, this message translates to:
+  /// **'فرستاده‌شده از این برنامه در امروز: {count}'**
+  String aiQuotaSentToday(int count);
+
+  /// No description provided for @aiRateReady.
+  ///
+  /// In fa, this message translates to:
+  /// **'آماده'**
+  String get aiRateReady;
+
+  /// No description provided for @aiRateCooling.
+  ///
+  /// In fa, this message translates to:
+  /// **'محدودیت تعداد درخواست — منتظر تا {time}'**
+  String aiRateCooling(String time);
+
+  /// No description provided for @aiRatePaused.
+  ///
+  /// In fa, this message translates to:
+  /// **'سهمیهٔ رایگان روزانه تمام شده — متوقف تا {time}'**
+  String aiRatePaused(String time);
+
+  /// No description provided for @aiRatePacing.
+  ///
+  /// In fa, this message translates to:
+  /// **'هر بار یک درخواست، با دست‌کم {seconds} ثانیه فاصله.'**
+  String aiRatePacing(int seconds);
+
+  /// No description provided for @aiCacheStats.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} نتیجهٔ ذخیره‌شدهٔ هوش مصنوعی}}'**
+  String aiCacheStats(int count);
+
+  /// No description provided for @aiCacheUsage.
+  ///
+  /// In fa, this message translates to:
+  /// **'{hits} بار استفادهٔ دوباره · {misses} بار درخواست'**
+  String aiCacheUsage(int hits, int misses);
+
+  /// No description provided for @aiCacheClear.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاک کردن نتایج ذخیره‌شده'**
+  String get aiCacheClear;
+
+  /// No description provided for @aiCacheCleared.
+  ///
+  /// In fa, this message translates to:
+  /// **'نتایج ذخیره‌شده پاک شد.'**
+  String get aiCacheCleared;
+
+  /// No description provided for @aiRefreshUsage.
+  ///
+  /// In fa, this message translates to:
+  /// **'به‌روزرسانی وضعیت'**
+  String get aiRefreshUsage;
+
+  /// No description provided for @aiUsageRefreshFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'وضعیت از OpenRouter دریافت نشد.'**
+  String get aiUsageRefreshFailed;
+
+  /// No description provided for @aiPrefsSaveFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'تنظیم ذخیره نشد. دوباره امتحان کنید.'**
+  String get aiPrefsSaveFailed;
 
   /// No description provided for @enrichTitle.
   ///
@@ -2024,6 +2216,30 @@ abstract class AppLocalizations {
   /// **'هزینهٔ گزارش‌شده توسط OpenRouter: {amount} دلار'**
   String enrichCost(String amount);
 
+  /// No description provided for @enrichNoCost.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل‌های رایگان — بدون هزینه'**
+  String get enrichNoCost;
+
+  /// No description provided for @enrichFreeOnly.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط مدل‌های رایگان — بدون هزینه.'**
+  String get enrichFreeOnly;
+
+  /// No description provided for @enrichResume.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{یک اجرای ناتمام پیدا شد: {count} لغت باقی مانده است. لغت‌های انجام‌شده حفظ شده‌اند.}}'**
+  String enrichResume(int count);
+
+  /// No description provided for @enrichFromCache.
+  ///
+  /// In fa, this message translates to:
+  /// **'نتیجهٔ ذخیره‌شده — چیزی فرستاده نشد'**
+  String get enrichFromCache;
+
   /// No description provided for @enrichConflict.
   ///
   /// In fa, this message translates to:
@@ -2101,6 +2317,840 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'متوقف شد.'**
   String get aiErrorCancelled;
+
+  /// No description provided for @aiErrorDailyQuota.
+  ///
+  /// In fa, this message translates to:
+  /// **'درخواست‌های رایگان امروزِ حساب OpenRouter شما تمام شده است. هوش مصنوعی تا بازنشانی روزانه (ساعت ۰۰:۰۰ UTC) متوقف می‌ماند و تا آن زمان چیزی فرستاده نمی‌شود.'**
+  String get aiErrorDailyQuota;
+
+  /// No description provided for @aiErrorPaidBlocked.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای رایگان ماندن متوقف شد: OpenRouter با مدل یا هزینه‌ای پاسخ داد که رایگان بودنش تأیید نشد. درخواست دیگری فرستاده نشد.'**
+  String get aiErrorPaidBlocked;
+
+  /// No description provided for @actionBack.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگشت'**
+  String get actionBack;
+
+  /// No description provided for @csvFieldTags.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب‌ها'**
+  String get csvFieldTags;
+
+  /// No description provided for @deckImportFile.
+  ///
+  /// In fa, this message translates to:
+  /// **'وارد کردن فایل (CSV یا Anki)'**
+  String get deckImportFile;
+
+  /// No description provided for @deckMoreActions.
+  ///
+  /// In fa, this message translates to:
+  /// **'کارهای بیشتر'**
+  String get deckMoreActions;
+
+  /// No description provided for @searchAllTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'جستجو در همه لغت‌ها'**
+  String get searchAllTitle;
+
+  /// No description provided for @searchClear.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاک کردن متن جستجو'**
+  String get searchClear;
+
+  /// No description provided for @searchLimited.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط {count} نتیجهٔ اول نمایش داده می‌شود؛ جستجو را دقیق‌تر کنید.'**
+  String searchLimited(int count);
+
+  /// No description provided for @filterDifficult.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌های دشوار'**
+  String get filterDifficult;
+
+  /// No description provided for @filterTag.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب'**
+  String get filterTag;
+
+  /// No description provided for @filterAllTags.
+  ///
+  /// In fa, this message translates to:
+  /// **'همه برچسب‌ها'**
+  String get filterAllTags;
+
+  /// No description provided for @filterClear.
+  ///
+  /// In fa, this message translates to:
+  /// **'حذف فیلترها'**
+  String get filterClear;
+
+  /// No description provided for @entryInDeck.
+  ///
+  /// In fa, this message translates to:
+  /// **'در دستهٔ {deck}'**
+  String entryInDeck(String deck);
+
+  /// No description provided for @entryDifficult.
+  ///
+  /// In fa, this message translates to:
+  /// **'دشوار'**
+  String get entryDifficult;
+
+  /// No description provided for @entryMarkDifficult.
+  ///
+  /// In fa, this message translates to:
+  /// **'علامت‌گذاری به‌عنوان دشوار'**
+  String get entryMarkDifficult;
+
+  /// No description provided for @entryUnmarkDifficult.
+  ///
+  /// In fa, this message translates to:
+  /// **'برداشتن علامت دشوار'**
+  String get entryUnmarkDifficult;
+
+  /// No description provided for @tagsTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب‌ها'**
+  String get tagsTitle;
+
+  /// No description provided for @tagsSettingsDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'ساختن، تغییر نام و حذف برچسب‌ها'**
+  String get tagsSettingsDescription;
+
+  /// No description provided for @tagsEmptyTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'هنوز برچسبی ندارید'**
+  String get tagsEmptyTitle;
+
+  /// No description provided for @tagsEmptyHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'با برچسب‌هایی مثل «B1» یا «سفر» لغت‌ها را دسته‌بندی کنید.'**
+  String get tagsEmptyHint;
+
+  /// No description provided for @tagsAdd.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن برچسب'**
+  String get tagsAdd;
+
+  /// No description provided for @tagsEdit.
+  ///
+  /// In fa, this message translates to:
+  /// **'ویرایش برچسب‌ها'**
+  String get tagsEdit;
+
+  /// No description provided for @tagsEditTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب‌های این لغت'**
+  String get tagsEditTitle;
+
+  /// No description provided for @tagNewLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب تازه'**
+  String get tagNewLabel;
+
+  /// No description provided for @tagNameLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'نام برچسب'**
+  String get tagNameLabel;
+
+  /// No description provided for @tagCreate.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب تازه'**
+  String get tagCreate;
+
+  /// No description provided for @tagRename.
+  ///
+  /// In fa, this message translates to:
+  /// **'تغییر نام برچسب'**
+  String get tagRename;
+
+  /// No description provided for @tagWordCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت}}'**
+  String tagWordCount(int count);
+
+  /// No description provided for @tagDeleteTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب «{name}» حذف شود؟'**
+  String tagDeleteTitle(String name);
+
+  /// No description provided for @tagDeleteBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, =0{این برچسب به هیچ لغتی داده نشده است.} other{برچسب از {count} لغت برداشته می‌شود. خود لغت‌ها حذف نمی‌شوند.}}'**
+  String tagDeleteBody(int count);
+
+  /// No description provided for @tagErrorEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'نام برچسب را بنویسید.'**
+  String get tagErrorEmpty;
+
+  /// No description provided for @tagErrorTooLong.
+  ///
+  /// In fa, this message translates to:
+  /// **'نام برچسب حداکثر {max} نویسه است.'**
+  String tagErrorTooLong(int max);
+
+  /// No description provided for @tagErrorDuplicate.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسبی با همین نام وجود دارد.'**
+  String get tagErrorDuplicate;
+
+  /// No description provided for @exportCsv.
+  ///
+  /// In fa, this message translates to:
+  /// **'خروجی CSV'**
+  String get exportCsv;
+
+  /// No description provided for @exportAnki.
+  ///
+  /// In fa, this message translates to:
+  /// **'خروجی برای Anki (‎.apkg‎)'**
+  String get exportAnki;
+
+  /// No description provided for @exportSaved.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل ذخیره شد.'**
+  String get exportSaved;
+
+  /// No description provided for @exportCancelled.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیرهٔ فایل لغو شد.'**
+  String get exportCancelled;
+
+  /// No description provided for @exportEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'این دسته لغتی برای خروجی ندارد.'**
+  String get exportEmpty;
+
+  /// No description provided for @exportWriteFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل ذخیره نشد. جای دیگری را امتحان کنید.'**
+  String get exportWriteFailed;
+
+  /// No description provided for @ankiImportTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'وارد کردن از Anki'**
+  String get ankiImportTitle;
+
+  /// No description provided for @ankiImportDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'یک بستهٔ ‎.apkg‎ از Anki انتخاب کنید'**
+  String get ankiImportDescription;
+
+  /// No description provided for @ankiImportIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'در Anki یک دسته را با قالب «Anki Deck Package (‎.apkg‎)» خروجی بگیرید و اینجا انتخاب کنید. فیلدهای یادداشت‌ها را به لغت و معنی وصل کنید.'**
+  String get ankiImportIntro;
+
+  /// No description provided for @ankiImportNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط متن یادداشت‌ها و برچسب‌ها وارد می‌شود؛ تصویر، صدا و سابقهٔ مرور Anki وارد نمی‌شود.'**
+  String get ankiImportNote;
+
+  /// No description provided for @ankiNoteCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} یادداشت Anki}}'**
+  String ankiNoteCount(int count);
+
+  /// No description provided for @ankiErrorNotPackage.
+  ///
+  /// In fa, this message translates to:
+  /// **'این فایل بستهٔ Anki (‎.apkg‎) نیست یا آسیب دیده است.'**
+  String get ankiErrorNotPackage;
+
+  /// No description provided for @ankiErrorUnsupported.
+  ///
+  /// In fa, this message translates to:
+  /// **'قالب این بستهٔ Anki پشتیبانی نمی‌شود.'**
+  String get ankiErrorUnsupported;
+
+  /// No description provided for @ankiErrorNoNotes.
+  ///
+  /// In fa, this message translates to:
+  /// **'این بستهٔ Anki هیچ یادداشتی ندارد.'**
+  String get ankiErrorNoNotes;
+
+  /// No description provided for @ankiErrorTooLarge.
+  ///
+  /// In fa, this message translates to:
+  /// **'بستهٔ Anki بزرگ‌تر از {size} مگابایت است.'**
+  String ankiErrorTooLarge(int size);
+
+  /// No description provided for @speakWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'تلفظ لغت'**
+  String get speakWord;
+
+  /// No description provided for @speakExample.
+  ///
+  /// In fa, this message translates to:
+  /// **'خواندن جملهٔ مثال'**
+  String get speakExample;
+
+  /// No description provided for @speechVoiceUnavailable.
+  ///
+  /// In fa, this message translates to:
+  /// **'صدای آلمانی روی این دستگاه نصب نیست. در تنظیمات «تبدیل متن به گفتار» دستگاه آن را نصب کنید.'**
+  String get speechVoiceUnavailable;
+
+  /// No description provided for @speechFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'پخش تلفظ ممکن نشد.'**
+  String get speechFailed;
+
+  /// No description provided for @settingsStudy.
+  ///
+  /// In fa, this message translates to:
+  /// **'مطالعه'**
+  String get settingsStudy;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'یادآور مطالعه'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'هر روز در ساعتی که انتخاب می‌کنید یک اعلان روی همین دستگاه نمایش داده می‌شود. هیچ سروری استفاده نمی‌شود.'**
+  String get reminderIntro;
+
+  /// No description provided for @reminderEnabled.
+  ///
+  /// In fa, this message translates to:
+  /// **'یادآور روزانه'**
+  String get reminderEnabled;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In fa, this message translates to:
+  /// **'ساعت یادآوری'**
+  String get reminderTime;
+
+  /// No description provided for @reminderOff.
+  ///
+  /// In fa, this message translates to:
+  /// **'خاموش'**
+  String get reminderOff;
+
+  /// No description provided for @reminderOnAt.
+  ///
+  /// In fa, this message translates to:
+  /// **'هر روز ساعت {time}'**
+  String reminderOnAt(String time);
+
+  /// No description provided for @reminderNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای روشن کردن یادآور، اجازهٔ نمایش اعلان خواسته می‌شود. در اندروید ممکن است اعلان چند دقیقه دیرتر برسد و برخی گوشی‌ها برای صرفه‌جویی در باتری آن را متوقف کنند.'**
+  String get reminderNote;
+
+  /// No description provided for @reminderPermissionDenied.
+  ///
+  /// In fa, this message translates to:
+  /// **'اجازهٔ اعلان داده نشد. آن را در تنظیمات دستگاه برای AI WortBox فعال کنید.'**
+  String get reminderPermissionDenied;
+
+  /// No description provided for @reminderSchedulingFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'یادآور تنظیم نشد. دوباره تلاش کنید.'**
+  String get reminderSchedulingFailed;
+
+  /// No description provided for @reminderNotificationTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'وقت مرور لغت‌هاست'**
+  String get reminderNotificationTitle;
+
+  /// No description provided for @reminderNotificationBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'چند دقیقه با لغت‌های آلمانی خود تمرین کنید.'**
+  String get reminderNotificationBody;
+
+  /// No description provided for @practiceTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'مرور لغت‌ها'**
+  String get practiceTitle;
+
+  /// No description provided for @practiceTileDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'جهت مرور، دسته و تمرین آزاد را انتخاب کنید'**
+  String get practiceTileDescription;
+
+  /// No description provided for @practiceTileStreak.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} روز پیاپی تمرین}}'**
+  String practiceTileStreak(int count);
+
+  /// No description provided for @practiceIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'در هر کارت فقط یک طرف نمایش داده می‌شود. پاسخ را به یاد بیاورید، سپس آن را ببینید و بگویید به یاد آوردید یا نه.'**
+  String get practiceIntro;
+
+  /// No description provided for @practiceNotSrs.
+  ///
+  /// In fa, this message translates to:
+  /// **'این تمرین آزاد است و زمان‌بندی مرور (FSRS) را تغییر نمی‌دهد. فقط نتیجهٔ شما برای آمار ثبت می‌شود.'**
+  String get practiceNotSrs;
+
+  /// No description provided for @practiceWordsFrom.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌ها از'**
+  String get practiceWordsFrom;
+
+  /// No description provided for @practiceAllDecks.
+  ///
+  /// In fa, this message translates to:
+  /// **'همه دسته‌ها'**
+  String get practiceAllDecks;
+
+  /// No description provided for @practiceDifficultOnly.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط لغت‌های دشوار'**
+  String get practiceDifficultOnly;
+
+  /// No description provided for @practiceStart.
+  ///
+  /// In fa, this message translates to:
+  /// **'شروع تمرین'**
+  String get practiceStart;
+
+  /// No description provided for @practiceEnd.
+  ///
+  /// In fa, this message translates to:
+  /// **'پایان تمرین'**
+  String get practiceEnd;
+
+  /// No description provided for @practiceProgress.
+  ///
+  /// In fa, this message translates to:
+  /// **'{current} از {total}'**
+  String practiceProgress(String current, String total);
+
+  /// No description provided for @practicePrompt.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت آلمانی این معنی چیست؟'**
+  String get practicePrompt;
+
+  /// No description provided for @practiceReveal.
+  ///
+  /// In fa, this message translates to:
+  /// **'نمایش پاسخ'**
+  String get practiceReveal;
+
+  /// No description provided for @practiceAsk.
+  ///
+  /// In fa, this message translates to:
+  /// **'آن را به یاد آوردید؟'**
+  String get practiceAsk;
+
+  /// No description provided for @practiceRemembered.
+  ///
+  /// In fa, this message translates to:
+  /// **'به یاد آوردم'**
+  String get practiceRemembered;
+
+  /// No description provided for @practiceForgotten.
+  ///
+  /// In fa, this message translates to:
+  /// **'به یاد نیاوردم'**
+  String get practiceForgotten;
+
+  /// No description provided for @practiceEmptyTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغتی برای تمرین نیست'**
+  String get practiceEmptyTitle;
+
+  /// No description provided for @practiceEmptyBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای این تمرین لغت‌هایی لازم است که معنی فارسی دارند.'**
+  String get practiceEmptyBody;
+
+  /// No description provided for @practiceEmptyDifficult.
+  ///
+  /// In fa, this message translates to:
+  /// **'هیچ لغت دشواری با معنی فارسی پیدا نشد. در صفحهٔ هر لغت می‌توانید آن را دشوار علامت بزنید.'**
+  String get practiceEmptyDifficult;
+
+  /// No description provided for @practiceDoneTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین تمام شد'**
+  String get practiceDoneTitle;
+
+  /// No description provided for @practiceRememberedCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت را به یاد آوردید}}'**
+  String practiceRememberedCount(int count);
+
+  /// No description provided for @practiceForgottenCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت را به یاد نیاوردید}}'**
+  String practiceForgottenCount(int count);
+
+  /// No description provided for @practiceFinish.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگشت به امروز'**
+  String get practiceFinish;
+
+  /// No description provided for @practiceSeeStatistics.
+  ///
+  /// In fa, this message translates to:
+  /// **'دیدن آمار'**
+  String get practiceSeeStatistics;
+
+  /// No description provided for @statsWords.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌ها'**
+  String get statsWords;
+
+  /// No description provided for @statsDifficult.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌های دشوار'**
+  String get statsDifficult;
+
+  /// No description provided for @statsReviews.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ‌های ثبت‌شده'**
+  String get statsReviews;
+
+  /// No description provided for @statsRemembered.
+  ///
+  /// In fa, this message translates to:
+  /// **'به یاد آورده'**
+  String get statsRemembered;
+
+  /// No description provided for @statsSessions.
+  ///
+  /// In fa, this message translates to:
+  /// **'جلسه‌های تمرین'**
+  String get statsSessions;
+
+  /// No description provided for @statsStudyDays.
+  ///
+  /// In fa, this message translates to:
+  /// **'روزهای تمرین'**
+  String get statsStudyDays;
+
+  /// No description provided for @statsCurrentStreak.
+  ///
+  /// In fa, this message translates to:
+  /// **'روزهای پیاپی فعلی'**
+  String get statsCurrentStreak;
+
+  /// No description provided for @statsLongestStreak.
+  ///
+  /// In fa, this message translates to:
+  /// **'طولانی‌ترین زنجیره'**
+  String get statsLongestStreak;
+
+  /// No description provided for @statsDays.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} روز}}'**
+  String statsDays(int count);
+
+  /// No description provided for @statsRecentDays.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ‌ها در ۱۴ روز اخیر'**
+  String get statsRecentDays;
+
+  /// No description provided for @statsEmptyBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'آمار تمرین از پاسخ‌هایی ساخته می‌شود که در تمرین ثبت می‌کنید. هنوز پاسخی ثبت نشده است.'**
+  String get statsEmptyBody;
+
+  /// No description provided for @statsPolicy.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط پاسخ‌هایی شمرده می‌شوند که پس از نمایش پاسخ ثبت کرده‌اید؛ باز کردن برنامه یا یک لغت شمرده نمی‌شود. هر روز طبق ساعت همین دستگاه از نیمه‌شب تا نیمه‌شب است. زنجیره تا وقتی ادامه دارد که دیروز یا امروز تمرین کرده باشید. این آمار به معنای به‌خاطرسپاری همیشگی نیست.'**
+  String get statsPolicy;
+
+  /// No description provided for @practiceScheduledNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'مرور زمان‌بندی‌شده: فقط کارت‌هایی که موعدشان رسیده نمایش داده می‌شوند و هر پاسخ، زمان مرور بعدی را با الگوریتم FSRS تعیین می‌کند. لغت‌های جدید طبق سقف روزانهٔ هر دسته اضافه می‌شوند.'**
+  String get practiceScheduledNote;
+
+  /// No description provided for @practiceFreeMode.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین آزاد (زمان‌بندی تغییر نمی‌کند)'**
+  String get practiceFreeMode;
+
+  /// No description provided for @practicePromptMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی این لغت آلمانی چیست؟'**
+  String get practicePromptMeaning;
+
+  /// No description provided for @practiceEmptyDueTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'فعلاً کارتی برای مرور نیست'**
+  String get practiceEmptyDueTitle;
+
+  /// No description provided for @practiceEmptyDueBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'همهٔ کارت‌های موعددار مرور شده‌اند و کارت‌های بعدی در زمان خودشان برمی‌گردند. می‌توانید بدون تغییر زمان‌بندی، تمرین آزاد کنید.'**
+  String get practiceEmptyDueBody;
+
+  /// No description provided for @practiceFreeInstead.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین آزاد'**
+  String get practiceFreeInstead;
+
+  /// No description provided for @practiceScheduledDone.
+  ///
+  /// In fa, this message translates to:
+  /// **'زمان مرور بعدی هر کارت ذخیره شد.'**
+  String get practiceScheduledDone;
+
+  /// No description provided for @reviewDirectionTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'جهت مرور'**
+  String get reviewDirectionTitle;
+
+  /// No description provided for @reviewDirectionGermanToPersian.
+  ///
+  /// In fa, this message translates to:
+  /// **'آلمانی ← فارسی'**
+  String get reviewDirectionGermanToPersian;
+
+  /// No description provided for @reviewDirectionPersianToGerman.
+  ///
+  /// In fa, this message translates to:
+  /// **'فارسی ← آلمانی'**
+  String get reviewDirectionPersianToGerman;
+
+  /// No description provided for @reviewDirectionBoth.
+  ///
+  /// In fa, this message translates to:
+  /// **'هر دو جهت'**
+  String get reviewDirectionBoth;
+
+  /// No description provided for @reviewDirectionBothNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'هر لغت دو کارت جدا با زمان‌بندی مستقل دارد. هر لغت در هر روز فقط در یک جهت پرسیده می‌شود؛ اول جهتی که موعدش زودتر است (در کارت‌های جدید، آلمانی ← فارسی).'**
+  String get reviewDirectionBothNote;
+
+  /// No description provided for @reviewStart.
+  ///
+  /// In fa, this message translates to:
+  /// **'شروع مرور'**
+  String get reviewStart;
+
+  /// No description provided for @reviewDueCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, =0{فعلاً کارتی برای مرور نیست} other{{count} کارت برای مرور}}'**
+  String reviewDueCount(int count);
+
+  /// No description provided for @reviewDueShort.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} کارت}}'**
+  String reviewDueShort(int count);
+
+  /// No description provided for @deckShowMeanings.
+  ///
+  /// In fa, this message translates to:
+  /// **'نمایش معنی‌ها'**
+  String get deckShowMeanings;
+
+  /// No description provided for @deckHideMeanings.
+  ///
+  /// In fa, this message translates to:
+  /// **'پنهان کردن معنی‌ها'**
+  String get deckHideMeanings;
+
+  /// No description provided for @selectionCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} انتخاب‌شده}}'**
+  String selectionCount(int count);
+
+  /// No description provided for @selectionSelectAll.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب همه'**
+  String get selectionSelectAll;
+
+  /// No description provided for @selectionClear.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغو همهٔ انتخاب‌ها'**
+  String get selectionClear;
+
+  /// No description provided for @selectionExit.
+  ///
+  /// In fa, this message translates to:
+  /// **'خروج از حالت انتخاب'**
+  String get selectionExit;
+
+  /// No description provided for @selectionDelete.
+  ///
+  /// In fa, this message translates to:
+  /// **'حذف انتخاب‌شده‌ها'**
+  String get selectionDelete;
+
+  /// No description provided for @bulkDeleteTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت حذف شود؟}}'**
+  String bulkDeleteTitle(int count);
+
+  /// No description provided for @bulkDeleteBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی‌ها، برچسب‌ها و زمان‌بندی مرور این لغت‌ها هم حذف می‌شوند. پاسخ‌های ثبت‌شده برای آمار باقی می‌مانند. این کار برگشت‌پذیر نیست.'**
+  String get bulkDeleteBody;
+
+  /// No description provided for @bulkDeleted.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت حذف شد}}'**
+  String bulkDeleted(int count);
+
+  /// No description provided for @scanViewImage.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب روی عکس'**
+  String get scanViewImage;
+
+  /// No description provided for @scanViewText.
+  ///
+  /// In fa, this message translates to:
+  /// **'نمایش متن'**
+  String get scanViewText;
+
+  /// No description provided for @scanImageHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'روی لغت بزنید تا انتخاب شود. برای چند لغت پشت سر هم، روی اولی نگه دارید و تا آخری بکشید. با دو انگشت بزرگ‌نمایی کنید.'**
+  String get scanImageHint;
+
+  /// No description provided for @scanPageImageLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'عکس صفحه'**
+  String get scanPageImageLabel;
+
+  /// No description provided for @scanRegionMode.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب ناحیه'**
+  String get scanRegionMode;
+
+  /// No description provided for @scanRegionHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'دور متنی که درست خوانده نشده یک کادر بکشید تا دوباره خوانده شود.'**
+  String get scanRegionHint;
+
+  /// No description provided for @scanRegionTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'متن ناحیهٔ انتخاب‌شده'**
+  String get scanRegionTitle;
+
+  /// No description provided for @scanRegionHelper.
+  ///
+  /// In fa, this message translates to:
+  /// **'در صورت نیاز اصلاح کنید؛ فقط همین متن اضافه می‌شود.'**
+  String get scanRegionHelper;
+
+  /// No description provided for @scanRegionAdd.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن'**
+  String get scanRegionAdd;
+
+  /// No description provided for @scanRegionEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'در این ناحیه متنی پیدا نشد. کادر بزرگ‌تری بکشید.'**
+  String get scanRegionEmpty;
+
+  /// No description provided for @scanRegionFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'خواندن این ناحیه ممکن نشد. دوباره تلاش کنید.'**
+  String get scanRegionFailed;
+
+  /// No description provided for @scanSplitWords.
+  ///
+  /// In fa, this message translates to:
+  /// **'جدا کردن به لغت‌های تکی'**
+  String get scanSplitWords;
+
+  /// No description provided for @scanRemoveSelection.
+  ///
+  /// In fa, this message translates to:
+  /// **'حذف از انتخاب'**
+  String get scanRemoveSelection;
 }
 
 class _AppLocalizationsDelegate

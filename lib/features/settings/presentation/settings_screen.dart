@@ -10,6 +10,9 @@ import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../enrichment/presentation/ai_settings_controller.dart';
+import '../../reminders/presentation/reminder_controller.dart';
+import '../../review/presentation/practice_screen.dart';
+import '../../review/presentation/review_providers.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -60,6 +63,61 @@ class SettingsScreen extends ConsumerWidget {
                 ? l10n.settingsAiConfigured
                 : l10n.settingsAiNotConfigured,
             onTap: () => context.go(AppRoutes.aiSettings),
+          ),
+          sectionGap,
+          SectionHeader(l10n.settingsStudy),
+          ActionTile(
+            key: const Key('settings.reviewDirection'),
+            icon: Icons.swap_horiz,
+            title: l10n.reviewDirectionTitle,
+            description: switch (ref.watch(reviewDirectionProvider).value) {
+              final d? => reviewDirectionLabel(l10n, d),
+              null => '',
+            },
+            onTap: () => showModalBottomSheet<void>(
+              context: context,
+              showDragHandle: true,
+              builder: (context) => SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpace.gutter,
+                    0,
+                    AppSpace.gutter,
+                    AppSpace.lg,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SectionHeader(l10n.reviewDirectionTitle),
+                      const ReviewDirectionPicker(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpace.sm),
+          ActionTile(
+            key: const Key('settings.reminder'),
+            icon: Icons.notifications_outlined,
+            title: l10n.reminderTitle,
+            description: switch (ref.watch(reminderControllerProvider).value) {
+              final r? when r.enabled => l10n.reminderOnAt(
+                MaterialLocalizations.of(context)
+                    .formatTimeOfDay(TimeOfDay(hour: r.hour, minute: r.minute)),
+              ),
+              _ => l10n.reminderOff,
+            },
+            onTap: () => context.go(AppRoutes.reminders),
+          ),
+          const SizedBox(height: AppSpace.sm),
+          ActionTile(
+            key: const Key('settings.tags'),
+            icon: Icons.label_outline,
+            title: l10n.tagsTitle,
+            description: l10n.tagsSettingsDescription,
+            onTap: () => context.push(AppRoutes.tags),
           ),
           sectionGap,
           SectionHeader(l10n.settingsPrivacy),

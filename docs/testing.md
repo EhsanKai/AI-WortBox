@@ -290,3 +290,111 @@ Android and iPhone devices.
     whether the Keychain item persists; "Remove key" clears it.
 11. Review states and due cards unchanged after enrichment (Phase 5 will
     show them; inspect the database if needed).
+
+## Phase 5 results (2026-10-19)
+
+- `dart format --set-exit-if-changed lib test`: 0 changed
+- `flutter analyze`: no issues
+- `flutter test`: **463 passed, 3 skipped, 0 failed** (baseline before
+  Phase 5: 358 passed, 2 skipped). Skipped: the two opt-in OpenRouter live
+  tests and the opt-in Anki sample writer (`ANKI_EXPORT_DIR`).
+- The schema test that asserted "schema v1" was updated to v2 (expected
+  change, not a weakened assertion).
+- Anki compatibility (external, not part of `flutter test`): the app's
+  `.apkg` export was imported by the official Anki library 26.09.3
+  (`tool/anki/validate_apkg.py`): 2 new notes, 2 cards, every field and tag
+  as expected, Anki's database check passed; re-importing reported 2
+  duplicates and 0 new notes. Import fixtures were written by the same
+  library (`tool/anki/make_fixtures.py`).
+- Builds: still not possible on this machine (no Android SDK, no full
+  Xcode). Nothing in Phase 5 has run on a device.
+
+### What the automated tests can and cannot show
+
+| Area | Automated (host) | Needs a real device |
+| --- | --- | --- |
+| Search, tags, difficult, export/import formats, statistics, migration | Real SQLite (in memory and on disk), real file formats | Performance with large collections |
+| TTS | Method channel replaced: locale, voice check, error mapping | Whether a German voice exists, how it sounds, audio focus |
+| Reminders | DST/next-time logic with real IANA data; controller with a fake scheduler | Permission prompts, delivery time, reboot/update restore, battery restrictions |
+| File save | Fake sink: bytes, names, cancel, failure | System save dialogs, cloud providers, permissions |
+| Anki | Fixtures written by Anki; export imported by the Anki library | Anki desktop GUI, AnkiDroid, AnkiMobile |
+
+### Phase 5 suites
+
+| File | Covers |
+| --- | --- |
+| `test/drift/app_database/migration_test.dart` (2) | Every schema step; v1 → v2 keeps decks, entries (Persian with Arabic letters and ZWNJ, metadata), meanings and flashcards unchanged, backfills search keys |
+| `test/data/database/app_database_test.dart` (+2) | v2 tables; entry delete removes tag links, keeps tag and review history (entry reference nulled); unique tag key |
+| `test/features/vocabulary/data/search_tags_difficult_test.dart` (14) | Search: empty/blank query, German case/umlaut/decomposed input, base form, Persian letter variants/diacritics/ZWNJ, no results, `%`/`_` literal, deck filter, limit, key updated on edit with stored text unchanged; difficult mark keeps content, `updatedAt` and flashcards; tags: validation, duplicates by case/spaces, rename, counts, filters, delete keeps words, entry delete; import tags only for created/merged rows; persistence after closing and reopening a database file |
+| `test/features/export/csv_exporter_test.dart` (6) | Header, BOM, CRLF, empty list, quoting of quotes/commas/line breaks/edge spaces, round trip through the CSV importer with automatic mapping (German, Persian, tags), the `;`-in-meaning limitation, file names |
+| `test/features/anki/anki_package_test.dart` (12, +1 opt-in) | HTML ↔ text; modern and legacy packages written by Anki (all note types, tags, HTML, sound, empty front); import analysis with duplicates; not a ZIP, no collection, damaged collection, placeholder-only package, no notes; export structure (schema 11, checksum equal to Anki's, escaping, cards, note type, deck); export → import round trip |
+| `test/features/statistics/study_statistics_test.dart` (7) | Local days across month/leap/DST dates; empty state; several reviews per day; consecutive days; streak ending yesterday; missed day; longest streak; order independence |
+| `test/features/review/data/drift_review_repository_test.dart` (4) | Local day from a UTC+3:30 offset around midnight; daily activity and distinct sessions; no writes to flashcards or vocabulary; empty history |
+| `test/features/review/presentation/practice_controller_test.dart` (4) | Empty states; difficult-only; reveal required; double tap records once; reverse direction, one session; words and flashcards unchanged; 20-word cap |
+| `test/features/reminders/reminder_test.dart` (12) | Next time today/tomorrow, Berlin autumn DST (25 h), spring-forward gap, Tehran; settings defaults and malformed values; permission denied (nothing saved); enable/reschedule/disable with one notification id; persistence across a new container; startup sync without permission prompt; scheduling and cancel failures |
+| `test/features/speech/flutter_tts_speech_service_test.dart` (6) | `de-DE`, voice checked once, interruption, blank text, missing voice, engine errors, `stop` never throws |
+| `test/widgets/phase5_flow_test.dart` (12) | Search across decks with deck names, no-result state, clear, difficult filter; mark difficult, pronounce, create tag (duplicate rejected), assign; missing voice message; tag filter; tag delete keeps word; practice → summary → streak on Today → statistics; narrow 320 px/2×/dark answer and statistics; difficult-only empty state; reminder permission denied/allowed/off; CSV and Anki export via the deck menu; cancelled/failed/empty export; Anki import from a real package through the preview; invalid package error |
+| `test/widgets/design_system_test.dart` (+24) | Search, tags, Anki import, reminder, practice setup and session at 320 px, 1.5×/2×, light/dark |
+
+## Manual device checklist (Phase 5)
+
+Needs Android and iPhone devices; none of this has been run yet.
+
+1. Update from a Phase 4 install with existing words: words, meanings and
+   enrichment data are intact; search finds them by German and Persian.
+2. Search: Persian with and without ZWNJ, German with umlauts; tag and
+   difficult filters; clearing filters.
+3. Tags: create, rename, delete (words remain), assign several; restart the
+   app → unchanged.
+4. Difficult: mark/unmark; list badge; difficult-only practice.
+5. TTS: word and example on both platforms, with and without a German
+   voice installed, with the Ring/Silent switch on silent (D45), offline,
+   while music plays (ducked, then restored), tapping repeatedly.
+6. Practice: complete a session, leave one midway (answers so far are kept),
+   check statistics; change the device date/time zone and confirm past days
+   do not move.
+7. Reminder: turn on (permission prompt appears now, not at app start);
+   deny → message; allow → notification at the chosen time; change the
+   time; turn off → no notification; reboot (Android) → still scheduled;
+   check behaviour across a DST change if possible.
+8. Export CSV and `.apkg` to Files/Drive; open the CSV in Excel/Numbers/
+   Google Sheets (Persian readable); re-import the CSV into a new deck.
+9. Import the `.apkg` into Anki desktop, AnkiDroid and AnkiMobile; import a
+   deck exported from each of them into the app (with and without "support
+   older Anki versions"); a package with images/audio (media ignored).
+
+## Review, FSRS, photo selection, TTS and bulk delete (D42–D47)
+
+| Test file | Covers |
+| --- | --- |
+| `test/features/review/domain/review_scheduler_test.dart` | FSRS ratings, learning steps, graduation, growing intervals, lapses, determinism per direction |
+| `test/features/review/domain/review_queue_test.dart` | Due rules (learning look-ahead, end of local day), new-card limits and order, one direction per day for "both", limit, direction setting parsing |
+| `test/features/review/data/drift_study_repository_test.dart` | Card + event in one transaction, persistence, repeated reviews, local-day boundaries (UTC+3:30), daily new-card limit, independent directions, deck filter, deleted words, live due count |
+| `test/drift/app_database/migration_test.dart` | A v1 database with old words and an old card row is reviewed with FSRS after migration; nothing lost |
+| `test/features/review/presentation/practice_controller_test.dart` | Default direction, scheduled vs free, reveal required, double taps, re-queued learning steps, both directions over two days, difficult-only stays unscheduled, direction persisted |
+| `test/features/speech/flutter_tts_speech_service_test.dart` | iOS playback session (once, before speaking, not on Android, retried after failure), rapid taps, restart, stop, refused language |
+| `test/features/vocabulary/data/bulk_delete_test.dart` | Only selected words deleted; meanings, tags, card state cascade; history kept; unknown ids; 1200 ids |
+| `test/features/scan/domain/page_layout_test.dart` | Word boxes ↔ characters (umlauts, ß, punctuation, hyphenation), hit tests with slop, misaligned boxes disable the photo view, image ↔ screen mapping incl. zoom/pan |
+| `test/features/scan/presentation/scan_visual_selection_test.dart` | Photo kept only while scanning, three words from different paragraphs saved and nothing else, deselect/split/remove, disjoint selections, area crop → correction → item |
+| `test/widgets/review_flow_test.dart` | Deck hides meanings (text and semantics), Start review shows one prompt, reveal, FSRS row written, direction from Settings survives restart, due count, nothing due → free practice, long-press selection, select all/clear, cancel/confirm delete, back leaves selection |
+| `test/widgets/scan_visual_flow_test.dart` | Taps at real screen positions, pinch zoom keeps boxes aligned, hold-and-drag vs plain drag, area drawn on screen → correct photo region, view switching, 320 px at 2× text |
+
+Automated tests cannot show: ML Kit's real word boxes and their alignment
+with the decoded photo on a device, gesture feel, whether a German voice is
+installed, how speech sounds, and the silent switch. See the manual checks
+in the final report of this change and below.
+
+Manual checks on a device (D42–D47):
+
+1. Review German → Persian from Today: German shown, meaning hidden until
+   "Show answer"; answer; the card returns after its learning step.
+2. Settings → Review direction → Persian → German; restart; review shows the
+   meaning first. Then "Both directions": each word once per day.
+3. Answer some cards, close the app, reopen: due count reflects the answers;
+   the next day graduated cards reappear only when due.
+4. Open a deck: meanings hidden; eye icon shows them; long-press → select
+   several → delete → confirm; cancel deletes nothing.
+5. Pronunciation with the silent switch on, with music playing, offline.
+6. Scan a page: tap three words in different paragraphs, zoom and tap
+   more, touch-hold-drag an expression, draw an area around a misread word,
+   correct it, continue, choose the deck, save; only those words are added.

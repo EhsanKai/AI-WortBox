@@ -1,5 +1,6 @@
 import 'package:ai_wortbox/data/database/app_database.dart';
 import 'package:ai_wortbox/features/review/domain/flashcard.dart';
+import 'package:ai_wortbox/features/review/domain/review_event.dart';
 import 'package:ai_wortbox/features/vocabulary/domain/vocabulary_entry.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
@@ -63,8 +64,8 @@ void main() {
         ),
       );
 
-  test('creates schema version 1 with all tables', () async {
-    expect(db.schemaVersion, 1);
+  test('creates schema version 2 with all tables', () async {
+    expect(db.schemaVersion, 2);
     final tables = await db
         .customSelect(
           "SELECT name FROM sqlite_master WHERE type = 'table' "
@@ -73,11 +74,80 @@ void main() {
         .map((row) => row.read<String>('name'))
         .get();
     expect(tables, [
+      'app_settings',
       'decks',
+      'entry_tags',
       'flashcards',
+      'review_events',
+      'tags',
       'vocabulary_entries',
       'vocabulary_meanings',
     ]);
+  });
+
+  test('deleting an entry removes its tag assignments but keeps the tag '
+      'and its review history (entry reference cleared)', () async {
+    await insertDeck();
+    await insertEntry();
+    await db
+        .into(db.tags)
+        .insert(
+          TagsCompanion.insert(
+            id: 't-1',
+            name: 'B1',
+            nameKey: 'b1',
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+    await db
+        .into(db.entryTags)
+        .insert(
+          EntryTagsCompanion.insert(
+            entryId: 'entry-1',
+            tagId: 't-1',
+            createdAt: now,
+          ),
+        );
+    await db
+        .into(db.reviewEvents)
+        .insert(
+          ReviewEventsCompanion.insert(
+            id: 'r-1',
+            entryId: const Value('entry-1'),
+            sessionId: 's-1',
+            direction: CardDirection.reverse,
+            outcome: ReviewOutcome.remembered,
+            reviewedAt: now,
+            localDay: '2026-10-15',
+          ),
+        );
+
+    await (db.delete(
+      db.vocabularyEntries,
+    )..where((e) => e.id.equals('entry-1'))).go();
+
+    expect(await db.select(db.entryTags).get(), isEmpty);
+    expect(await db.select(db.tags).get(), hasLength(1));
+    final event = await db.select(db.reviewEvents).getSingle();
+    expect(event.entryId, isNull);
+    expect(event.outcome, ReviewOutcome.remembered);
+  });
+
+  test('tag names are unique by key', () async {
+    Future<void> insert(String id) => db
+        .into(db.tags)
+        .insert(
+          TagsCompanion.insert(
+            id: id,
+            name: 'Reise',
+            nameKey: 'reise',
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+    await insert('t-1');
+    await expectLater(insert('t-2'), throwsA(isA<Exception>()));
   });
 
   test('enables foreign keys', () async {

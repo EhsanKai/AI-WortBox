@@ -7,8 +7,11 @@ phase. They complement the product specification and
 ## Approval gates
 
 1. Work only on the phase that is currently approved. Current state:
-   **Phase 4** is implemented and awaiting the product owner's review and
-   commit. Phase 5 is not approved.
+   **Phase 5** (scope selected by the product owner; see the roadmap) is
+   implemented, together with the product owner's follow-up request
+   (D42–D47: FSRS review, review direction, hidden answers, photo word
+   selection, iOS speech fix, bulk delete). No later phase exists; other
+   proposals are not approved.
 2. At the end of each phase: report and **stop**. Do not start the next phase
    without explicit approval.
 3. Items in the proposed-feature register (P1–P13, Anki `.apkg`) are
@@ -74,6 +77,9 @@ and must be reported that way until real builds run.
   (a backend is a possible future alternative, not current scope); no request
   without a saved key and an explicit user action; never claim real AI works
   when only mocks ran; protect user-edited content.
-- **Phase 5:** use a verified FSRS implementation or document the
-  limitation; do not market a simplified scheduler as FSRS; inject a clock;
-  do not claim words are permanently learned.
+- **Phase 5 (as implemented):** practice and statistics come only from
+  explicitly recorded answers; scheduled review uses the `fsrs` package
+  (D42) and free practice is never presented as FSRS; inject a clock; do
+  not claim words are permanently learned; never claim Anki, TTS, OCR
+  alignment or notification behaviour that was not verified (see
+  `docs/testing.md`).

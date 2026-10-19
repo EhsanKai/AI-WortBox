@@ -4,7 +4,7 @@
 //
 import 'package:drift/drift.dart';
 
-class Decks extends Table with TableInfo {
+class Decks extends Table with TableInfo<Decks, DecksData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -85,8 +85,38 @@ class Decks extends Table with TableInfo {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Never map(Map<String, dynamic> data, {String? tablePrefix}) {
-    throw UnsupportedError('TableInfo.map in schema verification code');
+  DecksData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DecksData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sourceLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_language'],
+      )!,
+      definitionLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}definition_language'],
+      )!,
+      dailyNewCardLimit: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}daily_new_card_limit'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
   }
 
   @override
@@ -100,7 +130,278 @@ class Decks extends Table with TableInfo {
   bool get dontWriteConstraints => true;
 }
 
-class VocabularyEntries extends Table with TableInfo {
+class DecksData extends DataClass implements Insertable<DecksData> {
+  final String id;
+  final String name;
+  final String sourceLanguage;
+  final String definitionLanguage;
+  final int dailyNewCardLimit;
+  final String createdAt;
+  final String updatedAt;
+  const DecksData({
+    required this.id,
+    required this.name,
+    required this.sourceLanguage,
+    required this.definitionLanguage,
+    required this.dailyNewCardLimit,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['source_language'] = Variable<String>(sourceLanguage);
+    map['definition_language'] = Variable<String>(definitionLanguage);
+    map['daily_new_card_limit'] = Variable<int>(dailyNewCardLimit);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  DecksCompanion toCompanion(bool nullToAbsent) {
+    return DecksCompanion(
+      id: Value(id),
+      name: Value(name),
+      sourceLanguage: Value(sourceLanguage),
+      definitionLanguage: Value(definitionLanguage),
+      dailyNewCardLimit: Value(dailyNewCardLimit),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DecksData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DecksData(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      sourceLanguage: serializer.fromJson<String>(json['sourceLanguage']),
+      definitionLanguage: serializer.fromJson<String>(
+        json['definitionLanguage'],
+      ),
+      dailyNewCardLimit: serializer.fromJson<int>(json['dailyNewCardLimit']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'sourceLanguage': serializer.toJson<String>(sourceLanguage),
+      'definitionLanguage': serializer.toJson<String>(definitionLanguage),
+      'dailyNewCardLimit': serializer.toJson<int>(dailyNewCardLimit),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  DecksData copyWith({
+    String? id,
+    String? name,
+    String? sourceLanguage,
+    String? definitionLanguage,
+    int? dailyNewCardLimit,
+    String? createdAt,
+    String? updatedAt,
+  }) => DecksData(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    sourceLanguage: sourceLanguage ?? this.sourceLanguage,
+    definitionLanguage: definitionLanguage ?? this.definitionLanguage,
+    dailyNewCardLimit: dailyNewCardLimit ?? this.dailyNewCardLimit,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  DecksData copyWithCompanion(DecksCompanion data) {
+    return DecksData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      sourceLanguage: data.sourceLanguage.present
+          ? data.sourceLanguage.value
+          : this.sourceLanguage,
+      definitionLanguage: data.definitionLanguage.present
+          ? data.definitionLanguage.value
+          : this.definitionLanguage,
+      dailyNewCardLimit: data.dailyNewCardLimit.present
+          ? data.dailyNewCardLimit.value
+          : this.dailyNewCardLimit,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DecksData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sourceLanguage: $sourceLanguage, ')
+          ..write('definitionLanguage: $definitionLanguage, ')
+          ..write('dailyNewCardLimit: $dailyNewCardLimit, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    sourceLanguage,
+    definitionLanguage,
+    dailyNewCardLimit,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DecksData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.sourceLanguage == this.sourceLanguage &&
+          other.definitionLanguage == this.definitionLanguage &&
+          other.dailyNewCardLimit == this.dailyNewCardLimit &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DecksCompanion extends UpdateCompanion<DecksData> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> sourceLanguage;
+  final Value<String> definitionLanguage;
+  final Value<int> dailyNewCardLimit;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const DecksCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sourceLanguage = const Value.absent(),
+    this.definitionLanguage = const Value.absent(),
+    this.dailyNewCardLimit = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DecksCompanion.insert({
+    required String id,
+    required String name,
+    required String sourceLanguage,
+    required String definitionLanguage,
+    required int dailyNewCardLimit,
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       sourceLanguage = Value(sourceLanguage),
+       definitionLanguage = Value(definitionLanguage),
+       dailyNewCardLimit = Value(dailyNewCardLimit),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<DecksData> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? sourceLanguage,
+    Expression<String>? definitionLanguage,
+    Expression<int>? dailyNewCardLimit,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (sourceLanguage != null) 'source_language': sourceLanguage,
+      if (definitionLanguage != null) 'definition_language': definitionLanguage,
+      if (dailyNewCardLimit != null) 'daily_new_card_limit': dailyNewCardLimit,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DecksCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? sourceLanguage,
+    Value<String>? definitionLanguage,
+    Value<int>? dailyNewCardLimit,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return DecksCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      sourceLanguage: sourceLanguage ?? this.sourceLanguage,
+      definitionLanguage: definitionLanguage ?? this.definitionLanguage,
+      dailyNewCardLimit: dailyNewCardLimit ?? this.dailyNewCardLimit,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sourceLanguage.present) {
+      map['source_language'] = Variable<String>(sourceLanguage.value);
+    }
+    if (definitionLanguage.present) {
+      map['definition_language'] = Variable<String>(definitionLanguage.value);
+    }
+    if (dailyNewCardLimit.present) {
+      map['daily_new_card_limit'] = Variable<int>(dailyNewCardLimit.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DecksCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sourceLanguage: $sourceLanguage, ')
+          ..write('definitionLanguage: $definitionLanguage, ')
+          ..write('dailyNewCardLimit: $dailyNewCardLimit, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class VocabularyEntries extends Table
+    with TableInfo<VocabularyEntries, VocabularyEntriesData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -290,8 +591,86 @@ class VocabularyEntries extends Table with TableInfo {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Never map(Map<String, dynamic> data, {String? tablePrefix}) {
-    throw UnsupportedError('TableInfo.map in schema verification code');
+  VocabularyEntriesData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VocabularyEntriesData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      deckId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deck_id'],
+      )!,
+      original: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}original'],
+      )!,
+      normalized: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}normalized'],
+      )!,
+      lemma: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lemma'],
+      ),
+      sourceLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_language'],
+      )!,
+      definitionLanguage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}definition_language'],
+      )!,
+      partOfSpeech: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}part_of_speech'],
+      ),
+      exampleSentence: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}example_sentence'],
+      ),
+      exampleTranslation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}example_translation'],
+      ),
+      grammarInfo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}grammar_info'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      sourceContext: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_context'],
+      ),
+      sourceType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_type'],
+      )!,
+      enrichmentStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}enrichment_status'],
+      )!,
+      enrichmentMetadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}enrichment_metadata'],
+      ),
+      userEditedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_edited_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
   }
 
   @override
@@ -305,7 +684,625 @@ class VocabularyEntries extends Table with TableInfo {
   bool get dontWriteConstraints => true;
 }
 
-class VocabularyMeanings extends Table with TableInfo {
+class VocabularyEntriesData extends DataClass
+    implements Insertable<VocabularyEntriesData> {
+  final String id;
+  final String deckId;
+  final String original;
+  final String normalized;
+  final String? lemma;
+  final String sourceLanguage;
+  final String definitionLanguage;
+  final String? partOfSpeech;
+  final String? exampleSentence;
+  final String? exampleTranslation;
+  final String? grammarInfo;
+  final String? notes;
+  final String? sourceContext;
+  final String sourceType;
+  final String enrichmentStatus;
+  final String? enrichmentMetadata;
+  final String? userEditedAt;
+  final String createdAt;
+  final String updatedAt;
+  const VocabularyEntriesData({
+    required this.id,
+    required this.deckId,
+    required this.original,
+    required this.normalized,
+    this.lemma,
+    required this.sourceLanguage,
+    required this.definitionLanguage,
+    this.partOfSpeech,
+    this.exampleSentence,
+    this.exampleTranslation,
+    this.grammarInfo,
+    this.notes,
+    this.sourceContext,
+    required this.sourceType,
+    required this.enrichmentStatus,
+    this.enrichmentMetadata,
+    this.userEditedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['deck_id'] = Variable<String>(deckId);
+    map['original'] = Variable<String>(original);
+    map['normalized'] = Variable<String>(normalized);
+    if (!nullToAbsent || lemma != null) {
+      map['lemma'] = Variable<String>(lemma);
+    }
+    map['source_language'] = Variable<String>(sourceLanguage);
+    map['definition_language'] = Variable<String>(definitionLanguage);
+    if (!nullToAbsent || partOfSpeech != null) {
+      map['part_of_speech'] = Variable<String>(partOfSpeech);
+    }
+    if (!nullToAbsent || exampleSentence != null) {
+      map['example_sentence'] = Variable<String>(exampleSentence);
+    }
+    if (!nullToAbsent || exampleTranslation != null) {
+      map['example_translation'] = Variable<String>(exampleTranslation);
+    }
+    if (!nullToAbsent || grammarInfo != null) {
+      map['grammar_info'] = Variable<String>(grammarInfo);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || sourceContext != null) {
+      map['source_context'] = Variable<String>(sourceContext);
+    }
+    map['source_type'] = Variable<String>(sourceType);
+    map['enrichment_status'] = Variable<String>(enrichmentStatus);
+    if (!nullToAbsent || enrichmentMetadata != null) {
+      map['enrichment_metadata'] = Variable<String>(enrichmentMetadata);
+    }
+    if (!nullToAbsent || userEditedAt != null) {
+      map['user_edited_at'] = Variable<String>(userEditedAt);
+    }
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  VocabularyEntriesCompanion toCompanion(bool nullToAbsent) {
+    return VocabularyEntriesCompanion(
+      id: Value(id),
+      deckId: Value(deckId),
+      original: Value(original),
+      normalized: Value(normalized),
+      lemma: lemma == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lemma),
+      sourceLanguage: Value(sourceLanguage),
+      definitionLanguage: Value(definitionLanguage),
+      partOfSpeech: partOfSpeech == null && nullToAbsent
+          ? const Value.absent()
+          : Value(partOfSpeech),
+      exampleSentence: exampleSentence == null && nullToAbsent
+          ? const Value.absent()
+          : Value(exampleSentence),
+      exampleTranslation: exampleTranslation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(exampleTranslation),
+      grammarInfo: grammarInfo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(grammarInfo),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      sourceContext: sourceContext == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceContext),
+      sourceType: Value(sourceType),
+      enrichmentStatus: Value(enrichmentStatus),
+      enrichmentMetadata: enrichmentMetadata == null && nullToAbsent
+          ? const Value.absent()
+          : Value(enrichmentMetadata),
+      userEditedAt: userEditedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userEditedAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory VocabularyEntriesData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VocabularyEntriesData(
+      id: serializer.fromJson<String>(json['id']),
+      deckId: serializer.fromJson<String>(json['deckId']),
+      original: serializer.fromJson<String>(json['original']),
+      normalized: serializer.fromJson<String>(json['normalized']),
+      lemma: serializer.fromJson<String?>(json['lemma']),
+      sourceLanguage: serializer.fromJson<String>(json['sourceLanguage']),
+      definitionLanguage: serializer.fromJson<String>(
+        json['definitionLanguage'],
+      ),
+      partOfSpeech: serializer.fromJson<String?>(json['partOfSpeech']),
+      exampleSentence: serializer.fromJson<String?>(json['exampleSentence']),
+      exampleTranslation: serializer.fromJson<String?>(
+        json['exampleTranslation'],
+      ),
+      grammarInfo: serializer.fromJson<String?>(json['grammarInfo']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      sourceContext: serializer.fromJson<String?>(json['sourceContext']),
+      sourceType: serializer.fromJson<String>(json['sourceType']),
+      enrichmentStatus: serializer.fromJson<String>(json['enrichmentStatus']),
+      enrichmentMetadata: serializer.fromJson<String?>(
+        json['enrichmentMetadata'],
+      ),
+      userEditedAt: serializer.fromJson<String?>(json['userEditedAt']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'deckId': serializer.toJson<String>(deckId),
+      'original': serializer.toJson<String>(original),
+      'normalized': serializer.toJson<String>(normalized),
+      'lemma': serializer.toJson<String?>(lemma),
+      'sourceLanguage': serializer.toJson<String>(sourceLanguage),
+      'definitionLanguage': serializer.toJson<String>(definitionLanguage),
+      'partOfSpeech': serializer.toJson<String?>(partOfSpeech),
+      'exampleSentence': serializer.toJson<String?>(exampleSentence),
+      'exampleTranslation': serializer.toJson<String?>(exampleTranslation),
+      'grammarInfo': serializer.toJson<String?>(grammarInfo),
+      'notes': serializer.toJson<String?>(notes),
+      'sourceContext': serializer.toJson<String?>(sourceContext),
+      'sourceType': serializer.toJson<String>(sourceType),
+      'enrichmentStatus': serializer.toJson<String>(enrichmentStatus),
+      'enrichmentMetadata': serializer.toJson<String?>(enrichmentMetadata),
+      'userEditedAt': serializer.toJson<String?>(userEditedAt),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  VocabularyEntriesData copyWith({
+    String? id,
+    String? deckId,
+    String? original,
+    String? normalized,
+    Value<String?> lemma = const Value.absent(),
+    String? sourceLanguage,
+    String? definitionLanguage,
+    Value<String?> partOfSpeech = const Value.absent(),
+    Value<String?> exampleSentence = const Value.absent(),
+    Value<String?> exampleTranslation = const Value.absent(),
+    Value<String?> grammarInfo = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    Value<String?> sourceContext = const Value.absent(),
+    String? sourceType,
+    String? enrichmentStatus,
+    Value<String?> enrichmentMetadata = const Value.absent(),
+    Value<String?> userEditedAt = const Value.absent(),
+    String? createdAt,
+    String? updatedAt,
+  }) => VocabularyEntriesData(
+    id: id ?? this.id,
+    deckId: deckId ?? this.deckId,
+    original: original ?? this.original,
+    normalized: normalized ?? this.normalized,
+    lemma: lemma.present ? lemma.value : this.lemma,
+    sourceLanguage: sourceLanguage ?? this.sourceLanguage,
+    definitionLanguage: definitionLanguage ?? this.definitionLanguage,
+    partOfSpeech: partOfSpeech.present ? partOfSpeech.value : this.partOfSpeech,
+    exampleSentence: exampleSentence.present
+        ? exampleSentence.value
+        : this.exampleSentence,
+    exampleTranslation: exampleTranslation.present
+        ? exampleTranslation.value
+        : this.exampleTranslation,
+    grammarInfo: grammarInfo.present ? grammarInfo.value : this.grammarInfo,
+    notes: notes.present ? notes.value : this.notes,
+    sourceContext: sourceContext.present
+        ? sourceContext.value
+        : this.sourceContext,
+    sourceType: sourceType ?? this.sourceType,
+    enrichmentStatus: enrichmentStatus ?? this.enrichmentStatus,
+    enrichmentMetadata: enrichmentMetadata.present
+        ? enrichmentMetadata.value
+        : this.enrichmentMetadata,
+    userEditedAt: userEditedAt.present ? userEditedAt.value : this.userEditedAt,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  VocabularyEntriesData copyWithCompanion(VocabularyEntriesCompanion data) {
+    return VocabularyEntriesData(
+      id: data.id.present ? data.id.value : this.id,
+      deckId: data.deckId.present ? data.deckId.value : this.deckId,
+      original: data.original.present ? data.original.value : this.original,
+      normalized: data.normalized.present
+          ? data.normalized.value
+          : this.normalized,
+      lemma: data.lemma.present ? data.lemma.value : this.lemma,
+      sourceLanguage: data.sourceLanguage.present
+          ? data.sourceLanguage.value
+          : this.sourceLanguage,
+      definitionLanguage: data.definitionLanguage.present
+          ? data.definitionLanguage.value
+          : this.definitionLanguage,
+      partOfSpeech: data.partOfSpeech.present
+          ? data.partOfSpeech.value
+          : this.partOfSpeech,
+      exampleSentence: data.exampleSentence.present
+          ? data.exampleSentence.value
+          : this.exampleSentence,
+      exampleTranslation: data.exampleTranslation.present
+          ? data.exampleTranslation.value
+          : this.exampleTranslation,
+      grammarInfo: data.grammarInfo.present
+          ? data.grammarInfo.value
+          : this.grammarInfo,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      sourceContext: data.sourceContext.present
+          ? data.sourceContext.value
+          : this.sourceContext,
+      sourceType: data.sourceType.present
+          ? data.sourceType.value
+          : this.sourceType,
+      enrichmentStatus: data.enrichmentStatus.present
+          ? data.enrichmentStatus.value
+          : this.enrichmentStatus,
+      enrichmentMetadata: data.enrichmentMetadata.present
+          ? data.enrichmentMetadata.value
+          : this.enrichmentMetadata,
+      userEditedAt: data.userEditedAt.present
+          ? data.userEditedAt.value
+          : this.userEditedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VocabularyEntriesData(')
+          ..write('id: $id, ')
+          ..write('deckId: $deckId, ')
+          ..write('original: $original, ')
+          ..write('normalized: $normalized, ')
+          ..write('lemma: $lemma, ')
+          ..write('sourceLanguage: $sourceLanguage, ')
+          ..write('definitionLanguage: $definitionLanguage, ')
+          ..write('partOfSpeech: $partOfSpeech, ')
+          ..write('exampleSentence: $exampleSentence, ')
+          ..write('exampleTranslation: $exampleTranslation, ')
+          ..write('grammarInfo: $grammarInfo, ')
+          ..write('notes: $notes, ')
+          ..write('sourceContext: $sourceContext, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('enrichmentStatus: $enrichmentStatus, ')
+          ..write('enrichmentMetadata: $enrichmentMetadata, ')
+          ..write('userEditedAt: $userEditedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    deckId,
+    original,
+    normalized,
+    lemma,
+    sourceLanguage,
+    definitionLanguage,
+    partOfSpeech,
+    exampleSentence,
+    exampleTranslation,
+    grammarInfo,
+    notes,
+    sourceContext,
+    sourceType,
+    enrichmentStatus,
+    enrichmentMetadata,
+    userEditedAt,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VocabularyEntriesData &&
+          other.id == this.id &&
+          other.deckId == this.deckId &&
+          other.original == this.original &&
+          other.normalized == this.normalized &&
+          other.lemma == this.lemma &&
+          other.sourceLanguage == this.sourceLanguage &&
+          other.definitionLanguage == this.definitionLanguage &&
+          other.partOfSpeech == this.partOfSpeech &&
+          other.exampleSentence == this.exampleSentence &&
+          other.exampleTranslation == this.exampleTranslation &&
+          other.grammarInfo == this.grammarInfo &&
+          other.notes == this.notes &&
+          other.sourceContext == this.sourceContext &&
+          other.sourceType == this.sourceType &&
+          other.enrichmentStatus == this.enrichmentStatus &&
+          other.enrichmentMetadata == this.enrichmentMetadata &&
+          other.userEditedAt == this.userEditedAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class VocabularyEntriesCompanion
+    extends UpdateCompanion<VocabularyEntriesData> {
+  final Value<String> id;
+  final Value<String> deckId;
+  final Value<String> original;
+  final Value<String> normalized;
+  final Value<String?> lemma;
+  final Value<String> sourceLanguage;
+  final Value<String> definitionLanguage;
+  final Value<String?> partOfSpeech;
+  final Value<String?> exampleSentence;
+  final Value<String?> exampleTranslation;
+  final Value<String?> grammarInfo;
+  final Value<String?> notes;
+  final Value<String?> sourceContext;
+  final Value<String> sourceType;
+  final Value<String> enrichmentStatus;
+  final Value<String?> enrichmentMetadata;
+  final Value<String?> userEditedAt;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const VocabularyEntriesCompanion({
+    this.id = const Value.absent(),
+    this.deckId = const Value.absent(),
+    this.original = const Value.absent(),
+    this.normalized = const Value.absent(),
+    this.lemma = const Value.absent(),
+    this.sourceLanguage = const Value.absent(),
+    this.definitionLanguage = const Value.absent(),
+    this.partOfSpeech = const Value.absent(),
+    this.exampleSentence = const Value.absent(),
+    this.exampleTranslation = const Value.absent(),
+    this.grammarInfo = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.sourceContext = const Value.absent(),
+    this.sourceType = const Value.absent(),
+    this.enrichmentStatus = const Value.absent(),
+    this.enrichmentMetadata = const Value.absent(),
+    this.userEditedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VocabularyEntriesCompanion.insert({
+    required String id,
+    required String deckId,
+    required String original,
+    required String normalized,
+    this.lemma = const Value.absent(),
+    required String sourceLanguage,
+    required String definitionLanguage,
+    this.partOfSpeech = const Value.absent(),
+    this.exampleSentence = const Value.absent(),
+    this.exampleTranslation = const Value.absent(),
+    this.grammarInfo = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.sourceContext = const Value.absent(),
+    required String sourceType,
+    required String enrichmentStatus,
+    this.enrichmentMetadata = const Value.absent(),
+    this.userEditedAt = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       deckId = Value(deckId),
+       original = Value(original),
+       normalized = Value(normalized),
+       sourceLanguage = Value(sourceLanguage),
+       definitionLanguage = Value(definitionLanguage),
+       sourceType = Value(sourceType),
+       enrichmentStatus = Value(enrichmentStatus),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<VocabularyEntriesData> custom({
+    Expression<String>? id,
+    Expression<String>? deckId,
+    Expression<String>? original,
+    Expression<String>? normalized,
+    Expression<String>? lemma,
+    Expression<String>? sourceLanguage,
+    Expression<String>? definitionLanguage,
+    Expression<String>? partOfSpeech,
+    Expression<String>? exampleSentence,
+    Expression<String>? exampleTranslation,
+    Expression<String>? grammarInfo,
+    Expression<String>? notes,
+    Expression<String>? sourceContext,
+    Expression<String>? sourceType,
+    Expression<String>? enrichmentStatus,
+    Expression<String>? enrichmentMetadata,
+    Expression<String>? userEditedAt,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (deckId != null) 'deck_id': deckId,
+      if (original != null) 'original': original,
+      if (normalized != null) 'normalized': normalized,
+      if (lemma != null) 'lemma': lemma,
+      if (sourceLanguage != null) 'source_language': sourceLanguage,
+      if (definitionLanguage != null) 'definition_language': definitionLanguage,
+      if (partOfSpeech != null) 'part_of_speech': partOfSpeech,
+      if (exampleSentence != null) 'example_sentence': exampleSentence,
+      if (exampleTranslation != null) 'example_translation': exampleTranslation,
+      if (grammarInfo != null) 'grammar_info': grammarInfo,
+      if (notes != null) 'notes': notes,
+      if (sourceContext != null) 'source_context': sourceContext,
+      if (sourceType != null) 'source_type': sourceType,
+      if (enrichmentStatus != null) 'enrichment_status': enrichmentStatus,
+      if (enrichmentMetadata != null) 'enrichment_metadata': enrichmentMetadata,
+      if (userEditedAt != null) 'user_edited_at': userEditedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VocabularyEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? deckId,
+    Value<String>? original,
+    Value<String>? normalized,
+    Value<String?>? lemma,
+    Value<String>? sourceLanguage,
+    Value<String>? definitionLanguage,
+    Value<String?>? partOfSpeech,
+    Value<String?>? exampleSentence,
+    Value<String?>? exampleTranslation,
+    Value<String?>? grammarInfo,
+    Value<String?>? notes,
+    Value<String?>? sourceContext,
+    Value<String>? sourceType,
+    Value<String>? enrichmentStatus,
+    Value<String?>? enrichmentMetadata,
+    Value<String?>? userEditedAt,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return VocabularyEntriesCompanion(
+      id: id ?? this.id,
+      deckId: deckId ?? this.deckId,
+      original: original ?? this.original,
+      normalized: normalized ?? this.normalized,
+      lemma: lemma ?? this.lemma,
+      sourceLanguage: sourceLanguage ?? this.sourceLanguage,
+      definitionLanguage: definitionLanguage ?? this.definitionLanguage,
+      partOfSpeech: partOfSpeech ?? this.partOfSpeech,
+      exampleSentence: exampleSentence ?? this.exampleSentence,
+      exampleTranslation: exampleTranslation ?? this.exampleTranslation,
+      grammarInfo: grammarInfo ?? this.grammarInfo,
+      notes: notes ?? this.notes,
+      sourceContext: sourceContext ?? this.sourceContext,
+      sourceType: sourceType ?? this.sourceType,
+      enrichmentStatus: enrichmentStatus ?? this.enrichmentStatus,
+      enrichmentMetadata: enrichmentMetadata ?? this.enrichmentMetadata,
+      userEditedAt: userEditedAt ?? this.userEditedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (deckId.present) {
+      map['deck_id'] = Variable<String>(deckId.value);
+    }
+    if (original.present) {
+      map['original'] = Variable<String>(original.value);
+    }
+    if (normalized.present) {
+      map['normalized'] = Variable<String>(normalized.value);
+    }
+    if (lemma.present) {
+      map['lemma'] = Variable<String>(lemma.value);
+    }
+    if (sourceLanguage.present) {
+      map['source_language'] = Variable<String>(sourceLanguage.value);
+    }
+    if (definitionLanguage.present) {
+      map['definition_language'] = Variable<String>(definitionLanguage.value);
+    }
+    if (partOfSpeech.present) {
+      map['part_of_speech'] = Variable<String>(partOfSpeech.value);
+    }
+    if (exampleSentence.present) {
+      map['example_sentence'] = Variable<String>(exampleSentence.value);
+    }
+    if (exampleTranslation.present) {
+      map['example_translation'] = Variable<String>(exampleTranslation.value);
+    }
+    if (grammarInfo.present) {
+      map['grammar_info'] = Variable<String>(grammarInfo.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (sourceContext.present) {
+      map['source_context'] = Variable<String>(sourceContext.value);
+    }
+    if (sourceType.present) {
+      map['source_type'] = Variable<String>(sourceType.value);
+    }
+    if (enrichmentStatus.present) {
+      map['enrichment_status'] = Variable<String>(enrichmentStatus.value);
+    }
+    if (enrichmentMetadata.present) {
+      map['enrichment_metadata'] = Variable<String>(enrichmentMetadata.value);
+    }
+    if (userEditedAt.present) {
+      map['user_edited_at'] = Variable<String>(userEditedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VocabularyEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('deckId: $deckId, ')
+          ..write('original: $original, ')
+          ..write('normalized: $normalized, ')
+          ..write('lemma: $lemma, ')
+          ..write('sourceLanguage: $sourceLanguage, ')
+          ..write('definitionLanguage: $definitionLanguage, ')
+          ..write('partOfSpeech: $partOfSpeech, ')
+          ..write('exampleSentence: $exampleSentence, ')
+          ..write('exampleTranslation: $exampleTranslation, ')
+          ..write('grammarInfo: $grammarInfo, ')
+          ..write('notes: $notes, ')
+          ..write('sourceContext: $sourceContext, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('enrichmentStatus: $enrichmentStatus, ')
+          ..write('enrichmentMetadata: $enrichmentMetadata, ')
+          ..write('userEditedAt: $userEditedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class VocabularyMeanings extends Table
+    with TableInfo<VocabularyMeanings, VocabularyMeaningsData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -371,8 +1368,30 @@ class VocabularyMeanings extends Table with TableInfo {
     {entryId, position},
   ];
   @override
-  Never map(Map<String, dynamic> data, {String? tablePrefix}) {
-    throw UnsupportedError('TableInfo.map in schema verification code');
+  VocabularyMeaningsData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VocabularyMeaningsData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      entryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entry_id'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      meaning: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}meaning'],
+      )!,
+      explanation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}explanation'],
+      ),
+    );
   }
 
   @override
@@ -389,7 +1408,222 @@ class VocabularyMeanings extends Table with TableInfo {
   bool get dontWriteConstraints => true;
 }
 
-class Flashcards extends Table with TableInfo {
+class VocabularyMeaningsData extends DataClass
+    implements Insertable<VocabularyMeaningsData> {
+  final String id;
+  final String entryId;
+  final int position;
+  final String meaning;
+  final String? explanation;
+  const VocabularyMeaningsData({
+    required this.id,
+    required this.entryId,
+    required this.position,
+    required this.meaning,
+    this.explanation,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['entry_id'] = Variable<String>(entryId);
+    map['position'] = Variable<int>(position);
+    map['meaning'] = Variable<String>(meaning);
+    if (!nullToAbsent || explanation != null) {
+      map['explanation'] = Variable<String>(explanation);
+    }
+    return map;
+  }
+
+  VocabularyMeaningsCompanion toCompanion(bool nullToAbsent) {
+    return VocabularyMeaningsCompanion(
+      id: Value(id),
+      entryId: Value(entryId),
+      position: Value(position),
+      meaning: Value(meaning),
+      explanation: explanation == null && nullToAbsent
+          ? const Value.absent()
+          : Value(explanation),
+    );
+  }
+
+  factory VocabularyMeaningsData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VocabularyMeaningsData(
+      id: serializer.fromJson<String>(json['id']),
+      entryId: serializer.fromJson<String>(json['entryId']),
+      position: serializer.fromJson<int>(json['position']),
+      meaning: serializer.fromJson<String>(json['meaning']),
+      explanation: serializer.fromJson<String?>(json['explanation']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'entryId': serializer.toJson<String>(entryId),
+      'position': serializer.toJson<int>(position),
+      'meaning': serializer.toJson<String>(meaning),
+      'explanation': serializer.toJson<String?>(explanation),
+    };
+  }
+
+  VocabularyMeaningsData copyWith({
+    String? id,
+    String? entryId,
+    int? position,
+    String? meaning,
+    Value<String?> explanation = const Value.absent(),
+  }) => VocabularyMeaningsData(
+    id: id ?? this.id,
+    entryId: entryId ?? this.entryId,
+    position: position ?? this.position,
+    meaning: meaning ?? this.meaning,
+    explanation: explanation.present ? explanation.value : this.explanation,
+  );
+  VocabularyMeaningsData copyWithCompanion(VocabularyMeaningsCompanion data) {
+    return VocabularyMeaningsData(
+      id: data.id.present ? data.id.value : this.id,
+      entryId: data.entryId.present ? data.entryId.value : this.entryId,
+      position: data.position.present ? data.position.value : this.position,
+      meaning: data.meaning.present ? data.meaning.value : this.meaning,
+      explanation: data.explanation.present
+          ? data.explanation.value
+          : this.explanation,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VocabularyMeaningsData(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('position: $position, ')
+          ..write('meaning: $meaning, ')
+          ..write('explanation: $explanation')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, entryId, position, meaning, explanation);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VocabularyMeaningsData &&
+          other.id == this.id &&
+          other.entryId == this.entryId &&
+          other.position == this.position &&
+          other.meaning == this.meaning &&
+          other.explanation == this.explanation);
+}
+
+class VocabularyMeaningsCompanion
+    extends UpdateCompanion<VocabularyMeaningsData> {
+  final Value<String> id;
+  final Value<String> entryId;
+  final Value<int> position;
+  final Value<String> meaning;
+  final Value<String?> explanation;
+  final Value<int> rowid;
+  const VocabularyMeaningsCompanion({
+    this.id = const Value.absent(),
+    this.entryId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.meaning = const Value.absent(),
+    this.explanation = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VocabularyMeaningsCompanion.insert({
+    required String id,
+    required String entryId,
+    required int position,
+    required String meaning,
+    this.explanation = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       entryId = Value(entryId),
+       position = Value(position),
+       meaning = Value(meaning);
+  static Insertable<VocabularyMeaningsData> custom({
+    Expression<String>? id,
+    Expression<String>? entryId,
+    Expression<int>? position,
+    Expression<String>? meaning,
+    Expression<String>? explanation,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entryId != null) 'entry_id': entryId,
+      if (position != null) 'position': position,
+      if (meaning != null) 'meaning': meaning,
+      if (explanation != null) 'explanation': explanation,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VocabularyMeaningsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? entryId,
+    Value<int>? position,
+    Value<String>? meaning,
+    Value<String?>? explanation,
+    Value<int>? rowid,
+  }) {
+    return VocabularyMeaningsCompanion(
+      id: id ?? this.id,
+      entryId: entryId ?? this.entryId,
+      position: position ?? this.position,
+      meaning: meaning ?? this.meaning,
+      explanation: explanation ?? this.explanation,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (entryId.present) {
+      map['entry_id'] = Variable<String>(entryId.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (meaning.present) {
+      map['meaning'] = Variable<String>(meaning.value);
+    }
+    if (explanation.present) {
+      map['explanation'] = Variable<String>(explanation.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VocabularyMeaningsCompanion(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('position: $position, ')
+          ..write('meaning: $meaning, ')
+          ..write('explanation: $explanation, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class Flashcards extends Table with TableInfo<Flashcards, FlashcardsData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -538,8 +1772,66 @@ class Flashcards extends Table with TableInfo {
     {entryId, direction},
   ];
   @override
-  Never map(Map<String, dynamic> data, {String? tablePrefix}) {
-    throw UnsupportedError('TableInfo.map in schema verification code');
+  FlashcardsData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FlashcardsData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      entryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entry_id'],
+      )!,
+      direction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}direction'],
+      )!,
+      state: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state'],
+      )!,
+      step: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}step'],
+      ),
+      stability: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}stability'],
+      ),
+      difficulty: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}difficulty'],
+      ),
+      due: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}due'],
+      )!,
+      lastReviewedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_reviewed_at'],
+      ),
+      reviewCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}review_count'],
+      )!,
+      lapseCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lapse_count'],
+      )!,
+      schedulerVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scheduler_version'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
   }
 
   @override
@@ -554,6 +1846,461 @@ class Flashcards extends Table with TableInfo {
   ];
   @override
   bool get dontWriteConstraints => true;
+}
+
+class FlashcardsData extends DataClass implements Insertable<FlashcardsData> {
+  final String id;
+  final String entryId;
+  final String direction;
+  final String state;
+  final int? step;
+  final double? stability;
+  final double? difficulty;
+  final String due;
+  final String? lastReviewedAt;
+  final int reviewCount;
+  final int lapseCount;
+  final String? schedulerVersion;
+  final String createdAt;
+  final String updatedAt;
+  const FlashcardsData({
+    required this.id,
+    required this.entryId,
+    required this.direction,
+    required this.state,
+    this.step,
+    this.stability,
+    this.difficulty,
+    required this.due,
+    this.lastReviewedAt,
+    required this.reviewCount,
+    required this.lapseCount,
+    this.schedulerVersion,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['entry_id'] = Variable<String>(entryId);
+    map['direction'] = Variable<String>(direction);
+    map['state'] = Variable<String>(state);
+    if (!nullToAbsent || step != null) {
+      map['step'] = Variable<int>(step);
+    }
+    if (!nullToAbsent || stability != null) {
+      map['stability'] = Variable<double>(stability);
+    }
+    if (!nullToAbsent || difficulty != null) {
+      map['difficulty'] = Variable<double>(difficulty);
+    }
+    map['due'] = Variable<String>(due);
+    if (!nullToAbsent || lastReviewedAt != null) {
+      map['last_reviewed_at'] = Variable<String>(lastReviewedAt);
+    }
+    map['review_count'] = Variable<int>(reviewCount);
+    map['lapse_count'] = Variable<int>(lapseCount);
+    if (!nullToAbsent || schedulerVersion != null) {
+      map['scheduler_version'] = Variable<String>(schedulerVersion);
+    }
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    return map;
+  }
+
+  FlashcardsCompanion toCompanion(bool nullToAbsent) {
+    return FlashcardsCompanion(
+      id: Value(id),
+      entryId: Value(entryId),
+      direction: Value(direction),
+      state: Value(state),
+      step: step == null && nullToAbsent ? const Value.absent() : Value(step),
+      stability: stability == null && nullToAbsent
+          ? const Value.absent()
+          : Value(stability),
+      difficulty: difficulty == null && nullToAbsent
+          ? const Value.absent()
+          : Value(difficulty),
+      due: Value(due),
+      lastReviewedAt: lastReviewedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastReviewedAt),
+      reviewCount: Value(reviewCount),
+      lapseCount: Value(lapseCount),
+      schedulerVersion: schedulerVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(schedulerVersion),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory FlashcardsData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FlashcardsData(
+      id: serializer.fromJson<String>(json['id']),
+      entryId: serializer.fromJson<String>(json['entryId']),
+      direction: serializer.fromJson<String>(json['direction']),
+      state: serializer.fromJson<String>(json['state']),
+      step: serializer.fromJson<int?>(json['step']),
+      stability: serializer.fromJson<double?>(json['stability']),
+      difficulty: serializer.fromJson<double?>(json['difficulty']),
+      due: serializer.fromJson<String>(json['due']),
+      lastReviewedAt: serializer.fromJson<String?>(json['lastReviewedAt']),
+      reviewCount: serializer.fromJson<int>(json['reviewCount']),
+      lapseCount: serializer.fromJson<int>(json['lapseCount']),
+      schedulerVersion: serializer.fromJson<String?>(json['schedulerVersion']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'entryId': serializer.toJson<String>(entryId),
+      'direction': serializer.toJson<String>(direction),
+      'state': serializer.toJson<String>(state),
+      'step': serializer.toJson<int?>(step),
+      'stability': serializer.toJson<double?>(stability),
+      'difficulty': serializer.toJson<double?>(difficulty),
+      'due': serializer.toJson<String>(due),
+      'lastReviewedAt': serializer.toJson<String?>(lastReviewedAt),
+      'reviewCount': serializer.toJson<int>(reviewCount),
+      'lapseCount': serializer.toJson<int>(lapseCount),
+      'schedulerVersion': serializer.toJson<String?>(schedulerVersion),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+    };
+  }
+
+  FlashcardsData copyWith({
+    String? id,
+    String? entryId,
+    String? direction,
+    String? state,
+    Value<int?> step = const Value.absent(),
+    Value<double?> stability = const Value.absent(),
+    Value<double?> difficulty = const Value.absent(),
+    String? due,
+    Value<String?> lastReviewedAt = const Value.absent(),
+    int? reviewCount,
+    int? lapseCount,
+    Value<String?> schedulerVersion = const Value.absent(),
+    String? createdAt,
+    String? updatedAt,
+  }) => FlashcardsData(
+    id: id ?? this.id,
+    entryId: entryId ?? this.entryId,
+    direction: direction ?? this.direction,
+    state: state ?? this.state,
+    step: step.present ? step.value : this.step,
+    stability: stability.present ? stability.value : this.stability,
+    difficulty: difficulty.present ? difficulty.value : this.difficulty,
+    due: due ?? this.due,
+    lastReviewedAt: lastReviewedAt.present
+        ? lastReviewedAt.value
+        : this.lastReviewedAt,
+    reviewCount: reviewCount ?? this.reviewCount,
+    lapseCount: lapseCount ?? this.lapseCount,
+    schedulerVersion: schedulerVersion.present
+        ? schedulerVersion.value
+        : this.schedulerVersion,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  FlashcardsData copyWithCompanion(FlashcardsCompanion data) {
+    return FlashcardsData(
+      id: data.id.present ? data.id.value : this.id,
+      entryId: data.entryId.present ? data.entryId.value : this.entryId,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      state: data.state.present ? data.state.value : this.state,
+      step: data.step.present ? data.step.value : this.step,
+      stability: data.stability.present ? data.stability.value : this.stability,
+      difficulty: data.difficulty.present
+          ? data.difficulty.value
+          : this.difficulty,
+      due: data.due.present ? data.due.value : this.due,
+      lastReviewedAt: data.lastReviewedAt.present
+          ? data.lastReviewedAt.value
+          : this.lastReviewedAt,
+      reviewCount: data.reviewCount.present
+          ? data.reviewCount.value
+          : this.reviewCount,
+      lapseCount: data.lapseCount.present
+          ? data.lapseCount.value
+          : this.lapseCount,
+      schedulerVersion: data.schedulerVersion.present
+          ? data.schedulerVersion.value
+          : this.schedulerVersion,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardsData(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('direction: $direction, ')
+          ..write('state: $state, ')
+          ..write('step: $step, ')
+          ..write('stability: $stability, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('due: $due, ')
+          ..write('lastReviewedAt: $lastReviewedAt, ')
+          ..write('reviewCount: $reviewCount, ')
+          ..write('lapseCount: $lapseCount, ')
+          ..write('schedulerVersion: $schedulerVersion, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    entryId,
+    direction,
+    state,
+    step,
+    stability,
+    difficulty,
+    due,
+    lastReviewedAt,
+    reviewCount,
+    lapseCount,
+    schedulerVersion,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FlashcardsData &&
+          other.id == this.id &&
+          other.entryId == this.entryId &&
+          other.direction == this.direction &&
+          other.state == this.state &&
+          other.step == this.step &&
+          other.stability == this.stability &&
+          other.difficulty == this.difficulty &&
+          other.due == this.due &&
+          other.lastReviewedAt == this.lastReviewedAt &&
+          other.reviewCount == this.reviewCount &&
+          other.lapseCount == this.lapseCount &&
+          other.schedulerVersion == this.schedulerVersion &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class FlashcardsCompanion extends UpdateCompanion<FlashcardsData> {
+  final Value<String> id;
+  final Value<String> entryId;
+  final Value<String> direction;
+  final Value<String> state;
+  final Value<int?> step;
+  final Value<double?> stability;
+  final Value<double?> difficulty;
+  final Value<String> due;
+  final Value<String?> lastReviewedAt;
+  final Value<int> reviewCount;
+  final Value<int> lapseCount;
+  final Value<String?> schedulerVersion;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> rowid;
+  const FlashcardsCompanion({
+    this.id = const Value.absent(),
+    this.entryId = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.state = const Value.absent(),
+    this.step = const Value.absent(),
+    this.stability = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    this.due = const Value.absent(),
+    this.lastReviewedAt = const Value.absent(),
+    this.reviewCount = const Value.absent(),
+    this.lapseCount = const Value.absent(),
+    this.schedulerVersion = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FlashcardsCompanion.insert({
+    required String id,
+    required String entryId,
+    required String direction,
+    required String state,
+    this.step = const Value.absent(),
+    this.stability = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    required String due,
+    this.lastReviewedAt = const Value.absent(),
+    this.reviewCount = const Value.absent(),
+    this.lapseCount = const Value.absent(),
+    this.schedulerVersion = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       entryId = Value(entryId),
+       direction = Value(direction),
+       state = Value(state),
+       due = Value(due),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<FlashcardsData> custom({
+    Expression<String>? id,
+    Expression<String>? entryId,
+    Expression<String>? direction,
+    Expression<String>? state,
+    Expression<int>? step,
+    Expression<double>? stability,
+    Expression<double>? difficulty,
+    Expression<String>? due,
+    Expression<String>? lastReviewedAt,
+    Expression<int>? reviewCount,
+    Expression<int>? lapseCount,
+    Expression<String>? schedulerVersion,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entryId != null) 'entry_id': entryId,
+      if (direction != null) 'direction': direction,
+      if (state != null) 'state': state,
+      if (step != null) 'step': step,
+      if (stability != null) 'stability': stability,
+      if (difficulty != null) 'difficulty': difficulty,
+      if (due != null) 'due': due,
+      if (lastReviewedAt != null) 'last_reviewed_at': lastReviewedAt,
+      if (reviewCount != null) 'review_count': reviewCount,
+      if (lapseCount != null) 'lapse_count': lapseCount,
+      if (schedulerVersion != null) 'scheduler_version': schedulerVersion,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FlashcardsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? entryId,
+    Value<String>? direction,
+    Value<String>? state,
+    Value<int?>? step,
+    Value<double?>? stability,
+    Value<double?>? difficulty,
+    Value<String>? due,
+    Value<String?>? lastReviewedAt,
+    Value<int>? reviewCount,
+    Value<int>? lapseCount,
+    Value<String?>? schedulerVersion,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return FlashcardsCompanion(
+      id: id ?? this.id,
+      entryId: entryId ?? this.entryId,
+      direction: direction ?? this.direction,
+      state: state ?? this.state,
+      step: step ?? this.step,
+      stability: stability ?? this.stability,
+      difficulty: difficulty ?? this.difficulty,
+      due: due ?? this.due,
+      lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
+      reviewCount: reviewCount ?? this.reviewCount,
+      lapseCount: lapseCount ?? this.lapseCount,
+      schedulerVersion: schedulerVersion ?? this.schedulerVersion,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (entryId.present) {
+      map['entry_id'] = Variable<String>(entryId.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<String>(direction.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (step.present) {
+      map['step'] = Variable<int>(step.value);
+    }
+    if (stability.present) {
+      map['stability'] = Variable<double>(stability.value);
+    }
+    if (difficulty.present) {
+      map['difficulty'] = Variable<double>(difficulty.value);
+    }
+    if (due.present) {
+      map['due'] = Variable<String>(due.value);
+    }
+    if (lastReviewedAt.present) {
+      map['last_reviewed_at'] = Variable<String>(lastReviewedAt.value);
+    }
+    if (reviewCount.present) {
+      map['review_count'] = Variable<int>(reviewCount.value);
+    }
+    if (lapseCount.present) {
+      map['lapse_count'] = Variable<int>(lapseCount.value);
+    }
+    if (schedulerVersion.present) {
+      map['scheduler_version'] = Variable<String>(schedulerVersion.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FlashcardsCompanion(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('direction: $direction, ')
+          ..write('state: $state, ')
+          ..write('step: $step, ')
+          ..write('stability: $stability, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('due: $due, ')
+          ..write('lastReviewedAt: $lastReviewedAt, ')
+          ..write('reviewCount: $reviewCount, ')
+          ..write('lapseCount: $lapseCount, ')
+          ..write('schedulerVersion: $schedulerVersion, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
 }
 
 class DatabaseAtV1 extends GeneratedDatabase {

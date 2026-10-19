@@ -1,17 +1,21 @@
 import 'dart:convert';
+import 'dart:math' show min;
 
 import 'package:drift/drift.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/id/id_generator.dart';
 import '../../../core/language/language.dart';
 import '../../../core/time/clock.dart';
 import '../../../data/database/app_database.dart';
+import '../../tags/data/drift_tag_repository.dart';
 import '../domain/duplicate_detection.dart';
 import '../domain/enrichment_update.dart';
 import '../domain/vocabulary_draft.dart';
 import '../domain/vocabulary_entry.dart';
 import '../domain/vocabulary_repository.dart';
+import '../domain/vocabulary_search.dart';
 
 class DriftVocabularyRepository implements VocabularyRepository {
   DriftVocabularyRepository(
@@ -72,6 +76,86 @@ class DriftVocabularyRepository implements VocabularyRepository {
       _entriesWithMeanings(_entries.id.equals(id))
           .watch()
           .map((rows) => _group(rows).firstOrNull);
+
+  @override
+  Stream<List<VocabularyEntry>> watchSearch(
+    VocabularyQuery query, {
+    int limit = AppConfig.maxSearchResults,
+  }) => _searchStatement(query, limit).watch().map(_group);
+
+  @override
+  Future<List<VocabularyEntry>> search(
+    VocabularyQuery query, {
+    int limit = AppConfig.maxSearchResults,
+  }) => _guard(
+    'search',
+    () async => _group(await _searchStatement(query, limit).get()),
+  );
+
+  JoinedSelectStatement<HasResultSet, dynamic> _searchStatement(
+    VocabularyQuery query,
+    int limit,
+  ) {
+    var where = const Constant(true) as Expression<bool>;
+    if (query.deckId case final deckId?) {
+      where &= _entries.deckId.equals(deckId);
+    }
+    if (query.difficultOnly) where &= _entries.markedDifficultAt.isNotNull();
+    if (query.tagId case final tagId?) {
+      final tagged = _db.selectOnly(_db.entryTags)
+        ..addColumns([_db.entryTags.entryId])
+        ..where(_db.entryTags.tagId.equals(tagId));
+      where &= _entries.id.isInQuery(tagged);
+    }
+    final keys = VocabularySearch.queryKeys(query.text);
+    if (keys.isNotEmpty) {
+      // instr(): exact substring match; no LIKE wildcards to escape.
+      where &= keys
+          .map(
+            (key) => FunctionCallExpression<int>('instr', [
+              _entries.searchKey,
+              Variable.withString(key),
+            ]).isBiggerThanValue(0),
+          )
+          .reduce((a, b) => a | b);
+    }
+    // Limit entries first, then load their meanings.
+    final ids = _db.selectOnly(_entries)
+      ..addColumns([_entries.id])
+      ..where(where)
+      ..orderBy([
+        OrderingTerm.desc(_entries.createdAt),
+        OrderingTerm.asc(_entries.normalized),
+        OrderingTerm.asc(_entries.id),
+      ])
+      ..limit(limit);
+    return _entriesWithMeanings(_entries.id.isInQuery(ids));
+  }
+
+  @override
+  Stream<({int total, int difficult})> watchCounts() {
+    final total = _entries.id.count();
+    final difficult = _entries.id.count(
+      filter: _entries.markedDifficultAt.isNotNull(),
+    );
+    final query = _db.selectOnly(_entries)..addColumns([total, difficult]);
+    return query.watchSingle().map(
+      (row) =>
+          (total: row.read(total) ?? 0, difficult: row.read(difficult) ?? 0),
+    );
+  }
+
+  @override
+  Future<void> setDifficult(String id, {required bool difficult}) =>
+      _guard('setDifficult', () async {
+        final updated =
+            await (_db.update(_entries)..where((e) => e.id.equals(id))).write(
+              VocabularyEntriesCompanion(
+                markedDifficultAt: Value(difficult ? _clock.nowUtc() : null),
+              ),
+            );
+        if (updated == 0) throw NotFoundException('VocabularyEntry', id);
+      });
 
   @override
   Future<List<VocabularyEntry>> getEntries(String deckId) => _guard(
@@ -227,6 +311,26 @@ class DriftVocabularyRepository implements VocabularyRepository {
   });
 
   @override
+  Future<int> deleteEntries(Iterable<String> ids) {
+    final unique = ids.toSet().toList();
+    if (unique.isEmpty) return Future.value(0);
+    return _guard(
+      'deleteEntries',
+      () => _db.transaction(() async {
+        var deleted = 0;
+        // Bounded batches stay below SQLite's bound-parameter limit.
+        for (var i = 0; i < unique.length; i += 500) {
+          final batch = unique.sublist(i, min(i + 500, unique.length));
+          deleted += await (_db.delete(
+            _entries,
+          )..where((e) => e.id.isIn(batch))).go();
+        }
+        return deleted;
+      }),
+    );
+  }
+
+  @override
   Future<ImportSummary> importEntries(
     String deckId,
     List<ImportCandidate> candidates,
@@ -237,6 +341,7 @@ class DriftVocabularyRepository implements VocabularyRepository {
         ImportCandidate(
           rowNumber: c.rowNumber,
           draft: _validated(c.draft.copyWith(deckId: deckId)),
+          tags: c.tags,
         ),
     ];
     return _guard('importEntries', () {
@@ -246,37 +351,45 @@ class DriftVocabularyRepository implements VocabularyRepository {
         final decisions = planImport(cleaned, existing, strategy);
 
         final draftsByRow = {for (final c in cleaned) c.rowNumber: c.draft};
+        final tagsByRow = {for (final c in cleaned) c.rowNumber: c.tags};
         // Rows to create, in row order, with later in-file merges folded in.
         final creates = <int, VocabularyDraft>{};
+        final createTags = <int, List<String>>{};
         // Existing entries receiving meanings, keyed by entry id.
         final entryMerges = <String, VocabularyDraft>{};
+        final mergeTags = <String, List<String>>{};
         final existingById = {for (final e in existing) e.id: e};
 
         for (final decision in decisions) {
           final draft = draftsByRow[decision.rowNumber]!;
+          final tags = tagsByRow[decision.rowNumber]!;
           switch (decision) {
             case CreateDecision():
               creates[decision.rowNumber] = draft;
+              createTags[decision.rowNumber] = [...tags];
             case MergeIntoRowDecision(:final targetRowNumber):
               creates[targetRowNumber] = mergeDrafts(
                 creates[targetRowNumber]!,
                 draft,
               );
+              createTags[targetRowNumber]!.addAll(tags);
             case MergeIntoEntryDecision(:final entryId):
               entryMerges[entryId] = mergeDrafts(
                 entryMerges[entryId] ??
                     VocabularyDraft.fromEntry(existingById[entryId]!),
                 draft,
               );
+              (mergeTags[entryId] ??= []).addAll(tags);
             case SkipDecision():
               break;
           }
         }
 
         final now = _clock.nowUtc();
-        for (final draft in creates.values) {
+        for (final MapEntry(key: row, value: draft) in creates.entries) {
           _throwIfInvalid(draft);
-          await _insert(deck, draft, now, userEdited: false);
+          final id = await _insert(deck, draft, now, userEdited: false);
+          await addTagsByName(_db, id, createTags[row]!, now: now, ids: _ids);
         }
         for (final MapEntry(key: entryId, value: draft)
             in entryMerges.entries) {
@@ -287,6 +400,13 @@ class DriftVocabularyRepository implements VocabularyRepository {
             draft,
             now,
             userEdited: false,
+          );
+          await addTagsByName(
+            _db,
+            entryId,
+            mergeTags[entryId]!,
+            now: now,
+            ids: _ids,
           );
         }
         return ImportSummary(decisions: decisions);
@@ -357,6 +477,7 @@ class DriftVocabularyRepository implements VocabularyRepository {
             userEditedAt: Value(userEdited ? now : null),
             createdAt: now,
             updatedAt: now,
+            searchKey: Value(_searchKey(draft)),
           ),
         );
     await _insertMeanings(id, draft.meanings);
@@ -394,6 +515,7 @@ class DriftVocabularyRepository implements VocabularyRepository {
         enrichmentStatus: Value(status),
         userEditedAt: userEdited ? Value(now) : const Value.absent(),
         updatedAt: Value(now),
+        searchKey: Value(_searchKey(draft)),
       ),
     );
     await (_db.delete(
@@ -401,6 +523,12 @@ class DriftVocabularyRepository implements VocabularyRepository {
     )..where((m) => m.entryId.equals(existing.id))).go();
     await _insertMeanings(existing.id, draft.meanings);
   }
+
+  static String _searchKey(VocabularyDraft draft) => VocabularySearch.keyFor(
+    original: draft.original,
+    lemma: draft.lemma,
+    meanings: draft.meanings.map((m) => m.text),
+  );
 
   Future<void> _insertMeanings(
     String entryId,
@@ -445,6 +573,7 @@ class DriftVocabularyRepository implements VocabularyRepository {
     userEditedAt: row.userEditedAt?.toUtc(),
     createdAt: row.createdAt.toUtc(),
     updatedAt: row.updatedAt.toUtc(),
+    markedDifficultAt: row.markedDifficultAt?.toUtc(),
   );
 
   /// Malformed metadata is ignored rather than making the entry unreadable.

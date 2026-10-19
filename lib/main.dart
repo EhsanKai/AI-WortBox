@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
+import 'features/reminders/presentation/reminder_controller.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,5 +31,15 @@ void main() {
     }
   });
 
-  runApp(const ProviderScope(child: AiWortBoxApp()));
+  final container = ProviderContainer();
+  // Re-creates an enabled study reminder (e.g. after an app update or a
+  // time-zone change). Never asks for permission; does nothing when off.
+  container.read(reminderControllerProvider.notifier).syncOnStartup();
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const AiWortBoxApp(),
+    ),
+  );
 }

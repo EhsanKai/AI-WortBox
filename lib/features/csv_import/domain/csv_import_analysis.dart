@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/error/app_exception.dart';
 import '../../../core/text/script_detector.dart';
+import '../../tags/domain/tag.dart';
 import '../../vocabulary/domain/duplicate_detection.dart';
 import '../../vocabulary/domain/vocabulary_draft.dart';
 import '../../vocabulary/domain/vocabulary_entry.dart';
@@ -26,6 +27,7 @@ class ImportRow {
     required this.line,
     required this.draft,
     required this.issues,
+    this.tags = const [],
   });
 
   /// 1-based index among data rows (the header is not counted).
@@ -40,6 +42,9 @@ class ImportRow {
   final VocabularyDraft draft;
 
   final Set<ImportRowIssue> issues;
+
+  /// Tag names from the tags column.
+  final List<String> tags;
 
   bool get isValid => issues.isEmpty;
 }
@@ -67,7 +72,11 @@ class CsvImportAnalysis {
   List<ImportCandidate> get candidates => [
     for (final row in rows)
       if (row.isValid)
-        ImportCandidate(rowNumber: row.rowNumber, draft: row.draft),
+        ImportCandidate(
+          rowNumber: row.rowNumber,
+          draft: row.draft,
+          tags: row.tags,
+        ),
   ];
 
   int get createCount => decisions.values.whereType<CreateDecision>().length;
@@ -112,12 +121,14 @@ CsvImportAnalysis analyzeCsvImport({
     rowNumber++;
     final draft = _draftFrom(record, mapping, deckId);
     if (draft == null) continue; // Every mapped cell is blank.
+    final tagColumn = mapping.fields.indexOf(ImportField.tags);
     rows.add(
       ImportRow(
         rowNumber: rowNumber,
         line: record.line,
         draft: draft,
         issues: _issuesOf(draft),
+        tags: tagColumn < 0 ? const [] : TagNames.split(record.cell(tagColumn)),
       ),
     );
   }
@@ -126,7 +137,11 @@ CsvImportAnalysis analyzeCsvImport({
   final candidates = [
     for (final row in analysisRows)
       if (row.isValid)
-        ImportCandidate(rowNumber: row.rowNumber, draft: row.draft),
+        ImportCandidate(
+          rowNumber: row.rowNumber,
+          draft: row.draft,
+          tags: row.tags,
+        ),
   ];
   final decisions = planImport(candidates, existing, strategy);
 

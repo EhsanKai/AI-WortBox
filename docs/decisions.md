@@ -332,3 +332,281 @@ Status: accepted (Phase 4 hardening).
   saving the model, are shown in Settings → AI. No success state is shown
   unless the write succeeded; after a failure the screen re-reads the stored
   key. Errors carry only the platform error code, never the key.
+
+## D33 — Schema v2: additive migration for Phase 5 (2026-10-19)
+
+Status: accepted (Phase 5).
+
+- New tables `tags`, `entry_tags` (cascade on entry and tag delete),
+  `review_events` (`entry_id` set to null when the word is deleted, so
+  history and statistics do not change retroactively) and `app_settings`
+  (non-secret key-value settings). New nullable/defaulted columns on
+  `vocabulary_entries`: `marked_difficult_at`, `search_key`.
+- `from1To2` only adds tables, columns and indexes, then computes
+  `search_key` for existing entries from their stored word, base form and
+  meanings. No existing value is changed; covered by a data-integrity
+  migration test with real v1 rows (Persian meanings with Arabic letters
+  and ZWNJ, enrichment metadata, flashcards).
+- The `flashcards` table is unchanged and still unused (no scheduler).
+
+## D34 — Search runs in the database on a stored search key (2026-10-19)
+
+Status: accepted (Phase 5).
+
+- `search_key` holds one comparison key per line: the German word and base
+  form (`TextNormalizer.vocabularyKey`: case, umlaut composition, edge
+  punctuation) and each meaning (`meaningKey`, plus ZWNJ removed). It is
+  rewritten on every content write and never shown.
+- Queries use `instr(search_key, key) > 0` (exact substring; typed `%` and
+  `_` are not wildcards), combined with deck, tag and difficult filters, at
+  most 300 results. No FTS table: simple, offline and fast enough for
+  personal collections; revisit only with real performance data.
+- Policy: ZWNJ is ignored (می‌روم = میروم); a space is not treated as ZWNJ.
+
+## D35 — Practice is not spaced repetition (2026-10-19)
+
+Status: accepted (Phase 5, product owner scope).
+
+- Persian → German practice shows the meaning, reveals the German word on
+  request and records the learner's own "remembered/not remembered" as a
+  review event (`direction = reverse`). It never reads or writes
+  `flashcards`, never changes vocabulary, and does not adapt anything.
+- Only these explicit answers count as reviews. Opening the app, a word or a
+  practice screen records nothing.
+- Difficult words are a manual mark only (no automatic detection; see P9).
+
+## D36 — Local-day and streak policy (2026-10-19)
+
+Status: accepted (Phase 5).
+
+- Each event stores its UTC time and the device's local calendar day at
+  recording time (`YYYY-MM-DD`). Statistics group by that stored day, so a
+  later time-zone change does not move past reviews.
+- A study day has ≥ 1 recorded answer. The current streak counts
+  consecutive study days ending today, or ending yesterday while today has
+  no answer yet; otherwise 0. The longest streak is the longest such run.
+  No streak "freezes". Wording avoids implying permanent learning.
+
+## D37 — Study reminder: local notifications only (2026-10-19)
+
+Status: accepted (Phase 5).
+
+- `flutter_local_notifications` 22.3.2 (dexterx.dev), `timezone` 0.11.2
+  (labs.dart.dev) and `flutter_timezone` 5.1.1 (device IANA zone). One
+  notification id, repeating daily at local wall-clock time
+  (`DateTimeComponents.time`), so DST does not shift it and rescheduling
+  replaces instead of duplicating.
+- Permission is requested only when the user turns the reminder on, never
+  at startup. Android: `POST_NOTIFICATIONS` (runtime, 13+),
+  `RECEIVE_BOOT_COMPLETED` and the plugin's receivers; inexact scheduling
+  (`inexactAllowWhileIdle`) so no exact-alarm permission is needed — the
+  notification may arrive minutes late. Core library desugaring enabled as
+  the plugin requires; the launcher icon is kept for R8 (`res/raw/keep.xml`).
+  iOS: notification-center delegate in `AppDelegate`.
+- Settings (`reminder.enabled`, `reminder.time`) live in `app_settings`.
+  The UI state changes only after the system call and the save succeed. An
+  enabled reminder is re-created at app start without asking for anything.
+
+## D38 — German pronunciation via system TTS (2026-10-19)
+
+Status: accepted (Phase 5).
+
+- `flutter_tts` 4.2.5 (eyedeadevelopment.com): Android TextToSpeech / iOS
+  AVSpeechSynthesizer, `de-DE`, offline when the voice is installed. No
+  cloud TTS (would send text to a provider and need keys). Android 11+
+  `TTS_SERVICE` query added to the manifest.
+- A missing German voice or an engine error is shown as a message.
+
+## D39 — CSV export is an exchange file, not a backup (2026-10-19)
+
+Status: accepted (Phase 5).
+
+- Columns `word, meaning, lemma, part of speech, grammar, example, example
+  translation, notes, tags` — exactly the importer's recognized headers, so
+  a round trip needs no manual mapping. UTF-8 with BOM, comma, CRLF, RFC 4180
+  quoting. Meanings and tags joined with `"; "`.
+- Not included: meaning explanations, sentence context, source type,
+  enrichment metadata, difficult marks, review events, settings and the API
+  key. A `;` inside one meaning splits it on re-import (tested limitation).
+  Cells beginning with `=`, `+`, `-` or `@` are not altered (keeps the data
+  exact; spreadsheet apps may treat them as formulas).
+- Files are saved through `file_picker`'s save dialog (Android
+  `ACTION_CREATE_DOCUMENT`, iOS document picker).
+
+## D40 — Anki `.apkg` import and export (2026-10-19)
+
+Status: accepted (Phase 5, after evaluation).
+
+- `archive` 4.5.2 (loki3d.com, MIT; ZIP plus a pure-Dart zstd decoder) and
+  `sqlite3` (already used by Drift, now a direct dependency) with a private
+  in-memory VFS: packages are read and written without temporary files.
+  `crypto` (SHA-1 checksum Anki uses) and `typed_data` were already
+  transitive.
+- Import: prefers `collection.anki21b` (schema 18, zstd), then
+  `collection.anki21`, then `collection.anki2` (schema 11). Registers Anki's
+  `unicase` collation (needed to query schema-18 tables) and opens WAL-mode
+  copies in rollback mode. Notes become rows of the existing import
+  pipeline; the "please update Anki" placeholder is rejected.
+- Export: legacy schema 11 `collection.anki2` (importable by current Anki,
+  older Anki 2.1 and AnkiDroid), note GUID `aiwortbox-<entry id>`.
+- Evidence: fixtures written by the official Anki library 26.09.3; export
+  imported by the same library with an exact field/tag check and a
+  duplicate-free re-import (`tool/anki/`). The Anki desktop GUI and
+  AnkiDroid apps were not run.
+
+## D41 — Free-only OpenRouter usage by default (2026-10-19)
+
+Status: accepted. Refines D29 (model list) and D32 (retries).
+
+- **Zero cost first.** Free-only mode is on by default, also for existing
+  installs; paid catalog models are used only after the user turns it off
+  and confirms. Free-only requests use `openrouter/free` (Auto Free) or
+  models verified free in the live `GET /models` list (Quality Free).
+  "Verified free" means: a `:free` id (or the router), prompt and
+  completion prices present, every listed price exactly `"0"`, no pricing
+  `overrides`, text output, not expired. Zero token prices alone are not
+  enough (some paid media models list "0"). If the list cannot be loaded,
+  only the free router is used. No plugins are ever requested.
+- Three independent guards: model selection above; `provider.max_price`
+  of zero on every free request, so OpenRouter refuses priced endpoints;
+  and a check of every answer — a reported cost above zero, or an
+  answering model that is not recognisably free without a reported zero
+  cost, stops the run (`paidModelBlocked`) and nothing is kept.
+- **Pacing.** One request at a time, at least 4 s apart (free limit:
+  20/min), app-wide (`RequestScheduler`). `Retry-After` and the
+  `X-RateLimit-Reset` of a platform 429 are honoured exactly; a wait longer
+  than 20 s is not shortened: the request fails with the retry time and
+  the scheduler holds further requests until then. Otherwise exponential
+  backoff (1 s, 2 s) with up to 50 % jitter. At most 2 retries per batch,
+  shared by same-model retries and free-model fallbacks (≤ 3 requests).
+- **Daily quota.** A 429 naming the per-day free limit, or a platform 429
+  with nothing remaining and a reset more than a minute away, pauses free
+  requests until the reset (next 00:00 UTC if not given), persisted across
+  restarts. `free_model_daily_requests` from `GET /key` is shown and a
+  report of none left also pauses. Limits are only waited for, never
+  worked around.
+- **Fallback** goes only to other free attempts and only for failures
+  another model may fix (404/502/503, 400, 500, unusable answer, a
+  provider's own 429). Never for 401/402/403, account rate limits, the
+  daily quota, timeouts or network failures (D32 still applies).
+- **Batches.** 5 words per request by default (1–10), with ids; answers
+  are matched by id *and* echoed word; each word is validated alone, so a
+  bad or missing item fails only that word. Strict JSON Schema only where
+  the model lists `structured_outputs`; otherwise JSON mode or a prompt
+  with the schema, validated the same way. Grammar that cannot be checked
+  or contradicts itself is dropped (no note without a word class; nouns
+  capitalised with an article; verb lemmas ending in -n).
+- **Cache and resume.** Validated results are cached in `app_settings`
+  (`aicache.*`, keyed by a hash of word, sentence, existing meanings,
+  languages and prompt version; 90 days, 2000 entries), so no answered
+  word is sent twice. A deck run is remembered (`ai.job.<deck>`) until
+  saved; reopening resumes it, with answered words served from the cache.
+  No schema migration: all of this is non-secret key-value state; the key
+  stays in secure storage (D28).
+- Assumptions (from OpenRouter's documentation, not verified with a live
+  account): `max_price` of 0 admits free endpoints; daily free-limit 429s
+  carry `X-RateLimit-*` headers with a millisecond reset time; the free
+  router honours `require_parameters` for structured outputs.
+
+## D42 — FSRS scheduling is active for review (2026-10-19)
+
+Status: accepted (product owner request; supersedes D35 for scheduled
+review).
+
+- Root cause of "FSRS disabled": it was never implemented. `flashcards`
+  (schema v1) had the FSRS columns, but no scheduler existed, no code created
+  card rows, and practice deliberately bypassed them (D35).
+- Library: `fsrs` 2.0.1 (open-spaced-repetition, the version D4 was modelled
+  on), default parameters, 90 % desired retention, learning steps 1 and
+  10 min, relearning step 10 min, interval fuzzing on.
+  `FsrsReviewScheduler` maps "remembered" → Good, "not remembered" → Again
+  and stamps `scheduler_version = fsrs-2.0.1;default;retention=0.9`.
+- `StudyRepository.recordAnswer` advances the card and inserts the review
+  event in **one transaction**. A card row is created on the first
+  scheduled answer, so words saved before this change need no backfill and
+  `created_at` marks when the card was introduced.
+- Due queue (`buildDueQueue`, pure): (re)learning cards due within 20 min,
+  review cards due before the end of the local day, then new cards (oldest
+  word first) up to the deck's existing daily new-card limit minus cards
+  introduced today. 50 cards per session; a card due again within 20 min
+  (learning step) returns at the end of the session.
+- No schema change: schema stays v2. Existing card rows (e.g. from tests or
+  imports) are reused as-is.
+- Free practice (any deck, or difficult words only) stays unscheduled
+  (D35 rules): it records events, never card state. The manual difficult
+  mark is not connected to FSRS.
+
+## D43 — Review direction setting (2026-10-19)
+
+Status: accepted.
+
+- `app_settings['review.direction']` = `germanToPersian` (default when
+  missing) | `persianToGerman` | `both`. Chosen on the review setup screen
+  or in Settings; applies to every review entry point (Today, deck, setup).
+- Each direction is its own card (`flashcards` is unique per entry and
+  direction, D4), so switching direction never touches the other
+  direction's history.
+- Both: a word is asked in one direction per day. Of two due siblings, the
+  one due earlier is asked (new words: German → Persian first); a card not
+  yet answered today is held back when its sibling was answered today.
+  Free practice with both alternates German → Persian and Persian → German.
+
+## D44 — Answers stay hidden until review (2026-10-19)
+
+Status: accepted.
+
+- A deck opens with German words only; meanings are not built (also not
+  for screen readers) until "show meanings" is tapped. "Start review" and
+  "free practice" are on the deck screen.
+- In review only the prompt side of one card is built; the answer card,
+  pronunciation of a German answer and its details appear after "Show
+  answer". The word page and search keep showing everything (browse mode).
+
+## D45 — German speech on iOS uses the playback audio session (2026-10-19)
+
+Status: accepted (fixes "pronunciation does not work reliably").
+
+- Root cause: `flutter_tts` never configures `AVAudioSession`; iOS then
+  uses the default solo-ambient category, which the Ring/Silent switch
+  mutes, while `speak` still reports success — so nothing was heard on a
+  phone in silent mode and no error was shown.
+- Before the first utterance the session is set once to `playback` with
+  `duckOthers` (default mode), through the plugin's own channel method
+  because the Dart wrapper swallows failures. Other audio is ducked and
+  restored after speaking. No recording category, no microphone permission.
+- Requests are serialised: a newer tap replaces one not yet started, every
+  utterance stops the previous one, `setLanguage` returning 0 means no
+  voice. Failures are logged (`ai_wortbox.speech`) and shown as before.
+
+## D46 — Selecting words on the page photo (2026-10-19)
+
+Status: accepted (amends the Phase 3 privacy rule).
+
+- ML Kit word elements (text, box, confidence) are mapped onto the
+  normalized OCR text, so the photo view and the text view share one
+  `WordSelection`; review, context, duplicates and saving are unchanged.
+- Photo view: tap toggles a word; touch-and-hold then drag selects an
+  expression (max 10 words, one paragraph); one-finger drag pans, pinch
+  zooms (1–8×). `ImageFit` maps image pixels to the screen; the zoom
+  transform applies to photo and boxes together.
+- Fallback "select area": a drawn box is cropped on the device
+  (`dart:ui`, enlarged up to 2× when small), recognized again, shown for
+  correction and added as one item. Typed text and the text view remain.
+- If boxes do not fit inside the decoded photo (e.g. a rotation mismatch),
+  only the text view is offered.
+- Privacy: the photo is now kept as a temporary file **while the scan is
+  open** (needed to show it) and deleted when the user starts another scan,
+  types text instead, goes back, saves, or leaves the screen. Crops are
+  deleted right after recognition. Nothing is uploaded.
+
+## D47 — Selecting and deleting several words (2026-10-19)
+
+Status: accepted.
+
+- Long-press a word in a deck or search list to start selection mode; taps
+  toggle; select all (the listed words), clear, delete. Changing the search
+  or filters clears the selection. Back leaves selection mode.
+- Deletion asks for confirmation with the count, then
+  `VocabularyRepository.deleteEntries` deletes in one transaction with the
+  same rules as a single delete (meanings, tag assignments and card state
+  cascade; review events keep their history with `entry_id = NULL`).

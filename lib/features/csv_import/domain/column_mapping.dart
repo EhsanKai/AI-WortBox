@@ -14,7 +14,10 @@ enum ImportField {
   exampleSentence,
   exampleTranslation,
   grammarInfo,
-  notes;
+  notes,
+
+  /// Tag names, several per cell (see `TagNames.split`).
+  tags;
 
   /// Several columns may map to [meaning]; every other field (except
   /// [ignore]) can be mapped to at most one column.
@@ -166,6 +169,14 @@ abstract final class HeaderRecognizer {
     'notizen': ImportField.notes,
     'یادداشت': ImportField.notes,
     'توضیحات': ImportField.notes,
+    // Tags
+    'tags': ImportField.tags,
+    'tag': ImportField.tags,
+    'labels': ImportField.tags,
+    'schlagwörter': ImportField.tags,
+    'برچسب': ImportField.tags,
+    'برچسب ها': ImportField.tags,
+    'برچسبها': ImportField.tags,
   };
 
   static final _separators = RegExp(r'[_\-.:/]+');

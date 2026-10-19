@@ -37,10 +37,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardWords => 'Words';
 
   @override
-  String get dashboardReviewPending =>
-      'Daily FSRS review will be enabled in a later version.';
-
-  @override
   String get dashboardYourDecks => 'Your decks';
 
   @override
@@ -287,7 +283,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sourceManual => 'Manual entry';
 
   @override
-  String get sourceCsv => 'CSV import';
+  String get sourceCsv => 'File import (CSV or Anki)';
 
   @override
   String get sourceImage => 'Book scan';
@@ -1141,7 +1137,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiIntroBody =>
-      'To suggest meanings, examples and grammar notes, AI WortBox uses your own OpenRouter account. Each request is charged to your OpenRouter credits. AI WortBox has no shared key or account and sends nothing without your key.';
+      'To suggest meanings, examples and grammar notes, AI WortBox uses your own OpenRouter account. By default only free models are used, so nothing is charged; free models have daily limits. AI WortBox has no shared key or account and sends nothing without your key.';
 
   @override
   String get aiGetKey => 'Get a key at openrouter.ai/keys';
@@ -1242,7 +1238,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiModelHelper =>
-      'A curated list of low-cost models with structured output. Prices are listed on openrouter.ai.';
+      'A curated list of low-cost models with structured output, used only when free-only mode is off. Prices are listed on openrouter.ai.';
 
   @override
   String get aiPrivacyTitle => 'Privacy and connection';
@@ -1257,6 +1253,184 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiSecurityBody =>
       'The key is kept in the system’s secure storage (Keychain on iOS, Keystore on Android). It is never shown, and never stored in the database, logs or backups. This reduces exposure, but a compromised or instrumented device can still extract it. Set a credit limit for this key on OpenRouter.';
+
+  @override
+  String get aiFreeTitle => 'Free usage';
+
+  @override
+  String get aiFreeOnly => 'Free models only';
+
+  @override
+  String get aiFreeOnlyOn =>
+      'No request can cost money: only models verified as free are used, and OpenRouter is told to refuse anything priced.';
+
+  @override
+  String get aiFreeOnlyOff =>
+      'Off: the model below is used and billed to your OpenRouter credits.';
+
+  @override
+  String get aiPaidConfirmTitle => 'Use paid models?';
+
+  @override
+  String get aiPaidConfirmBody =>
+      'Each request will then be charged to your OpenRouter credits. Free models are often enough for vocabulary.';
+
+  @override
+  String get aiPaidConfirm => 'Use paid models';
+
+  @override
+  String get aiRoutingAuto => 'Auto Free';
+
+  @override
+  String get aiRoutingQuality => 'Quality Free';
+
+  @override
+  String get aiRoutingAutoHelp =>
+      'OpenRouter\'s free router picks an available free model.';
+
+  @override
+  String get aiRoutingQualityHelp =>
+      'The best-rated free models are tried first, then the free router. The free list is checked on OpenRouter before use.';
+
+  @override
+  String get aiQualityUnverified =>
+      'The free model list has not been verified yet, so the free router is used. Refresh to check it.';
+
+  @override
+  String aiFreeModelsVerified(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString free models verified',
+      one: '1 free model verified',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String aiCurrentModel(String model) {
+    return 'Current model: $model';
+  }
+
+  @override
+  String aiLastModel(String model) {
+    return 'Last answer from: $model';
+  }
+
+  @override
+  String get aiLastModelNone => 'No request sent yet.';
+
+  @override
+  String get aiBatchSize => 'Words per request';
+
+  @override
+  String get aiBatchSizeHelp =>
+      'Fewer requests use less of the free daily quota; smaller batches are more reliable.';
+
+  @override
+  String aiQuotaRemaining(int remaining, int limit) {
+    final intl.NumberFormat remainingNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String remainingString = remainingNumberFormat.format(remaining);
+    final intl.NumberFormat limitNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String limitString = limitNumberFormat.format(limit);
+
+    return 'About $remainingString of $limitString free requests left today';
+  }
+
+  @override
+  String aiQuotaRemainingNoLimit(int remaining) {
+    final intl.NumberFormat remainingNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String remainingString = remainingNumberFormat.format(remaining);
+
+    return 'About $remainingString free requests left today';
+  }
+
+  @override
+  String get aiQuotaUnknown =>
+      'Free requests left today: not checked yet. Test the key or refresh.';
+
+  @override
+  String aiQuotaSentToday(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'Sent by this app today: $countString';
+  }
+
+  @override
+  String get aiRateReady => 'Ready';
+
+  @override
+  String aiRateCooling(String time) {
+    return 'Rate limited — waiting until $time';
+  }
+
+  @override
+  String aiRatePaused(String time) {
+    return 'Daily free quota used up — paused until $time';
+  }
+
+  @override
+  String aiRatePacing(int seconds) {
+    final intl.NumberFormat secondsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String secondsString = secondsNumberFormat.format(seconds);
+
+    return 'One request at a time, at least $secondsString seconds apart.';
+  }
+
+  @override
+  String aiCacheStats(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString saved AI results',
+      one: '1 saved AI result',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String aiCacheUsage(int hits, int misses) {
+    final intl.NumberFormat hitsNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String hitsString = hitsNumberFormat.format(hits);
+    final intl.NumberFormat missesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String missesString = missesNumberFormat.format(misses);
+
+    return 'Reused $hitsString times · requested $missesString times';
+  }
+
+  @override
+  String get aiCacheClear => 'Clear saved results';
+
+  @override
+  String get aiCacheCleared => 'Saved results cleared.';
+
+  @override
+  String get aiRefreshUsage => 'Refresh status';
+
+  @override
+  String get aiUsageRefreshFailed =>
+      'The status could not be loaded from OpenRouter.';
+
+  @override
+  String get aiPrefsSaveFailed =>
+      'The setting could not be saved. Please try again.';
 
   @override
   String get enrichTitle => 'AI suggestions';
@@ -1406,6 +1580,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get enrichNoCost => 'Free models — no cost';
+
+  @override
+  String get enrichFreeOnly => 'Free models only — no cost.';
+
+  @override
+  String enrichResume(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'An unfinished run was found: $countString words left. Completed words are kept.',
+      one:
+          'An unfinished run was found: 1 word left. Completed words are kept.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get enrichFromCache => 'Saved result — nothing was sent';
+
+  @override
   String get enrichConflict =>
       'Some words changed in the meantime, so nothing was saved. Get suggestions again.';
 
@@ -1452,4 +1652,582 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiErrorCancelled => 'Stopped.';
+
+  @override
+  String get aiErrorDailyQuota =>
+      'Today\'s free requests on your OpenRouter account are used up. AI pauses until the daily reset (00:00 UTC); nothing is sent until then.';
+
+  @override
+  String get aiErrorPaidBlocked =>
+      'Stopped to keep AI free: OpenRouter answered with a model or cost that could not be verified as free. Nothing more was sent.';
+
+  @override
+  String get actionBack => 'Back';
+
+  @override
+  String get csvFieldTags => 'Tags';
+
+  @override
+  String get deckImportFile => 'Import a file (CSV or Anki)';
+
+  @override
+  String get deckMoreActions => 'More actions';
+
+  @override
+  String get searchAllTitle => 'Search all words';
+
+  @override
+  String get searchClear => 'Clear search text';
+
+  @override
+  String searchLimited(int count) {
+    return 'Only the first $count results are shown; narrow your search.';
+  }
+
+  @override
+  String get filterDifficult => 'Difficult words';
+
+  @override
+  String get filterTag => 'Tag';
+
+  @override
+  String get filterAllTags => 'All tags';
+
+  @override
+  String get filterClear => 'Clear filters';
+
+  @override
+  String entryInDeck(String deck) {
+    return 'In deck $deck';
+  }
+
+  @override
+  String get entryDifficult => 'Difficult';
+
+  @override
+  String get entryMarkDifficult => 'Mark as difficult';
+
+  @override
+  String get entryUnmarkDifficult => 'Unmark as difficult';
+
+  @override
+  String get tagsTitle => 'Tags';
+
+  @override
+  String get tagsSettingsDescription => 'Create, rename and delete tags';
+
+  @override
+  String get tagsEmptyTitle => 'No tags yet';
+
+  @override
+  String get tagsEmptyHint => 'Group words with tags such as “B1” or “travel”.';
+
+  @override
+  String get tagsAdd => 'Add tags';
+
+  @override
+  String get tagsEdit => 'Edit tags';
+
+  @override
+  String get tagsEditTitle => 'Tags of this word';
+
+  @override
+  String get tagNewLabel => 'New tag';
+
+  @override
+  String get tagNameLabel => 'Tag name';
+
+  @override
+  String get tagCreate => 'New tag';
+
+  @override
+  String get tagRename => 'Rename tag';
+
+  @override
+  String tagWordCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count words',
+      one: '1 word',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String tagDeleteTitle(String name) {
+    return 'Delete the tag “$name”?';
+  }
+
+  @override
+  String tagDeleteBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'The tag is removed from $count words. The words themselves are kept.',
+      one: 'The tag is removed from 1 word. The word itself is kept.',
+      zero: 'No word has this tag.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get tagErrorEmpty => 'Enter a tag name.';
+
+  @override
+  String tagErrorTooLong(int max) {
+    return 'A tag name can have at most $max characters.';
+  }
+
+  @override
+  String get tagErrorDuplicate => 'A tag with this name already exists.';
+
+  @override
+  String get exportCsv => 'Export as CSV';
+
+  @override
+  String get exportAnki => 'Export for Anki (.apkg)';
+
+  @override
+  String get exportSaved => 'File saved.';
+
+  @override
+  String get exportCancelled => 'Saving was cancelled.';
+
+  @override
+  String get exportEmpty => 'This deck has no words to export.';
+
+  @override
+  String get exportWriteFailed =>
+      'The file could not be saved. Try another location.';
+
+  @override
+  String get ankiImportTitle => 'Import from Anki';
+
+  @override
+  String get ankiImportDescription =>
+      'Choose an .apkg package exported from Anki';
+
+  @override
+  String get ankiImportIntro =>
+      'In Anki, export a deck as “Anki Deck Package (.apkg)” and choose it here. Then map the note fields to word and meaning.';
+
+  @override
+  String get ankiImportNote =>
+      'Only note text and tags are imported; images, audio and Anki review history are not.';
+
+  @override
+  String ankiNoteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Anki notes',
+      one: '1 Anki note',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ankiErrorNotPackage =>
+      'This is not an Anki package (.apkg), or it is damaged.';
+
+  @override
+  String get ankiErrorUnsupported =>
+      'This Anki package format is not supported.';
+
+  @override
+  String get ankiErrorNoNotes => 'This Anki package contains no notes.';
+
+  @override
+  String ankiErrorTooLarge(int size) {
+    return 'The Anki package is larger than $size MB.';
+  }
+
+  @override
+  String get speakWord => 'Pronounce the word';
+
+  @override
+  String get speakExample => 'Read the example aloud';
+
+  @override
+  String get speechVoiceUnavailable =>
+      'No German voice is installed on this device. Install one in the device\'s text-to-speech settings.';
+
+  @override
+  String get speechFailed => 'The pronunciation could not be played.';
+
+  @override
+  String get settingsStudy => 'Study';
+
+  @override
+  String get reminderTitle => 'Study reminder';
+
+  @override
+  String get reminderIntro =>
+      'A notification is shown on this device every day at the time you choose. No server is involved.';
+
+  @override
+  String get reminderEnabled => 'Daily reminder';
+
+  @override
+  String get reminderTime => 'Reminder time';
+
+  @override
+  String get reminderOff => 'Off';
+
+  @override
+  String reminderOnAt(String time) {
+    return 'Every day at $time';
+  }
+
+  @override
+  String get reminderNote =>
+      'Turning the reminder on asks for permission to show notifications. On Android it may arrive a few minutes late, and some phones stop it to save battery.';
+
+  @override
+  String get reminderPermissionDenied =>
+      'Notifications are not allowed. Enable them for AI WortBox in the device settings.';
+
+  @override
+  String get reminderSchedulingFailed =>
+      'The reminder could not be set. Please try again.';
+
+  @override
+  String get reminderNotificationTitle => 'Time to practise your words';
+
+  @override
+  String get reminderNotificationBody =>
+      'Spend a few minutes with your German words.';
+
+  @override
+  String get practiceTitle => 'Review';
+
+  @override
+  String get practiceTileDescription =>
+      'Choose the direction, deck or free practice';
+
+  @override
+  String practiceTileStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days in a row',
+      one: '1 day in a row',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get practiceIntro =>
+      'Each card shows one side only. Recall the answer, reveal it and say whether you remembered it.';
+
+  @override
+  String get practiceNotSrs =>
+      'This is free practice and does not change review scheduling (FSRS). Only your answers are recorded for statistics.';
+
+  @override
+  String get practiceWordsFrom => 'Words from';
+
+  @override
+  String get practiceAllDecks => 'All decks';
+
+  @override
+  String get practiceDifficultOnly => 'Difficult words only';
+
+  @override
+  String get practiceStart => 'Start practice';
+
+  @override
+  String get practiceEnd => 'End practice';
+
+  @override
+  String practiceProgress(String current, String total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get practicePrompt => 'What is the German word for this?';
+
+  @override
+  String get practiceReveal => 'Show answer';
+
+  @override
+  String get practiceAsk => 'Did you remember it?';
+
+  @override
+  String get practiceRemembered => 'Remembered';
+
+  @override
+  String get practiceForgotten => 'Not remembered';
+
+  @override
+  String get practiceEmptyTitle => 'No words to practise';
+
+  @override
+  String get practiceEmptyBody =>
+      'This practice needs words that have a Persian meaning.';
+
+  @override
+  String get practiceEmptyDifficult =>
+      'No difficult word with a Persian meaning was found. You can mark words as difficult on their page.';
+
+  @override
+  String get practiceDoneTitle => 'Practice complete';
+
+  @override
+  String practiceRememberedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remembered $count words',
+      one: 'Remembered 1 word',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String practiceForgottenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Did not remember $count words',
+      one: 'Did not remember 1 word',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get practiceFinish => 'Back to Today';
+
+  @override
+  String get practiceSeeStatistics => 'See statistics';
+
+  @override
+  String get statsWords => 'Words';
+
+  @override
+  String get statsDifficult => 'Difficult words';
+
+  @override
+  String get statsReviews => 'Recorded answers';
+
+  @override
+  String get statsRemembered => 'Remembered';
+
+  @override
+  String get statsSessions => 'Practice sessions';
+
+  @override
+  String get statsStudyDays => 'Days practised';
+
+  @override
+  String get statsCurrentStreak => 'Current streak';
+
+  @override
+  String get statsLongestStreak => 'Longest streak';
+
+  @override
+  String statsDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsRecentDays => 'Answers in the last 14 days';
+
+  @override
+  String get statsEmptyBody =>
+      'Practice statistics come from the answers you record in practice. None have been recorded yet.';
+
+  @override
+  String get statsPolicy =>
+      'Only answers you recorded after revealing a word are counted; opening the app or a word is not. A day runs from midnight to midnight on this device\'s clock. A streak continues while you practised yesterday or today. These numbers do not mean a word is learned for good.';
+
+  @override
+  String get practiceScheduledNote =>
+      'Scheduled review: only cards that are due are shown, and each answer sets the next review with the FSRS algorithm. New words are added up to each deck\'s daily limit.';
+
+  @override
+  String get practiceFreeMode => 'Free practice (does not change the schedule)';
+
+  @override
+  String get practicePromptMeaning => 'What does this German word mean?';
+
+  @override
+  String get practiceEmptyDueTitle => 'Nothing to review right now';
+
+  @override
+  String get practiceEmptyDueBody =>
+      'All due cards have been reviewed; the next ones come back when they are due. You can practise freely without changing the schedule.';
+
+  @override
+  String get practiceFreeInstead => 'Free practice';
+
+  @override
+  String get practiceScheduledDone => 'The next review of each card was saved.';
+
+  @override
+  String get reviewDirectionTitle => 'Review direction';
+
+  @override
+  String get reviewDirectionGermanToPersian => 'German → Persian';
+
+  @override
+  String get reviewDirectionPersianToGerman => 'Persian → German';
+
+  @override
+  String get reviewDirectionBoth => 'Both directions';
+
+  @override
+  String get reviewDirectionBothNote =>
+      'Each word has two separately scheduled cards. A word is asked in only one direction per day: the one due first (for new words, German → Persian).';
+
+  @override
+  String get reviewStart => 'Start review';
+
+  @override
+  String reviewDueCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString cards to review',
+      one: '1 card to review',
+      zero: 'Nothing to review right now',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewDueShort(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString cards',
+      one: '1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckShowMeanings => 'Show meanings';
+
+  @override
+  String get deckHideMeanings => 'Hide meanings';
+
+  @override
+  String selectionCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get selectionSelectAll => 'Select all';
+
+  @override
+  String get selectionClear => 'Clear selection';
+
+  @override
+  String get selectionExit => 'Exit selection';
+
+  @override
+  String get selectionDelete => 'Delete selected';
+
+  @override
+  String bulkDeleteTitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Delete $countString words?',
+      one: 'Delete 1 word?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkDeleteBody =>
+      'Their meanings, tags and review schedule are deleted too. Recorded answers are kept for statistics. This cannot be undone.';
+
+  @override
+  String bulkDeleted(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString words deleted',
+      one: '1 word deleted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanViewImage => 'Select on photo';
+
+  @override
+  String get scanViewText => 'Show text';
+
+  @override
+  String get scanImageHint =>
+      'Tap a word to select it. For several words in a row, touch and hold the first, then drag to the last. Pinch to zoom.';
+
+  @override
+  String get scanPageImageLabel => 'Page photo';
+
+  @override
+  String get scanRegionMode => 'Select area';
+
+  @override
+  String get scanRegionHint =>
+      'Draw a box around text that was not read correctly to read it again.';
+
+  @override
+  String get scanRegionTitle => 'Text in the selected area';
+
+  @override
+  String get scanRegionHelper =>
+      'Correct it if needed; only this text is added.';
+
+  @override
+  String get scanRegionAdd => 'Add';
+
+  @override
+  String get scanRegionEmpty =>
+      'No text was found in this area. Draw a larger box.';
+
+  @override
+  String get scanRegionFailed => 'This area could not be read. Try again.';
+
+  @override
+  String get scanSplitWords => 'Split into single words';
+
+  @override
+  String get scanRemoveSelection => 'Remove from selection';
 }

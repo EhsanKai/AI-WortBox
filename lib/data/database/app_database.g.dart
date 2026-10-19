@@ -715,6 +715,30 @@ class $VocabularyEntriesTable extends VocabularyEntries
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _markedDifficultAtMeta = const VerificationMeta(
+    'markedDifficultAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> markedDifficultAt =
+      GeneratedColumn<DateTime>(
+        'marked_difficult_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _searchKeyMeta = const VerificationMeta(
+    'searchKey',
+  );
+  @override
+  late final GeneratedColumn<String> searchKey = GeneratedColumn<String>(
+    'search_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -736,6 +760,8 @@ class $VocabularyEntriesTable extends VocabularyEntries
     userEditedAt,
     createdAt,
     updatedAt,
+    markedDifficultAt,
+    searchKey,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -891,6 +917,21 @@ class $VocabularyEntriesTable extends VocabularyEntries
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('marked_difficult_at')) {
+      context.handle(
+        _markedDifficultAtMeta,
+        markedDifficultAt.isAcceptableOrUnknown(
+          data['marked_difficult_at']!,
+          _markedDifficultAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('search_key')) {
+      context.handle(
+        _searchKeyMeta,
+        searchKey.isAcceptableOrUnknown(data['search_key']!, _searchKeyMeta),
+      );
+    }
     return context;
   }
 
@@ -981,6 +1022,14 @@ class $VocabularyEntriesTable extends VocabularyEntries
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      markedDifficultAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}marked_difficult_at'],
+      ),
+      searchKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}search_key'],
+      )!,
     );
   }
 
@@ -1022,6 +1071,15 @@ class VocabularyEntryRow extends DataClass
   final DateTime? userEditedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  /// UTC time the user marked the word as difficult; null when not marked
+  /// (schema v2). A manual mark only: nothing sets it automatically.
+  final DateTime? markedDifficultAt;
+
+  /// Comparison keys of the word, base form and meanings, one per line, for
+  /// search (schema v2). Derived from the content and rewritten by the
+  /// repository on every content change; never shown.
+  final String searchKey;
   const VocabularyEntryRow({
     required this.id,
     required this.deckId,
@@ -1042,6 +1100,8 @@ class VocabularyEntryRow extends DataClass
     this.userEditedAt,
     required this.createdAt,
     required this.updatedAt,
+    this.markedDifficultAt,
+    required this.searchKey,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1093,6 +1153,10 @@ class VocabularyEntryRow extends DataClass
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || markedDifficultAt != null) {
+      map['marked_difficult_at'] = Variable<DateTime>(markedDifficultAt);
+    }
+    map['search_key'] = Variable<String>(searchKey);
     return map;
   }
 
@@ -1135,6 +1199,10 @@ class VocabularyEntryRow extends DataClass
           : Value(userEditedAt),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      markedDifficultAt: markedDifficultAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(markedDifficultAt),
+      searchKey: Value(searchKey),
     );
   }
 
@@ -1172,6 +1240,10 @@ class VocabularyEntryRow extends DataClass
       userEditedAt: serializer.fromJson<DateTime?>(json['userEditedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      markedDifficultAt: serializer.fromJson<DateTime?>(
+        json['markedDifficultAt'],
+      ),
+      searchKey: serializer.fromJson<String>(json['searchKey']),
     );
   }
   @override
@@ -1203,6 +1275,8 @@ class VocabularyEntryRow extends DataClass
       'userEditedAt': serializer.toJson<DateTime?>(userEditedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'markedDifficultAt': serializer.toJson<DateTime?>(markedDifficultAt),
+      'searchKey': serializer.toJson<String>(searchKey),
     };
   }
 
@@ -1226,6 +1300,8 @@ class VocabularyEntryRow extends DataClass
     Value<DateTime?> userEditedAt = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
+    Value<DateTime?> markedDifficultAt = const Value.absent(),
+    String? searchKey,
   }) => VocabularyEntryRow(
     id: id ?? this.id,
     deckId: deckId ?? this.deckId,
@@ -1254,6 +1330,10 @@ class VocabularyEntryRow extends DataClass
     userEditedAt: userEditedAt.present ? userEditedAt.value : this.userEditedAt,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    markedDifficultAt: markedDifficultAt.present
+        ? markedDifficultAt.value
+        : this.markedDifficultAt,
+    searchKey: searchKey ?? this.searchKey,
   );
   VocabularyEntryRow copyWithCompanion(VocabularyEntriesCompanion data) {
     return VocabularyEntryRow(
@@ -1300,6 +1380,10 @@ class VocabularyEntryRow extends DataClass
           : this.userEditedAt,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      markedDifficultAt: data.markedDifficultAt.present
+          ? data.markedDifficultAt.value
+          : this.markedDifficultAt,
+      searchKey: data.searchKey.present ? data.searchKey.value : this.searchKey,
     );
   }
 
@@ -1324,13 +1408,15 @@ class VocabularyEntryRow extends DataClass
           ..write('enrichmentMetadata: $enrichmentMetadata, ')
           ..write('userEditedAt: $userEditedAt, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('markedDifficultAt: $markedDifficultAt, ')
+          ..write('searchKey: $searchKey')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     deckId,
     original,
@@ -1350,7 +1436,9 @@ class VocabularyEntryRow extends DataClass
     userEditedAt,
     createdAt,
     updatedAt,
-  );
+    markedDifficultAt,
+    searchKey,
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1373,7 +1461,9 @@ class VocabularyEntryRow extends DataClass
           other.enrichmentMetadata == this.enrichmentMetadata &&
           other.userEditedAt == this.userEditedAt &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.markedDifficultAt == this.markedDifficultAt &&
+          other.searchKey == this.searchKey);
 }
 
 class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
@@ -1396,6 +1486,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
   final Value<DateTime?> userEditedAt;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<DateTime?> markedDifficultAt;
+  final Value<String> searchKey;
   final Value<int> rowid;
   const VocabularyEntriesCompanion({
     this.id = const Value.absent(),
@@ -1417,6 +1509,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
     this.userEditedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.markedDifficultAt = const Value.absent(),
+    this.searchKey = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   VocabularyEntriesCompanion.insert({
@@ -1439,6 +1533,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
     this.userEditedAt = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
+    this.markedDifficultAt = const Value.absent(),
+    this.searchKey = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        deckId = Value(deckId),
@@ -1470,6 +1566,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
     Expression<DateTime>? userEditedAt,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<DateTime>? markedDifficultAt,
+    Expression<String>? searchKey,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1492,6 +1590,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
       if (userEditedAt != null) 'user_edited_at': userEditedAt,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (markedDifficultAt != null) 'marked_difficult_at': markedDifficultAt,
+      if (searchKey != null) 'search_key': searchKey,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1516,6 +1616,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
     Value<DateTime?>? userEditedAt,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<DateTime?>? markedDifficultAt,
+    Value<String>? searchKey,
     Value<int>? rowid,
   }) {
     return VocabularyEntriesCompanion(
@@ -1538,6 +1640,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
       userEditedAt: userEditedAt ?? this.userEditedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      markedDifficultAt: markedDifficultAt ?? this.markedDifficultAt,
+      searchKey: searchKey ?? this.searchKey,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1608,6 +1712,12 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (markedDifficultAt.present) {
+      map['marked_difficult_at'] = Variable<DateTime>(markedDifficultAt.value);
+    }
+    if (searchKey.present) {
+      map['search_key'] = Variable<String>(searchKey.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1636,6 +1746,8 @@ class VocabularyEntriesCompanion extends UpdateCompanion<VocabularyEntryRow> {
           ..write('userEditedAt: $userEditedAt, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('markedDifficultAt: $markedDifficultAt, ')
+          ..write('searchKey: $searchKey, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2855,6 +2967,1337 @@ class FlashcardsCompanion extends UpdateCompanion<FlashcardRow> {
   }
 }
 
+class $TagsTable extends Tags with TableInfo<$TagsTable, TagRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TagsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 40,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameKeyMeta = const VerificationMeta(
+    'nameKey',
+  );
+  @override
+  late final GeneratedColumn<String> nameKey = GeneratedColumn<String>(
+    'name_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    nameKey,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tags';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TagRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('name_key')) {
+      context.handle(
+        _nameKeyMeta,
+        nameKey.isAcceptableOrUnknown(data['name_key']!, _nameKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameKeyMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TagRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TagRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      nameKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_key'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TagsTable createAlias(String alias) {
+    return $TagsTable(attachedDatabase, alias);
+  }
+}
+
+class TagRow extends DataClass implements Insertable<TagRow> {
+  final String id;
+
+  /// As entered (whitespace cleaned).
+  final String name;
+
+  /// Case-insensitive key; two tags cannot differ only in case or spacing.
+  final String nameKey;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const TagRow({
+    required this.id,
+    required this.name,
+    required this.nameKey,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['name_key'] = Variable<String>(nameKey);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  TagsCompanion toCompanion(bool nullToAbsent) {
+    return TagsCompanion(
+      id: Value(id),
+      name: Value(name),
+      nameKey: Value(nameKey),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory TagRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TagRow(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      nameKey: serializer.fromJson<String>(json['nameKey']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'nameKey': serializer.toJson<String>(nameKey),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  TagRow copyWith({
+    String? id,
+    String? name,
+    String? nameKey,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => TagRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    nameKey: nameKey ?? this.nameKey,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  TagRow copyWithCompanion(TagsCompanion data) {
+    return TagRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      nameKey: data.nameKey.present ? data.nameKey.value : this.nameKey,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TagRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('nameKey: $nameKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, nameKey, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TagRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.nameKey == this.nameKey &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TagsCompanion extends UpdateCompanion<TagRow> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> nameKey;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const TagsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.nameKey = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TagsCompanion.insert({
+    required String id,
+    required String name,
+    required String nameKey,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       nameKey = Value(nameKey),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<TagRow> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? nameKey,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (nameKey != null) 'name_key': nameKey,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TagsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? nameKey,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return TagsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      nameKey: nameKey ?? this.nameKey,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (nameKey.present) {
+      map['name_key'] = Variable<String>(nameKey.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TagsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('nameKey: $nameKey, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $EntryTagsTable extends EntryTags
+    with TableInfo<$EntryTagsTable, EntryTagRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EntryTagsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _entryIdMeta = const VerificationMeta(
+    'entryId',
+  );
+  @override
+  late final GeneratedColumn<String> entryId = GeneratedColumn<String>(
+    'entry_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES vocabulary_entries (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
+  @override
+  late final GeneratedColumn<String> tagId = GeneratedColumn<String>(
+    'tag_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES tags (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [entryId, tagId, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'entry_tags';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EntryTagRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('entry_id')) {
+      context.handle(
+        _entryIdMeta,
+        entryId.isAcceptableOrUnknown(data['entry_id']!, _entryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entryIdMeta);
+    }
+    if (data.containsKey('tag_id')) {
+      context.handle(
+        _tagIdMeta,
+        tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tagIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {entryId, tagId};
+  @override
+  EntryTagRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EntryTagRow(
+      entryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entry_id'],
+      )!,
+      tagId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tag_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $EntryTagsTable createAlias(String alias) {
+    return $EntryTagsTable(attachedDatabase, alias);
+  }
+}
+
+class EntryTagRow extends DataClass implements Insertable<EntryTagRow> {
+  final String entryId;
+  final String tagId;
+  final DateTime createdAt;
+  const EntryTagRow({
+    required this.entryId,
+    required this.tagId,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['entry_id'] = Variable<String>(entryId);
+    map['tag_id'] = Variable<String>(tagId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  EntryTagsCompanion toCompanion(bool nullToAbsent) {
+    return EntryTagsCompanion(
+      entryId: Value(entryId),
+      tagId: Value(tagId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory EntryTagRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EntryTagRow(
+      entryId: serializer.fromJson<String>(json['entryId']),
+      tagId: serializer.fromJson<String>(json['tagId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'entryId': serializer.toJson<String>(entryId),
+      'tagId': serializer.toJson<String>(tagId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  EntryTagRow copyWith({String? entryId, String? tagId, DateTime? createdAt}) =>
+      EntryTagRow(
+        entryId: entryId ?? this.entryId,
+        tagId: tagId ?? this.tagId,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  EntryTagRow copyWithCompanion(EntryTagsCompanion data) {
+    return EntryTagRow(
+      entryId: data.entryId.present ? data.entryId.value : this.entryId,
+      tagId: data.tagId.present ? data.tagId.value : this.tagId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EntryTagRow(')
+          ..write('entryId: $entryId, ')
+          ..write('tagId: $tagId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(entryId, tagId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EntryTagRow &&
+          other.entryId == this.entryId &&
+          other.tagId == this.tagId &&
+          other.createdAt == this.createdAt);
+}
+
+class EntryTagsCompanion extends UpdateCompanion<EntryTagRow> {
+  final Value<String> entryId;
+  final Value<String> tagId;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const EntryTagsCompanion({
+    this.entryId = const Value.absent(),
+    this.tagId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EntryTagsCompanion.insert({
+    required String entryId,
+    required String tagId,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : entryId = Value(entryId),
+       tagId = Value(tagId),
+       createdAt = Value(createdAt);
+  static Insertable<EntryTagRow> custom({
+    Expression<String>? entryId,
+    Expression<String>? tagId,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (entryId != null) 'entry_id': entryId,
+      if (tagId != null) 'tag_id': tagId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EntryTagsCompanion copyWith({
+    Value<String>? entryId,
+    Value<String>? tagId,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return EntryTagsCompanion(
+      entryId: entryId ?? this.entryId,
+      tagId: tagId ?? this.tagId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (entryId.present) {
+      map['entry_id'] = Variable<String>(entryId.value);
+    }
+    if (tagId.present) {
+      map['tag_id'] = Variable<String>(tagId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EntryTagsCompanion(')
+          ..write('entryId: $entryId, ')
+          ..write('tagId: $tagId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ReviewEventsTable extends ReviewEvents
+    with TableInfo<$ReviewEventsTable, ReviewEventRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReviewEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _entryIdMeta = const VerificationMeta(
+    'entryId',
+  );
+  @override
+  late final GeneratedColumn<String> entryId = GeneratedColumn<String>(
+    'entry_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES vocabulary_entries (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<CardDirection, String> direction =
+      GeneratedColumn<String>(
+        'direction',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<CardDirection>($ReviewEventsTable.$converterdirection);
+  @override
+  late final GeneratedColumnWithTypeConverter<ReviewOutcome, String> outcome =
+      GeneratedColumn<String>(
+        'outcome',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<ReviewOutcome>($ReviewEventsTable.$converteroutcome);
+  static const VerificationMeta _reviewedAtMeta = const VerificationMeta(
+    'reviewedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> reviewedAt = GeneratedColumn<DateTime>(
+    'reviewed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _localDayMeta = const VerificationMeta(
+    'localDay',
+  );
+  @override
+  late final GeneratedColumn<String> localDay = GeneratedColumn<String>(
+    'local_day',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 10,
+      maxTextLength: 10,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    entryId,
+    sessionId,
+    direction,
+    outcome,
+    reviewedAt,
+    localDay,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'review_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReviewEventRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('entry_id')) {
+      context.handle(
+        _entryIdMeta,
+        entryId.isAcceptableOrUnknown(data['entry_id']!, _entryIdMeta),
+      );
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('reviewed_at')) {
+      context.handle(
+        _reviewedAtMeta,
+        reviewedAt.isAcceptableOrUnknown(data['reviewed_at']!, _reviewedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reviewedAtMeta);
+    }
+    if (data.containsKey('local_day')) {
+      context.handle(
+        _localDayMeta,
+        localDay.isAcceptableOrUnknown(data['local_day']!, _localDayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localDayMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReviewEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReviewEventRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      entryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entry_id'],
+      ),
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      direction: $ReviewEventsTable.$converterdirection.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}direction'],
+        )!,
+      ),
+      outcome: $ReviewEventsTable.$converteroutcome.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}outcome'],
+        )!,
+      ),
+      reviewedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}reviewed_at'],
+      )!,
+      localDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_day'],
+      )!,
+    );
+  }
+
+  @override
+  $ReviewEventsTable createAlias(String alias) {
+    return $ReviewEventsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<CardDirection, String, String> $converterdirection =
+      const EnumNameConverter<CardDirection>(CardDirection.values);
+  static JsonTypeConverter2<ReviewOutcome, String, String> $converteroutcome =
+      const EnumNameConverter<ReviewOutcome>(ReviewOutcome.values);
+}
+
+class ReviewEventRow extends DataClass implements Insertable<ReviewEventRow> {
+  final String id;
+  final String? entryId;
+  final String sessionId;
+  final CardDirection direction;
+  final ReviewOutcome outcome;
+  final DateTime reviewedAt;
+
+  /// `YYYY-MM-DD`, the device's local day at recording time.
+  final String localDay;
+  const ReviewEventRow({
+    required this.id,
+    this.entryId,
+    required this.sessionId,
+    required this.direction,
+    required this.outcome,
+    required this.reviewedAt,
+    required this.localDay,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || entryId != null) {
+      map['entry_id'] = Variable<String>(entryId);
+    }
+    map['session_id'] = Variable<String>(sessionId);
+    {
+      map['direction'] = Variable<String>(
+        $ReviewEventsTable.$converterdirection.toSql(direction),
+      );
+    }
+    {
+      map['outcome'] = Variable<String>(
+        $ReviewEventsTable.$converteroutcome.toSql(outcome),
+      );
+    }
+    map['reviewed_at'] = Variable<DateTime>(reviewedAt);
+    map['local_day'] = Variable<String>(localDay);
+    return map;
+  }
+
+  ReviewEventsCompanion toCompanion(bool nullToAbsent) {
+    return ReviewEventsCompanion(
+      id: Value(id),
+      entryId: entryId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(entryId),
+      sessionId: Value(sessionId),
+      direction: Value(direction),
+      outcome: Value(outcome),
+      reviewedAt: Value(reviewedAt),
+      localDay: Value(localDay),
+    );
+  }
+
+  factory ReviewEventRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReviewEventRow(
+      id: serializer.fromJson<String>(json['id']),
+      entryId: serializer.fromJson<String?>(json['entryId']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      direction: $ReviewEventsTable.$converterdirection.fromJson(
+        serializer.fromJson<String>(json['direction']),
+      ),
+      outcome: $ReviewEventsTable.$converteroutcome.fromJson(
+        serializer.fromJson<String>(json['outcome']),
+      ),
+      reviewedAt: serializer.fromJson<DateTime>(json['reviewedAt']),
+      localDay: serializer.fromJson<String>(json['localDay']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'entryId': serializer.toJson<String?>(entryId),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'direction': serializer.toJson<String>(
+        $ReviewEventsTable.$converterdirection.toJson(direction),
+      ),
+      'outcome': serializer.toJson<String>(
+        $ReviewEventsTable.$converteroutcome.toJson(outcome),
+      ),
+      'reviewedAt': serializer.toJson<DateTime>(reviewedAt),
+      'localDay': serializer.toJson<String>(localDay),
+    };
+  }
+
+  ReviewEventRow copyWith({
+    String? id,
+    Value<String?> entryId = const Value.absent(),
+    String? sessionId,
+    CardDirection? direction,
+    ReviewOutcome? outcome,
+    DateTime? reviewedAt,
+    String? localDay,
+  }) => ReviewEventRow(
+    id: id ?? this.id,
+    entryId: entryId.present ? entryId.value : this.entryId,
+    sessionId: sessionId ?? this.sessionId,
+    direction: direction ?? this.direction,
+    outcome: outcome ?? this.outcome,
+    reviewedAt: reviewedAt ?? this.reviewedAt,
+    localDay: localDay ?? this.localDay,
+  );
+  ReviewEventRow copyWithCompanion(ReviewEventsCompanion data) {
+    return ReviewEventRow(
+      id: data.id.present ? data.id.value : this.id,
+      entryId: data.entryId.present ? data.entryId.value : this.entryId,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      outcome: data.outcome.present ? data.outcome.value : this.outcome,
+      reviewedAt: data.reviewedAt.present
+          ? data.reviewedAt.value
+          : this.reviewedAt,
+      localDay: data.localDay.present ? data.localDay.value : this.localDay,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReviewEventRow(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('direction: $direction, ')
+          ..write('outcome: $outcome, ')
+          ..write('reviewedAt: $reviewedAt, ')
+          ..write('localDay: $localDay')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    entryId,
+    sessionId,
+    direction,
+    outcome,
+    reviewedAt,
+    localDay,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReviewEventRow &&
+          other.id == this.id &&
+          other.entryId == this.entryId &&
+          other.sessionId == this.sessionId &&
+          other.direction == this.direction &&
+          other.outcome == this.outcome &&
+          other.reviewedAt == this.reviewedAt &&
+          other.localDay == this.localDay);
+}
+
+class ReviewEventsCompanion extends UpdateCompanion<ReviewEventRow> {
+  final Value<String> id;
+  final Value<String?> entryId;
+  final Value<String> sessionId;
+  final Value<CardDirection> direction;
+  final Value<ReviewOutcome> outcome;
+  final Value<DateTime> reviewedAt;
+  final Value<String> localDay;
+  final Value<int> rowid;
+  const ReviewEventsCompanion({
+    this.id = const Value.absent(),
+    this.entryId = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.outcome = const Value.absent(),
+    this.reviewedAt = const Value.absent(),
+    this.localDay = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ReviewEventsCompanion.insert({
+    required String id,
+    this.entryId = const Value.absent(),
+    required String sessionId,
+    required CardDirection direction,
+    required ReviewOutcome outcome,
+    required DateTime reviewedAt,
+    required String localDay,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sessionId = Value(sessionId),
+       direction = Value(direction),
+       outcome = Value(outcome),
+       reviewedAt = Value(reviewedAt),
+       localDay = Value(localDay);
+  static Insertable<ReviewEventRow> custom({
+    Expression<String>? id,
+    Expression<String>? entryId,
+    Expression<String>? sessionId,
+    Expression<String>? direction,
+    Expression<String>? outcome,
+    Expression<DateTime>? reviewedAt,
+    Expression<String>? localDay,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entryId != null) 'entry_id': entryId,
+      if (sessionId != null) 'session_id': sessionId,
+      if (direction != null) 'direction': direction,
+      if (outcome != null) 'outcome': outcome,
+      if (reviewedAt != null) 'reviewed_at': reviewedAt,
+      if (localDay != null) 'local_day': localDay,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ReviewEventsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? entryId,
+    Value<String>? sessionId,
+    Value<CardDirection>? direction,
+    Value<ReviewOutcome>? outcome,
+    Value<DateTime>? reviewedAt,
+    Value<String>? localDay,
+    Value<int>? rowid,
+  }) {
+    return ReviewEventsCompanion(
+      id: id ?? this.id,
+      entryId: entryId ?? this.entryId,
+      sessionId: sessionId ?? this.sessionId,
+      direction: direction ?? this.direction,
+      outcome: outcome ?? this.outcome,
+      reviewedAt: reviewedAt ?? this.reviewedAt,
+      localDay: localDay ?? this.localDay,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (entryId.present) {
+      map['entry_id'] = Variable<String>(entryId.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<String>(
+        $ReviewEventsTable.$converterdirection.toSql(direction.value),
+      );
+    }
+    if (outcome.present) {
+      map['outcome'] = Variable<String>(
+        $ReviewEventsTable.$converteroutcome.toSql(outcome.value),
+      );
+    }
+    if (reviewedAt.present) {
+      map['reviewed_at'] = Variable<DateTime>(reviewedAt.value);
+    }
+    if (localDay.present) {
+      map['local_day'] = Variable<String>(localDay.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReviewEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('direction: $direction, ')
+          ..write('outcome: $outcome, ')
+          ..write('reviewedAt: $reviewedAt, ')
+          ..write('localDay: $localDay, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AppSettingsTable extends AppSettings
+    with TableInfo<$AppSettingsTable, AppSettingRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AppSettingRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  AppSettingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AppSettingRow(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+    );
+  }
+
+  @override
+  $AppSettingsTable createAlias(String alias) {
+    return $AppSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class AppSettingRow extends DataClass implements Insertable<AppSettingRow> {
+  final String key;
+  final String value;
+  const AppSettingRow({required this.key, required this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    return map;
+  }
+
+  AppSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AppSettingsCompanion(key: Value(key), value: Value(value));
+  }
+
+  factory AppSettingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AppSettingRow(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+    };
+  }
+
+  AppSettingRow copyWith({String? key, String? value}) =>
+      AppSettingRow(key: key ?? this.key, value: value ?? this.value);
+  AppSettingRow copyWithCompanion(AppSettingsCompanion data) {
+    return AppSettingRow(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSettingRow(')
+          ..write('key: $key, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AppSettingRow &&
+          other.key == this.key &&
+          other.value == this.value);
+}
+
+class AppSettingsCompanion extends UpdateCompanion<AppSettingRow> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<int> rowid;
+  const AppSettingsCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AppSettingsCompanion.insert({
+    required String key,
+    required String value,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value);
+  static Insertable<AppSettingRow> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AppSettingsCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<int>? rowid,
+  }) {
+    return AppSettingsCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSettingsCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2864,6 +4307,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $VocabularyMeaningsTable vocabularyMeanings =
       $VocabularyMeaningsTable(this);
   late final $FlashcardsTable flashcards = $FlashcardsTable(this);
+  late final $TagsTable tags = $TagsTable(this);
+  late final $EntryTagsTable entryTags = $EntryTagsTable(this);
+  late final $ReviewEventsTable reviewEvents = $ReviewEventsTable(this);
+  late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final Index idxEntriesDeckNormalized = Index(
     'idx_entries_deck_normalized',
     'CREATE INDEX idx_entries_deck_normalized ON vocabulary_entries (deck_id, normalized)',
@@ -2871,6 +4318,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index idxFlashcardsDue = Index(
     'idx_flashcards_due',
     'CREATE INDEX idx_flashcards_due ON flashcards (due)',
+  );
+  late final Index idxEntryTagsTag = Index(
+    'idx_entry_tags_tag',
+    'CREATE INDEX idx_entry_tags_tag ON entry_tags (tag_id)',
+  );
+  late final Index idxReviewEventsDay = Index(
+    'idx_review_events_day',
+    'CREATE INDEX idx_review_events_day ON review_events (local_day)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -2881,8 +4336,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     vocabularyEntries,
     vocabularyMeanings,
     flashcards,
+    tags,
+    entryTags,
+    reviewEvents,
+    appSettings,
     idxEntriesDeckNormalized,
     idxFlashcardsDue,
+    idxEntryTagsTag,
+    idxReviewEventsDay,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -2906,6 +4367,27 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('flashcards', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'vocabulary_entries',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('entry_tags', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'tags',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('entry_tags', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'vocabulary_entries',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('review_events', kind: UpdateKind.update)],
     ),
   ]);
   @override
@@ -3281,6 +4763,8 @@ typedef $$VocabularyEntriesTableCreateCompanionBuilder =
       Value<DateTime?> userEditedAt,
       required DateTime createdAt,
       required DateTime updatedAt,
+      Value<DateTime?> markedDifficultAt,
+      Value<String> searchKey,
       Value<int> rowid,
     });
 typedef $$VocabularyEntriesTableUpdateCompanionBuilder =
@@ -3304,6 +4788,8 @@ typedef $$VocabularyEntriesTableUpdateCompanionBuilder =
       Value<DateTime?> userEditedAt,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<DateTime?> markedDifficultAt,
+      Value<String> searchKey,
       Value<int> rowid,
     });
 
@@ -3374,6 +4860,42 @@ final class $$VocabularyEntriesTableReferences
     ).filter((f) => f.entryId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_flashcardsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$EntryTagsTable, List<EntryTagRow>>
+  _entryTagsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.entryTags,
+    aliasName: 'vocabulary_entries__id__entry_tags__entry_id',
+  );
+
+  $$EntryTagsTableProcessedTableManager get entryTagsRefs {
+    final manager = $$EntryTagsTableTableManager(
+      $_db,
+      $_db.entryTags,
+    ).filter((f) => f.entryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_entryTagsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ReviewEventsTable, List<ReviewEventRow>>
+  _reviewEventsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.reviewEvents,
+    aliasName: 'vocabulary_entries__id__review_events__entry_id',
+  );
+
+  $$ReviewEventsTableProcessedTableManager get reviewEventsRefs {
+    final manager = $$ReviewEventsTableTableManager(
+      $_db,
+      $_db.reviewEvents,
+    ).filter((f) => f.entryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_reviewEventsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3485,6 +5007,16 @@ class $$VocabularyEntriesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<DateTime> get markedDifficultAt => $composableBuilder(
+    column: $table.markedDifficultAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$DecksTableFilterComposer get deckId {
     final $$DecksTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -3549,6 +5081,56 @@ class $$VocabularyEntriesTableFilterComposer
           }) => $$FlashcardsTableFilterComposer(
             $db: $db,
             $table: $db.flashcards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> entryTagsRefs(
+    Expression<bool> Function($$EntryTagsTableFilterComposer f) f,
+  ) {
+    final $$EntryTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.entryTags,
+      getReferencedColumn: (t) => t.entryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EntryTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.entryTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> reviewEventsRefs(
+    Expression<bool> Function($$ReviewEventsTableFilterComposer f) f,
+  ) {
+    final $$ReviewEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.reviewEvents,
+      getReferencedColumn: (t) => t.entryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReviewEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.reviewEvents,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3655,6 +5237,16 @@ class $$VocabularyEntriesTableOrderingComposer
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get markedDifficultAt => $composableBuilder(
+    column: $table.markedDifficultAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3771,6 +5363,14 @@ class $$VocabularyEntriesTableAnnotationComposer
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get markedDifficultAt => $composableBuilder(
+    column: $table.markedDifficultAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get searchKey =>
+      $composableBuilder(column: $table.searchKey, builder: (column) => column);
+
   $$DecksTableAnnotationComposer get deckId {
     final $$DecksTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -3844,6 +5444,56 @@ class $$VocabularyEntriesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> entryTagsRefs<T extends Object>(
+    Expression<T> Function($$EntryTagsTableAnnotationComposer a) f,
+  ) {
+    final $$EntryTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.entryTags,
+      getReferencedColumn: (t) => t.entryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EntryTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.entryTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> reviewEventsRefs<T extends Object>(
+    Expression<T> Function($$ReviewEventsTableAnnotationComposer a) f,
+  ) {
+    final $$ReviewEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.reviewEvents,
+      getReferencedColumn: (t) => t.entryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ReviewEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.reviewEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VocabularyEntriesTableTableManager
@@ -3863,6 +5513,8 @@ class $$VocabularyEntriesTableTableManager
             bool deckId,
             bool vocabularyMeaningsRefs,
             bool flashcardsRefs,
+            bool entryTagsRefs,
+            bool reviewEventsRefs,
           })
         > {
   $$VocabularyEntriesTableTableManager(
@@ -3902,6 +5554,8 @@ class $$VocabularyEntriesTableTableManager
                 Value<DateTime?> userEditedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> markedDifficultAt = const Value.absent(),
+                Value<String> searchKey = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => VocabularyEntriesCompanion(
                 id: id,
@@ -3923,6 +5577,8 @@ class $$VocabularyEntriesTableTableManager
                 userEditedAt: userEditedAt,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                markedDifficultAt: markedDifficultAt,
+                searchKey: searchKey,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3946,6 +5602,8 @@ class $$VocabularyEntriesTableTableManager
                 Value<DateTime?> userEditedAt = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
+                Value<DateTime?> markedDifficultAt = const Value.absent(),
+                Value<String> searchKey = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => VocabularyEntriesCompanion.insert(
                 id: id,
@@ -3967,6 +5625,8 @@ class $$VocabularyEntriesTableTableManager
                 userEditedAt: userEditedAt,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                markedDifficultAt: markedDifficultAt,
+                searchKey: searchKey,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -3984,12 +5644,16 @@ class $$VocabularyEntriesTableTableManager
                 deckId = false,
                 vocabularyMeaningsRefs = false,
                 flashcardsRefs = false,
+                entryTagsRefs = false,
+                reviewEventsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (vocabularyMeaningsRefs) db.vocabularyMeanings,
                     if (flashcardsRefs) db.flashcards,
+                    if (entryTagsRefs) db.entryTags,
+                    if (reviewEventsRefs) db.reviewEvents,
                   ],
                   addJoins:
                       <
@@ -4065,6 +5729,48 @@ class $$VocabularyEntriesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (entryTagsRefs)
+                        await $_getPrefetchedData<
+                          VocabularyEntryRow,
+                          $VocabularyEntriesTable,
+                          EntryTagRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VocabularyEntriesTableReferences
+                              ._entryTagsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VocabularyEntriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).entryTagsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.entryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (reviewEventsRefs)
+                        await $_getPrefetchedData<
+                          VocabularyEntryRow,
+                          $VocabularyEntriesTable,
+                          ReviewEventRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VocabularyEntriesTableReferences
+                              ._reviewEventsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VocabularyEntriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).reviewEventsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.entryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4089,6 +5795,8 @@ typedef $$VocabularyEntriesTableProcessedTableManager =
         bool deckId,
         bool vocabularyMeaningsRefs,
         bool flashcardsRefs,
+        bool entryTagsRefs,
+        bool reviewEventsRefs,
       })
     >;
 typedef $$VocabularyMeaningsTableCreateCompanionBuilder =
@@ -4924,6 +6632,1163 @@ typedef $$FlashcardsTableProcessedTableManager =
       FlashcardRow,
       PrefetchHooks Function({bool entryId})
     >;
+typedef $$TagsTableCreateCompanionBuilder = TagsCompanion Function({
+  required String id,
+  required String name,
+  required String nameKey,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$TagsTableUpdateCompanionBuilder = TagsCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String> nameKey,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+final class $$TagsTableReferences
+    extends BaseReferences<_$AppDatabase, $TagsTable, TagRow> {
+  $$TagsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$EntryTagsTable, List<EntryTagRow>>
+  _entryTagsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.entryTags,
+    aliasName: 'tags__id__entry_tags__tag_id',
+  );
+
+  $$EntryTagsTableProcessedTableManager get entryTagsRefs {
+    final manager = $$EntryTagsTableTableManager(
+      $_db,
+      $_db.entryTags,
+    ).filter((f) => f.tagId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_entryTagsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TagsTableFilterComposer extends Composer<_$AppDatabase, $TagsTable> {
+  $$TagsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameKey => $composableBuilder(
+    column: $table.nameKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> entryTagsRefs(
+    Expression<bool> Function($$EntryTagsTableFilterComposer f) f,
+  ) {
+    final $$EntryTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.entryTags,
+      getReferencedColumn: (t) => t.tagId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EntryTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.entryTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TagsTableOrderingComposer extends Composer<_$AppDatabase, $TagsTable> {
+  $$TagsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameKey => $composableBuilder(
+    column: $table.nameKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TagsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TagsTable> {
+  $$TagsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get nameKey =>
+      $composableBuilder(column: $table.nameKey, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  Expression<T> entryTagsRefs<T extends Object>(
+    Expression<T> Function($$EntryTagsTableAnnotationComposer a) f,
+  ) {
+    final $$EntryTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.entryTags,
+      getReferencedColumn: (t) => t.tagId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EntryTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.entryTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TagsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TagsTable,
+          TagRow,
+          $$TagsTableFilterComposer,
+          $$TagsTableOrderingComposer,
+          $$TagsTableAnnotationComposer,
+          $$TagsTableCreateCompanionBuilder,
+          $$TagsTableUpdateCompanionBuilder,
+          (TagRow, $$TagsTableReferences),
+          TagRow,
+          PrefetchHooks Function({bool entryTagsRefs})
+        > {
+  $$TagsTableTableManager(_$AppDatabase db, $TagsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TagsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TagsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TagsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> nameKey = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TagsCompanion(
+                id: id,
+                name: name,
+                nameKey: nameKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String nameKey,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => TagsCompanion.insert(
+                id: id,
+                name: name,
+                nameKey: nameKey,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TagsTable, TagRow>(table),
+                  $$TagsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({entryTagsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (entryTagsRefs) db.entryTags],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (entryTagsRefs)
+                    await $_getPrefetchedData<TagRow, $TagsTable, EntryTagRow>(
+                      currentTable: table,
+                      referencedTable: $$TagsTableReferences
+                          ._entryTagsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$TagsTableReferences(db, table, p0).entryTagsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.tagId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TagsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TagsTable,
+      TagRow,
+      $$TagsTableFilterComposer,
+      $$TagsTableOrderingComposer,
+      $$TagsTableAnnotationComposer,
+      $$TagsTableCreateCompanionBuilder,
+      $$TagsTableUpdateCompanionBuilder,
+      (TagRow, $$TagsTableReferences),
+      TagRow,
+      PrefetchHooks Function({bool entryTagsRefs})
+    >;
+typedef $$EntryTagsTableCreateCompanionBuilder = EntryTagsCompanion Function({
+  required String entryId,
+  required String tagId,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$EntryTagsTableUpdateCompanionBuilder = EntryTagsCompanion Function({
+  Value<String> entryId,
+  Value<String> tagId,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+final class $$EntryTagsTableReferences
+    extends BaseReferences<_$AppDatabase, $EntryTagsTable, EntryTagRow> {
+  $$EntryTagsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $VocabularyEntriesTable _entryIdTable(_$AppDatabase db) => db
+      .vocabularyEntries
+      .createAlias('entry_tags__entry_id__vocabulary_entries__id');
+
+  $$VocabularyEntriesTableProcessedTableManager get entryId {
+    final $_column = $_itemColumn<String>('entry_id')!;
+
+    final manager = $$VocabularyEntriesTableTableManager(
+      $_db,
+      $_db.vocabularyEntries,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $TagsTable _tagIdTable(_$AppDatabase db) =>
+      db.tags.createAlias('entry_tags__tag_id__tags__id');
+
+  $$TagsTableProcessedTableManager get tagId {
+    final $_column = $_itemColumn<String>('tag_id')!;
+
+    final manager = $$TagsTableTableManager(
+      $_db,
+      $_db.tags,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tagIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EntryTagsTableFilterComposer
+    extends Composer<_$AppDatabase, $EntryTagsTable> {
+  $$EntryTagsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VocabularyEntriesTableFilterComposer get entryId {
+    final $$VocabularyEntriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableFilterComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TagsTableFilterComposer get tagId {
+    final $$TagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.tags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TagsTableFilterComposer(
+            $db: $db,
+            $table: $db.tags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EntryTagsTableOrderingComposer
+    extends Composer<_$AppDatabase, $EntryTagsTable> {
+  $$EntryTagsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VocabularyEntriesTableOrderingComposer get entryId {
+    final $$VocabularyEntriesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableOrderingComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TagsTableOrderingComposer get tagId {
+    final $$TagsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.tags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TagsTableOrderingComposer(
+            $db: $db,
+            $table: $db.tags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EntryTagsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EntryTagsTable> {
+  $$EntryTagsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$VocabularyEntriesTableAnnotationComposer get entryId {
+    final $$VocabularyEntriesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.entryId,
+          referencedTable: $db.vocabularyEntries,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$VocabularyEntriesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.vocabularyEntries,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$TagsTableAnnotationComposer get tagId {
+    final $$TagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.tags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EntryTagsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EntryTagsTable,
+          EntryTagRow,
+          $$EntryTagsTableFilterComposer,
+          $$EntryTagsTableOrderingComposer,
+          $$EntryTagsTableAnnotationComposer,
+          $$EntryTagsTableCreateCompanionBuilder,
+          $$EntryTagsTableUpdateCompanionBuilder,
+          (EntryTagRow, $$EntryTagsTableReferences),
+          EntryTagRow,
+          PrefetchHooks Function({bool entryId, bool tagId})
+        > {
+  $$EntryTagsTableTableManager(_$AppDatabase db, $EntryTagsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EntryTagsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EntryTagsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EntryTagsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> entryId = const Value.absent(),
+                Value<String> tagId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EntryTagsCompanion(
+                entryId: entryId,
+                tagId: tagId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String entryId,
+                required String tagId,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => EntryTagsCompanion.insert(
+                entryId: entryId,
+                tagId: tagId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$EntryTagsTable, EntryTagRow>(table),
+                  $$EntryTagsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({entryId = false, tagId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (entryId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.entryId,
+                        referencedTable: $$EntryTagsTableReferences
+                            ._entryIdTable(db),
+                        referencedColumn: $$EntryTagsTableReferences
+                            ._entryIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (tagId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.tagId,
+                        referencedTable: $$EntryTagsTableReferences._tagIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$EntryTagsTableReferences
+                            ._tagIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EntryTagsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EntryTagsTable,
+      EntryTagRow,
+      $$EntryTagsTableFilterComposer,
+      $$EntryTagsTableOrderingComposer,
+      $$EntryTagsTableAnnotationComposer,
+      $$EntryTagsTableCreateCompanionBuilder,
+      $$EntryTagsTableUpdateCompanionBuilder,
+      (EntryTagRow, $$EntryTagsTableReferences),
+      EntryTagRow,
+      PrefetchHooks Function({bool entryId, bool tagId})
+    >;
+typedef $$ReviewEventsTableCreateCompanionBuilder =
+    ReviewEventsCompanion Function({
+      required String id,
+      Value<String?> entryId,
+      required String sessionId,
+      required CardDirection direction,
+      required ReviewOutcome outcome,
+      required DateTime reviewedAt,
+      required String localDay,
+      Value<int> rowid,
+    });
+typedef $$ReviewEventsTableUpdateCompanionBuilder =
+    ReviewEventsCompanion Function({
+      Value<String> id,
+      Value<String?> entryId,
+      Value<String> sessionId,
+      Value<CardDirection> direction,
+      Value<ReviewOutcome> outcome,
+      Value<DateTime> reviewedAt,
+      Value<String> localDay,
+      Value<int> rowid,
+    });
+
+final class $$ReviewEventsTableReferences
+    extends BaseReferences<_$AppDatabase, $ReviewEventsTable, ReviewEventRow> {
+  $$ReviewEventsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $VocabularyEntriesTable _entryIdTable(_$AppDatabase db) => db
+      .vocabularyEntries
+      .createAlias('review_events__entry_id__vocabulary_entries__id');
+
+  $$VocabularyEntriesTableProcessedTableManager? get entryId {
+    final $_column = $_itemColumn<String>('entry_id');
+    if ($_column == null) return null;
+    final manager = $$VocabularyEntriesTableTableManager(
+      $_db,
+      $_db.vocabularyEntries,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ReviewEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $ReviewEventsTable> {
+  $$ReviewEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<CardDirection, CardDirection, String>
+  get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<ReviewOutcome, ReviewOutcome, String>
+  get outcome => $composableBuilder(
+    column: $table.outcome,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get localDay => $composableBuilder(
+    column: $table.localDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VocabularyEntriesTableFilterComposer get entryId {
+    final $$VocabularyEntriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableFilterComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ReviewEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReviewEventsTable> {
+  $$ReviewEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get outcome => $composableBuilder(
+    column: $table.outcome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get localDay => $composableBuilder(
+    column: $table.localDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VocabularyEntriesTableOrderingComposer get entryId {
+    final $$VocabularyEntriesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableOrderingComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ReviewEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReviewEventsTable> {
+  $$ReviewEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<CardDirection, String> get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<ReviewOutcome, String> get outcome =>
+      $composableBuilder(column: $table.outcome, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get localDay =>
+      $composableBuilder(column: $table.localDay, builder: (column) => column);
+
+  $$VocabularyEntriesTableAnnotationComposer get entryId {
+    final $$VocabularyEntriesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.entryId,
+          referencedTable: $db.vocabularyEntries,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$VocabularyEntriesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.vocabularyEntries,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ReviewEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ReviewEventsTable,
+          ReviewEventRow,
+          $$ReviewEventsTableFilterComposer,
+          $$ReviewEventsTableOrderingComposer,
+          $$ReviewEventsTableAnnotationComposer,
+          $$ReviewEventsTableCreateCompanionBuilder,
+          $$ReviewEventsTableUpdateCompanionBuilder,
+          (ReviewEventRow, $$ReviewEventsTableReferences),
+          ReviewEventRow,
+          PrefetchHooks Function({bool entryId})
+        > {
+  $$ReviewEventsTableTableManager(_$AppDatabase db, $ReviewEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReviewEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReviewEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReviewEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> entryId = const Value.absent(),
+                Value<String> sessionId = const Value.absent(),
+                Value<CardDirection> direction = const Value.absent(),
+                Value<ReviewOutcome> outcome = const Value.absent(),
+                Value<DateTime> reviewedAt = const Value.absent(),
+                Value<String> localDay = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ReviewEventsCompanion(
+                id: id,
+                entryId: entryId,
+                sessionId: sessionId,
+                direction: direction,
+                outcome: outcome,
+                reviewedAt: reviewedAt,
+                localDay: localDay,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> entryId = const Value.absent(),
+                required String sessionId,
+                required CardDirection direction,
+                required ReviewOutcome outcome,
+                required DateTime reviewedAt,
+                required String localDay,
+                Value<int> rowid = const Value.absent(),
+              }) => ReviewEventsCompanion.insert(
+                id: id,
+                entryId: entryId,
+                sessionId: sessionId,
+                direction: direction,
+                outcome: outcome,
+                reviewedAt: reviewedAt,
+                localDay: localDay,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ReviewEventsTable, ReviewEventRow>(table),
+                  $$ReviewEventsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({entryId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (entryId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.entryId,
+                        referencedTable: $$ReviewEventsTableReferences
+                            ._entryIdTable(db),
+                        referencedColumn: $$ReviewEventsTableReferences
+                            ._entryIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ReviewEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ReviewEventsTable,
+      ReviewEventRow,
+      $$ReviewEventsTableFilterComposer,
+      $$ReviewEventsTableOrderingComposer,
+      $$ReviewEventsTableAnnotationComposer,
+      $$ReviewEventsTableCreateCompanionBuilder,
+      $$ReviewEventsTableUpdateCompanionBuilder,
+      (ReviewEventRow, $$ReviewEventsTableReferences),
+      ReviewEventRow,
+      PrefetchHooks Function({bool entryId})
+    >;
+typedef $$AppSettingsTableCreateCompanionBuilder =
+    AppSettingsCompanion Function({
+      required String key,
+      required String value,
+      Value<int> rowid,
+    });
+typedef $$AppSettingsTableUpdateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<int> rowid,
+    });
+
+class $$AppSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AppSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AppSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+}
+
+class $$AppSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AppSettingsTable,
+          AppSettingRow,
+          $$AppSettingsTableFilterComposer,
+          $$AppSettingsTableOrderingComposer,
+          $$AppSettingsTableAnnotationComposer,
+          $$AppSettingsTableCreateCompanionBuilder,
+          $$AppSettingsTableUpdateCompanionBuilder,
+          (
+            AppSettingRow,
+            BaseReferences<_$AppDatabase, $AppSettingsTable, AppSettingRow>,
+          ),
+          AppSettingRow,
+          PrefetchHooks Function()
+        > {
+  $$AppSettingsTableTableManager(_$AppDatabase db, $AppSettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> key = const Value.absent(),
+            Value<String> value = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) => AppSettingsCompanion(key: key, value: value, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                Value<int> rowid = const Value.absent(),
+              }) => AppSettingsCompanion.insert(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AppSettingsTable, AppSettingRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AppSettingsTable,
+                    AppSettingRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AppSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AppSettingsTable,
+      AppSettingRow,
+      $$AppSettingsTableFilterComposer,
+      $$AppSettingsTableOrderingComposer,
+      $$AppSettingsTableAnnotationComposer,
+      $$AppSettingsTableCreateCompanionBuilder,
+      $$AppSettingsTableUpdateCompanionBuilder,
+      (
+        AppSettingRow,
+        BaseReferences<_$AppDatabase, $AppSettingsTable, AppSettingRow>,
+      ),
+      AppSettingRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4936,4 +7801,11 @@ class $AppDatabaseManager {
       $$VocabularyMeaningsTableTableManager(_db, _db.vocabularyMeanings);
   $$FlashcardsTableTableManager get flashcards =>
       $$FlashcardsTableTableManager(_db, _db.flashcards);
+  $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
+  $$EntryTagsTableTableManager get entryTags =>
+      $$EntryTagsTableTableManager(_db, _db.entryTags);
+  $$ReviewEventsTableTableManager get reviewEvents =>
+      $$ReviewEventsTableTableManager(_db, _db.reviewEvents);
+  $$AppSettingsTableTableManager get appSettings =>
+      $$AppSettingsTableTableManager(_db, _db.appSettings);
 }

@@ -37,10 +37,6 @@ class AppLocalizationsFa extends AppLocalizations {
   String get dashboardWords => 'لغات';
 
   @override
-  String get dashboardReviewPending =>
-      'مرور روزانه با الگوریتم FSRS در نسخه‌های بعدی فعال می‌شود.';
-
-  @override
   String get dashboardYourDecks => 'دسته‌های شما';
 
   @override
@@ -286,7 +282,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get sourceManual => 'ورود دستی';
 
   @override
-  String get sourceCsv => 'فایل CSV';
+  String get sourceCsv => 'وارد شده از فایل (CSV یا Anki)';
 
   @override
   String get sourceImage => 'اسکن کتاب';
@@ -1131,7 +1127,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get aiIntroBody =>
-      'برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. هزینهٔ هر درخواست از اعتبار حساب OpenRouter شما کم می‌شود. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.';
+      'برای پیشنهاد معنی، مثال و نکات دستوری، AI WortBox از حساب OpenRouter خود شما استفاده می‌کند. به‌طور پیش‌فرض فقط مدل‌های رایگان استفاده می‌شوند و هزینه‌ای کم نمی‌شود؛ مدل‌های رایگان سقف روزانه دارند. AI WortBox کلید یا حساب مشترکی ندارد و بدون کلید شما هیچ درخواستی نمی‌فرستد.';
 
   @override
   String get aiGetKey => 'دریافت کلید در openrouter.ai/keys';
@@ -1231,7 +1227,7 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get aiModelHelper =>
-      'فهرستی منتخب از مدل‌های کم‌هزینه که خروجی ساختاریافته دارند. قیمت‌ها در openrouter.ai آمده است.';
+      'فهرستی منتخب از مدل‌های کم‌هزینه با خروجی ساختاریافته که فقط وقتی «فقط مدل‌های رایگان» خاموش است استفاده می‌شود. قیمت‌ها در openrouter.ai آمده است.';
 
   @override
   String get aiPrivacyTitle => 'حریم خصوصی و اتصال';
@@ -1246,6 +1242,180 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String get aiSecurityBody =>
       'کلید در حافظهٔ امن سیستم (Keychain در iOS، Keystore در اندروید) نگه داشته می‌شود؛ هرگز نمایش داده نمی‌شود و در پایگاه داده، گزارش‌ها یا پشتیبان قرار نمی‌گیرد. این کار خطر را کم می‌کند، اما روی دستگاهی آلوده یا دستکاری‌شده، استخراج کلید ناممکن نیست. در OpenRouter برای این کلید سقف اعتبار تعیین کنید.';
+
+  @override
+  String get aiFreeTitle => 'استفادهٔ رایگان';
+
+  @override
+  String get aiFreeOnly => 'فقط مدل‌های رایگان';
+
+  @override
+  String get aiFreeOnlyOn =>
+      'هیچ درخواستی هزینه ندارد: فقط مدل‌هایی که رایگان بودنشان تأیید شده استفاده می‌شوند و از OpenRouter خواسته می‌شود هر مورد پولی را رد کند.';
+
+  @override
+  String get aiFreeOnlyOff =>
+      'خاموش: مدل زیر استفاده می‌شود و هزینه‌اش از اعتبار OpenRouter شما کم می‌شود.';
+
+  @override
+  String get aiPaidConfirmTitle => 'از مدل‌های پولی استفاده شود؟';
+
+  @override
+  String get aiPaidConfirmBody =>
+      'در این صورت هزینهٔ هر درخواست از اعتبار OpenRouter شما کم می‌شود. مدل‌های رایگان معمولاً برای واژگان کافی‌اند.';
+
+  @override
+  String get aiPaidConfirm => 'استفاده از مدل‌های پولی';
+
+  @override
+  String get aiRoutingAuto => 'رایگان خودکار';
+
+  @override
+  String get aiRoutingQuality => 'رایگان باکیفیت';
+
+  @override
+  String get aiRoutingAutoHelp =>
+      'مسیریاب رایگان OpenRouter یکی از مدل‌های رایگانِ در دسترس را انتخاب می‌کند.';
+
+  @override
+  String get aiRoutingQualityHelp =>
+      'ابتدا مدل‌های رایگانِ با امتیاز بالاتر و سپس مسیریاب رایگان امتحان می‌شوند. فهرست مدل‌های رایگان پیش از استفاده در OpenRouter بررسی می‌شود.';
+
+  @override
+  String get aiQualityUnverified =>
+      'فهرست مدل‌های رایگان هنوز تأیید نشده است، پس از مسیریاب رایگان استفاده می‌شود. برای بررسی، وضعیت را به‌روز کنید.';
+
+  @override
+  String aiFreeModelsVerified(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString مدل رایگان تأیید شد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String aiCurrentModel(String model) {
+    return 'مدل فعلی: $model';
+  }
+
+  @override
+  String aiLastModel(String model) {
+    return 'آخرین پاسخ از: $model';
+  }
+
+  @override
+  String get aiLastModelNone => 'هنوز درخواستی فرستاده نشده است.';
+
+  @override
+  String get aiBatchSize => 'تعداد لغت در هر درخواست';
+
+  @override
+  String get aiBatchSizeHelp =>
+      'درخواست کمتر یعنی مصرف کمتر از سهمیهٔ رایگان روزانه؛ دسته‌های کوچک‌تر مطمئن‌ترند.';
+
+  @override
+  String aiQuotaRemaining(int remaining, int limit) {
+    final intl.NumberFormat remainingNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String remainingString = remainingNumberFormat.format(remaining);
+    final intl.NumberFormat limitNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String limitString = limitNumberFormat.format(limit);
+
+    return 'حدود $remainingString از $limitString درخواست رایگان امروز باقی مانده است';
+  }
+
+  @override
+  String aiQuotaRemainingNoLimit(int remaining) {
+    final intl.NumberFormat remainingNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String remainingString = remainingNumberFormat.format(remaining);
+
+    return 'حدود $remainingString درخواست رایگان امروز باقی مانده است';
+  }
+
+  @override
+  String get aiQuotaUnknown =>
+      'درخواست‌های رایگان باقی‌ماندهٔ امروز: هنوز بررسی نشده است. کلید را آزمایش یا وضعیت را به‌روز کنید.';
+
+  @override
+  String aiQuotaSentToday(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'فرستاده‌شده از این برنامه در امروز: $countString';
+  }
+
+  @override
+  String get aiRateReady => 'آماده';
+
+  @override
+  String aiRateCooling(String time) {
+    return 'محدودیت تعداد درخواست — منتظر تا $time';
+  }
+
+  @override
+  String aiRatePaused(String time) {
+    return 'سهمیهٔ رایگان روزانه تمام شده — متوقف تا $time';
+  }
+
+  @override
+  String aiRatePacing(int seconds) {
+    final intl.NumberFormat secondsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String secondsString = secondsNumberFormat.format(seconds);
+
+    return 'هر بار یک درخواست، با دست‌کم $secondsString ثانیه فاصله.';
+  }
+
+  @override
+  String aiCacheStats(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString نتیجهٔ ذخیره‌شدهٔ هوش مصنوعی',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String aiCacheUsage(int hits, int misses) {
+    final intl.NumberFormat hitsNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String hitsString = hitsNumberFormat.format(hits);
+    final intl.NumberFormat missesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String missesString = missesNumberFormat.format(misses);
+
+    return '$hitsString بار استفادهٔ دوباره · $missesString بار درخواست';
+  }
+
+  @override
+  String get aiCacheClear => 'پاک کردن نتایج ذخیره‌شده';
+
+  @override
+  String get aiCacheCleared => 'نتایج ذخیره‌شده پاک شد.';
+
+  @override
+  String get aiRefreshUsage => 'به‌روزرسانی وضعیت';
+
+  @override
+  String get aiUsageRefreshFailed => 'وضعیت از OpenRouter دریافت نشد.';
+
+  @override
+  String get aiPrefsSaveFailed => 'تنظیم ذخیره نشد. دوباره امتحان کنید.';
 
   @override
   String get enrichTitle => 'پیشنهادهای هوش مصنوعی';
@@ -1392,6 +1562,30 @@ class AppLocalizationsFa extends AppLocalizations {
   }
 
   @override
+  String get enrichNoCost => 'مدل‌های رایگان — بدون هزینه';
+
+  @override
+  String get enrichFreeOnly => 'فقط مدل‌های رایگان — بدون هزینه.';
+
+  @override
+  String enrichResume(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'یک اجرای ناتمام پیدا شد: $countString لغت باقی مانده است. لغت‌های انجام‌شده حفظ شده‌اند.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get enrichFromCache => 'نتیجهٔ ذخیره‌شده — چیزی فرستاده نشد';
+
+  @override
   String get enrichConflict =>
       'برخی لغت‌ها در این فاصله تغییر کرده‌اند، پس چیزی ذخیره نشد. دوباره پیشنهاد بگیرید.';
 
@@ -1439,4 +1633,567 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get aiErrorCancelled => 'متوقف شد.';
+
+  @override
+  String get aiErrorDailyQuota =>
+      'درخواست‌های رایگان امروزِ حساب OpenRouter شما تمام شده است. هوش مصنوعی تا بازنشانی روزانه (ساعت ۰۰:۰۰ UTC) متوقف می‌ماند و تا آن زمان چیزی فرستاده نمی‌شود.';
+
+  @override
+  String get aiErrorPaidBlocked =>
+      'برای رایگان ماندن متوقف شد: OpenRouter با مدل یا هزینه‌ای پاسخ داد که رایگان بودنش تأیید نشد. درخواست دیگری فرستاده نشد.';
+
+  @override
+  String get actionBack => 'بازگشت';
+
+  @override
+  String get csvFieldTags => 'برچسب‌ها';
+
+  @override
+  String get deckImportFile => 'وارد کردن فایل (CSV یا Anki)';
+
+  @override
+  String get deckMoreActions => 'کارهای بیشتر';
+
+  @override
+  String get searchAllTitle => 'جستجو در همه لغت‌ها';
+
+  @override
+  String get searchClear => 'پاک کردن متن جستجو';
+
+  @override
+  String searchLimited(int count) {
+    return 'فقط $count نتیجهٔ اول نمایش داده می‌شود؛ جستجو را دقیق‌تر کنید.';
+  }
+
+  @override
+  String get filterDifficult => 'لغت‌های دشوار';
+
+  @override
+  String get filterTag => 'برچسب';
+
+  @override
+  String get filterAllTags => 'همه برچسب‌ها';
+
+  @override
+  String get filterClear => 'حذف فیلترها';
+
+  @override
+  String entryInDeck(String deck) {
+    return 'در دستهٔ $deck';
+  }
+
+  @override
+  String get entryDifficult => 'دشوار';
+
+  @override
+  String get entryMarkDifficult => 'علامت‌گذاری به‌عنوان دشوار';
+
+  @override
+  String get entryUnmarkDifficult => 'برداشتن علامت دشوار';
+
+  @override
+  String get tagsTitle => 'برچسب‌ها';
+
+  @override
+  String get tagsSettingsDescription => 'ساختن، تغییر نام و حذف برچسب‌ها';
+
+  @override
+  String get tagsEmptyTitle => 'هنوز برچسبی ندارید';
+
+  @override
+  String get tagsEmptyHint =>
+      'با برچسب‌هایی مثل «B1» یا «سفر» لغت‌ها را دسته‌بندی کنید.';
+
+  @override
+  String get tagsAdd => 'افزودن برچسب';
+
+  @override
+  String get tagsEdit => 'ویرایش برچسب‌ها';
+
+  @override
+  String get tagsEditTitle => 'برچسب‌های این لغت';
+
+  @override
+  String get tagNewLabel => 'برچسب تازه';
+
+  @override
+  String get tagNameLabel => 'نام برچسب';
+
+  @override
+  String get tagCreate => 'برچسب تازه';
+
+  @override
+  String get tagRename => 'تغییر نام برچسب';
+
+  @override
+  String tagWordCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count لغت',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String tagDeleteTitle(String name) {
+    return 'برچسب «$name» حذف شود؟';
+  }
+
+  @override
+  String tagDeleteBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'برچسب از $count لغت برداشته می‌شود. خود لغت‌ها حذف نمی‌شوند.',
+      zero: 'این برچسب به هیچ لغتی داده نشده است.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get tagErrorEmpty => 'نام برچسب را بنویسید.';
+
+  @override
+  String tagErrorTooLong(int max) {
+    return 'نام برچسب حداکثر $max نویسه است.';
+  }
+
+  @override
+  String get tagErrorDuplicate => 'برچسبی با همین نام وجود دارد.';
+
+  @override
+  String get exportCsv => 'خروجی CSV';
+
+  @override
+  String get exportAnki => 'خروجی برای Anki (‎.apkg‎)';
+
+  @override
+  String get exportSaved => 'فایل ذخیره شد.';
+
+  @override
+  String get exportCancelled => 'ذخیرهٔ فایل لغو شد.';
+
+  @override
+  String get exportEmpty => 'این دسته لغتی برای خروجی ندارد.';
+
+  @override
+  String get exportWriteFailed => 'فایل ذخیره نشد. جای دیگری را امتحان کنید.';
+
+  @override
+  String get ankiImportTitle => 'وارد کردن از Anki';
+
+  @override
+  String get ankiImportDescription => 'یک بستهٔ ‎.apkg‎ از Anki انتخاب کنید';
+
+  @override
+  String get ankiImportIntro =>
+      'در Anki یک دسته را با قالب «Anki Deck Package (‎.apkg‎)» خروجی بگیرید و اینجا انتخاب کنید. فیلدهای یادداشت‌ها را به لغت و معنی وصل کنید.';
+
+  @override
+  String get ankiImportNote =>
+      'فقط متن یادداشت‌ها و برچسب‌ها وارد می‌شود؛ تصویر، صدا و سابقهٔ مرور Anki وارد نمی‌شود.';
+
+  @override
+  String ankiNoteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count یادداشت Anki',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ankiErrorNotPackage =>
+      'این فایل بستهٔ Anki (‎.apkg‎) نیست یا آسیب دیده است.';
+
+  @override
+  String get ankiErrorUnsupported => 'قالب این بستهٔ Anki پشتیبانی نمی‌شود.';
+
+  @override
+  String get ankiErrorNoNotes => 'این بستهٔ Anki هیچ یادداشتی ندارد.';
+
+  @override
+  String ankiErrorTooLarge(int size) {
+    return 'بستهٔ Anki بزرگ‌تر از $size مگابایت است.';
+  }
+
+  @override
+  String get speakWord => 'تلفظ لغت';
+
+  @override
+  String get speakExample => 'خواندن جملهٔ مثال';
+
+  @override
+  String get speechVoiceUnavailable =>
+      'صدای آلمانی روی این دستگاه نصب نیست. در تنظیمات «تبدیل متن به گفتار» دستگاه آن را نصب کنید.';
+
+  @override
+  String get speechFailed => 'پخش تلفظ ممکن نشد.';
+
+  @override
+  String get settingsStudy => 'مطالعه';
+
+  @override
+  String get reminderTitle => 'یادآور مطالعه';
+
+  @override
+  String get reminderIntro =>
+      'هر روز در ساعتی که انتخاب می‌کنید یک اعلان روی همین دستگاه نمایش داده می‌شود. هیچ سروری استفاده نمی‌شود.';
+
+  @override
+  String get reminderEnabled => 'یادآور روزانه';
+
+  @override
+  String get reminderTime => 'ساعت یادآوری';
+
+  @override
+  String get reminderOff => 'خاموش';
+
+  @override
+  String reminderOnAt(String time) {
+    return 'هر روز ساعت $time';
+  }
+
+  @override
+  String get reminderNote =>
+      'برای روشن کردن یادآور، اجازهٔ نمایش اعلان خواسته می‌شود. در اندروید ممکن است اعلان چند دقیقه دیرتر برسد و برخی گوشی‌ها برای صرفه‌جویی در باتری آن را متوقف کنند.';
+
+  @override
+  String get reminderPermissionDenied =>
+      'اجازهٔ اعلان داده نشد. آن را در تنظیمات دستگاه برای AI WortBox فعال کنید.';
+
+  @override
+  String get reminderSchedulingFailed => 'یادآور تنظیم نشد. دوباره تلاش کنید.';
+
+  @override
+  String get reminderNotificationTitle => 'وقت مرور لغت‌هاست';
+
+  @override
+  String get reminderNotificationBody =>
+      'چند دقیقه با لغت‌های آلمانی خود تمرین کنید.';
+
+  @override
+  String get practiceTitle => 'مرور لغت‌ها';
+
+  @override
+  String get practiceTileDescription =>
+      'جهت مرور، دسته و تمرین آزاد را انتخاب کنید';
+
+  @override
+  String practiceTileStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count روز پیاپی تمرین',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get practiceIntro =>
+      'در هر کارت فقط یک طرف نمایش داده می‌شود. پاسخ را به یاد بیاورید، سپس آن را ببینید و بگویید به یاد آوردید یا نه.';
+
+  @override
+  String get practiceNotSrs =>
+      'این تمرین آزاد است و زمان‌بندی مرور (FSRS) را تغییر نمی‌دهد. فقط نتیجهٔ شما برای آمار ثبت می‌شود.';
+
+  @override
+  String get practiceWordsFrom => 'لغت‌ها از';
+
+  @override
+  String get practiceAllDecks => 'همه دسته‌ها';
+
+  @override
+  String get practiceDifficultOnly => 'فقط لغت‌های دشوار';
+
+  @override
+  String get practiceStart => 'شروع تمرین';
+
+  @override
+  String get practiceEnd => 'پایان تمرین';
+
+  @override
+  String practiceProgress(String current, String total) {
+    return '$current از $total';
+  }
+
+  @override
+  String get practicePrompt => 'لغت آلمانی این معنی چیست؟';
+
+  @override
+  String get practiceReveal => 'نمایش پاسخ';
+
+  @override
+  String get practiceAsk => 'آن را به یاد آوردید؟';
+
+  @override
+  String get practiceRemembered => 'به یاد آوردم';
+
+  @override
+  String get practiceForgotten => 'به یاد نیاوردم';
+
+  @override
+  String get practiceEmptyTitle => 'لغتی برای تمرین نیست';
+
+  @override
+  String get practiceEmptyBody =>
+      'برای این تمرین لغت‌هایی لازم است که معنی فارسی دارند.';
+
+  @override
+  String get practiceEmptyDifficult =>
+      'هیچ لغت دشواری با معنی فارسی پیدا نشد. در صفحهٔ هر لغت می‌توانید آن را دشوار علامت بزنید.';
+
+  @override
+  String get practiceDoneTitle => 'تمرین تمام شد';
+
+  @override
+  String practiceRememberedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count لغت را به یاد آوردید',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String practiceForgottenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count لغت را به یاد نیاوردید',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get practiceFinish => 'بازگشت به امروز';
+
+  @override
+  String get practiceSeeStatistics => 'دیدن آمار';
+
+  @override
+  String get statsWords => 'لغت‌ها';
+
+  @override
+  String get statsDifficult => 'لغت‌های دشوار';
+
+  @override
+  String get statsReviews => 'پاسخ‌های ثبت‌شده';
+
+  @override
+  String get statsRemembered => 'به یاد آورده';
+
+  @override
+  String get statsSessions => 'جلسه‌های تمرین';
+
+  @override
+  String get statsStudyDays => 'روزهای تمرین';
+
+  @override
+  String get statsCurrentStreak => 'روزهای پیاپی فعلی';
+
+  @override
+  String get statsLongestStreak => 'طولانی‌ترین زنجیره';
+
+  @override
+  String statsDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count روز',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsRecentDays => 'پاسخ‌ها در ۱۴ روز اخیر';
+
+  @override
+  String get statsEmptyBody =>
+      'آمار تمرین از پاسخ‌هایی ساخته می‌شود که در تمرین ثبت می‌کنید. هنوز پاسخی ثبت نشده است.';
+
+  @override
+  String get statsPolicy =>
+      'فقط پاسخ‌هایی شمرده می‌شوند که پس از نمایش پاسخ ثبت کرده‌اید؛ باز کردن برنامه یا یک لغت شمرده نمی‌شود. هر روز طبق ساعت همین دستگاه از نیمه‌شب تا نیمه‌شب است. زنجیره تا وقتی ادامه دارد که دیروز یا امروز تمرین کرده باشید. این آمار به معنای به‌خاطرسپاری همیشگی نیست.';
+
+  @override
+  String get practiceScheduledNote =>
+      'مرور زمان‌بندی‌شده: فقط کارت‌هایی که موعدشان رسیده نمایش داده می‌شوند و هر پاسخ، زمان مرور بعدی را با الگوریتم FSRS تعیین می‌کند. لغت‌های جدید طبق سقف روزانهٔ هر دسته اضافه می‌شوند.';
+
+  @override
+  String get practiceFreeMode => 'تمرین آزاد (زمان‌بندی تغییر نمی‌کند)';
+
+  @override
+  String get practicePromptMeaning => 'معنی این لغت آلمانی چیست؟';
+
+  @override
+  String get practiceEmptyDueTitle => 'فعلاً کارتی برای مرور نیست';
+
+  @override
+  String get practiceEmptyDueBody =>
+      'همهٔ کارت‌های موعددار مرور شده‌اند و کارت‌های بعدی در زمان خودشان برمی‌گردند. می‌توانید بدون تغییر زمان‌بندی، تمرین آزاد کنید.';
+
+  @override
+  String get practiceFreeInstead => 'تمرین آزاد';
+
+  @override
+  String get practiceScheduledDone => 'زمان مرور بعدی هر کارت ذخیره شد.';
+
+  @override
+  String get reviewDirectionTitle => 'جهت مرور';
+
+  @override
+  String get reviewDirectionGermanToPersian => 'آلمانی ← فارسی';
+
+  @override
+  String get reviewDirectionPersianToGerman => 'فارسی ← آلمانی';
+
+  @override
+  String get reviewDirectionBoth => 'هر دو جهت';
+
+  @override
+  String get reviewDirectionBothNote =>
+      'هر لغت دو کارت جدا با زمان‌بندی مستقل دارد. هر لغت در هر روز فقط در یک جهت پرسیده می‌شود؛ اول جهتی که موعدش زودتر است (در کارت‌های جدید، آلمانی ← فارسی).';
+
+  @override
+  String get reviewStart => 'شروع مرور';
+
+  @override
+  String reviewDueCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString کارت برای مرور',
+      zero: 'فعلاً کارتی برای مرور نیست',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewDueShort(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString کارت',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckShowMeanings => 'نمایش معنی‌ها';
+
+  @override
+  String get deckHideMeanings => 'پنهان کردن معنی‌ها';
+
+  @override
+  String selectionCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString انتخاب‌شده',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get selectionSelectAll => 'انتخاب همه';
+
+  @override
+  String get selectionClear => 'لغو همهٔ انتخاب‌ها';
+
+  @override
+  String get selectionExit => 'خروج از حالت انتخاب';
+
+  @override
+  String get selectionDelete => 'حذف انتخاب‌شده‌ها';
+
+  @override
+  String bulkDeleteTitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString لغت حذف شود؟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkDeleteBody =>
+      'معنی‌ها، برچسب‌ها و زمان‌بندی مرور این لغت‌ها هم حذف می‌شوند. پاسخ‌های ثبت‌شده برای آمار باقی می‌مانند. این کار برگشت‌پذیر نیست.';
+
+  @override
+  String bulkDeleted(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString لغت حذف شد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanViewImage => 'انتخاب روی عکس';
+
+  @override
+  String get scanViewText => 'نمایش متن';
+
+  @override
+  String get scanImageHint =>
+      'روی لغت بزنید تا انتخاب شود. برای چند لغت پشت سر هم، روی اولی نگه دارید و تا آخری بکشید. با دو انگشت بزرگ‌نمایی کنید.';
+
+  @override
+  String get scanPageImageLabel => 'عکس صفحه';
+
+  @override
+  String get scanRegionMode => 'انتخاب ناحیه';
+
+  @override
+  String get scanRegionHint =>
+      'دور متنی که درست خوانده نشده یک کادر بکشید تا دوباره خوانده شود.';
+
+  @override
+  String get scanRegionTitle => 'متن ناحیهٔ انتخاب‌شده';
+
+  @override
+  String get scanRegionHelper =>
+      'در صورت نیاز اصلاح کنید؛ فقط همین متن اضافه می‌شود.';
+
+  @override
+  String get scanRegionAdd => 'افزودن';
+
+  @override
+  String get scanRegionEmpty =>
+      'در این ناحیه متنی پیدا نشد. کادر بزرگ‌تری بکشید.';
+
+  @override
+  String get scanRegionFailed => 'خواندن این ناحیه ممکن نشد. دوباره تلاش کنید.';
+
+  @override
+  String get scanSplitWords => 'جدا کردن به لغت‌های تکی';
+
+  @override
+  String get scanRemoveSelection => 'حذف از انتخاب';
 }

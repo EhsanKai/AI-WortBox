@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../features/review/domain/flashcard.dart';
+import '../../features/review/domain/review_event.dart';
 import '../../features/vocabulary/domain/vocabulary_entry.dart';
 
 // Schema conventions:
@@ -56,6 +57,15 @@ class VocabularyEntries extends Table {
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 
+  /// UTC time the user marked the word as difficult; null when not marked
+  /// (schema v2). A manual mark only: nothing sets it automatically.
+  DateTimeColumn get markedDifficultAt => dateTime().nullable()();
+
+  /// Comparison keys of the word, base form and meanings, one per line, for
+  /// search (schema v2). Derived from the content and rewritten by the
+  /// repository on every content change; never shown.
+  TextColumn get searchKey => text().withDefault(const Constant(''))();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -108,4 +118,70 @@ class Flashcards extends Table {
   List<Set<Column<Object>>> get uniqueKeys => [
     {entryId, direction},
   ];
+}
+
+/// User-defined labels such as "B1" or "travel" (schema v2).
+@DataClassName('TagRow')
+class Tags extends Table {
+  TextColumn get id => text()();
+
+  /// As entered (whitespace cleaned).
+  TextColumn get name => text().withLength(min: 1, max: 40)();
+
+  /// Case-insensitive key; two tags cannot differ only in case or spacing.
+  TextColumn get nameKey => text().unique()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Which tags an entry has (schema v2). Deleting an entry or a tag removes
+/// only the assignment rows.
+@DataClassName('EntryTagRow')
+@TableIndex(name: 'idx_entry_tags_tag', columns: {#tagId})
+class EntryTags extends Table {
+  TextColumn get entryId =>
+      text().references(VocabularyEntries, #id, onDelete: KeyAction.cascade)();
+  TextColumn get tagId =>
+      text().references(Tags, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {entryId, tagId};
+}
+
+/// Explicitly recorded reviews (schema v2). History is kept when the word is
+/// deleted: [entryId] is set to null.
+@DataClassName('ReviewEventRow')
+@TableIndex(name: 'idx_review_events_day', columns: {#localDay})
+class ReviewEvents extends Table {
+  TextColumn get id => text()();
+  TextColumn get entryId => text().nullable().references(
+    VocabularyEntries,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  TextColumn get sessionId => text()();
+  TextColumn get direction => textEnum<CardDirection>()();
+  TextColumn get outcome => textEnum<ReviewOutcome>()();
+  DateTimeColumn get reviewedAt => dateTime()();
+
+  /// `YYYY-MM-DD`, the device's local day at recording time.
+  TextColumn get localDay => text().withLength(min: 10, max: 10)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Small local key-value settings, e.g. the study reminder (schema v2).
+/// Never holds secrets: the AI key stays in OS secure storage.
+@DataClassName('AppSettingRow')
+class AppSettings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {key};
 }

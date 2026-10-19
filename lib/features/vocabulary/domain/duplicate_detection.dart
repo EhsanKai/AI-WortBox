@@ -77,10 +77,18 @@ enum DuplicateStrategy {
 /// A valid, cleaned draft from import row [rowNumber] (1-based data row).
 @immutable
 class ImportCandidate {
-  const ImportCandidate({required this.rowNumber, required this.draft});
+  const ImportCandidate({
+    required this.rowNumber,
+    required this.draft,
+    this.tags = const [],
+  });
 
   final int rowNumber;
   final VocabularyDraft draft;
+
+  /// Tag names to add to the entry the row creates or merges into. Skipped
+  /// rows add no tags.
+  final List<String> tags;
 }
 
 /// What happens to one import candidate.
