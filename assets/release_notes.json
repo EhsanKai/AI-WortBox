@@ -3,6 +3,25 @@
   "releases": [
     {
       "version": "1.0.0",
+      "build": 4,
+      "date": "2026-10-20",
+      "changes": {
+        "fa": [
+          "تمرین جمله با هوش مصنوعی: اصلاح علت محتمل خطای «جمله‌ها ساخته نشد». همهٔ مدل‌های رایگان پیش از پاسخ «فکر می‌کنند» و ظرفیت خروجی قبلی برای این کار کافی نبود؛ اکنون جای کافی داده می‌شود و فکر کردن کوتاه نگه داشته می‌شود. پاسخ‌هایی با متن اضافه یا شمارهٔ عددی هم پذیرفته می‌شوند و تمرین‌های معتبر یک پاسخ نیمه‌کامل حفظ می‌شوند. همچنان فقط مدل‌های رایگان. این اصلاح هنوز با یک درخواست واقعی تأیید نشده است.",
+          "پیام‌های خطای دقیق‌تر (پاسخ ناقص به‌خاطر «فکر کردن»، پاسخی بدون جملهٔ قابل استفاده) و «جزئیات فنی» بدون کلید و بدون لغت‌های شما، برای گزارش مشکل. همین اصلاح به پیشنهادهای معنی با هوش مصنوعی هم کمک می‌کند.",
+          "ظاهر کارت: برای هر لغت رنگ پس‌زمینه، رنگ متن، اندازهٔ جداگانهٔ لغت و معنی‌ها، برجسته‌سازی کلمه‌ها یا معنی‌ها و یک برچسب تصویری انتخاب کنید؛ با پیش‌نمایش، ذخیره، انصراف و بازگشت به پیش‌فرض. از صفحهٔ لغت یا کارت مرور («ظاهر کارت»). لغت، برنامهٔ مرور و سابقه تغییر نمی‌کنند.",
+          "پشتیبان‌گیری ظاهر کارت‌ها را هم ذخیره و بازگردانی می‌کند؛ فایل‌های پشتیبان قبلی همچنان قابل بازگردانی‌اند."
+        ],
+        "en": [
+          "AI sentence practice: fixes the likely cause of \"The sentences could not be created\". All free models \"think\" before answering, and the previous output limit left them no room to answer; there is now enough room and thinking is kept short. Answers with extra text or numeric ids are accepted, and the valid exercises of a partly valid answer are kept. Still free models only. Not yet confirmed with a real request.",
+          "Clearer error messages (answer cut off by \"thinking\", answer without a usable sentence) and \"Technical details\" without your key or words, for reporting problems. The same fix helps AI meaning suggestions.",
+          "Card appearance: choose a background colour, text colour, separate sizes for the word and the meanings, highlighted words or meanings and a sticker for each word, with a preview, Save, Cancel and Reset. From the word page or the review card (\"Card appearance\"). The word, its review schedule and history do not change.",
+          "Backups now include card appearances; earlier backup files can still be restored."
+        ]
+      }
+    },
+    {
+      "version": "1.0.0",
       "build": 3,
       "date": "2026-10-20",
       "changes": {

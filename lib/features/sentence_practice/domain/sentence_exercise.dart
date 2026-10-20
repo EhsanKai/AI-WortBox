@@ -79,7 +79,14 @@ class SentenceExercise {
 /// The result of generating a session's exercises.
 @immutable
 class GeneratedExercises {
-  const GeneratedExercises(this.exercises, {this.rejected = const []});
+  const GeneratedExercises(
+    this.exercises, {
+    this.rejected = const [],
+    this.rejectionSummary,
+  });
+
+  /// Content-free counts of why items were rejected (for diagnostics).
+  final String? rejectionSummary;
 
   /// Valid exercises, in the order of the requested words.
   final List<SentenceExercise> exercises;
@@ -87,6 +94,33 @@ class GeneratedExercises {
   /// Words whose exercise was missing or failed validation (e.g. the
   /// sentence did not contain the word). They are left out.
   final List<PracticeWord> rejected;
+}
+
+/// Why a generated exercise was left out.
+enum ExerciseRejection {
+  /// No item with this word's id.
+  missing,
+
+  /// The id appears twice.
+  duplicate,
+
+  /// The item is about another word.
+  otherWord,
+
+  /// The German sentence or the Persian translation is missing or too long.
+  missingFields,
+
+  /// The "German" sentence is not in Latin script.
+  germanNotGerman,
+
+  /// The "Persian" translation is not in Persian script.
+  persianNotPersian,
+
+  /// No recognisable form of the target word in the German sentence.
+  targetWordMissing,
+
+  /// The Persian text contains German sentence text.
+  revealsAnswer,
 }
 
 /// The overall judgement of an answer.

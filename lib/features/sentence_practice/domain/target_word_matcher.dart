@@ -47,20 +47,48 @@ abstract final class TargetWordMatcher {
     for (final m in _word.allMatches(text)) m[0]!,
   ];
 
+  /// Separators after which a saved word carries extra information, e.g.
+  /// "das Haus, die Häuser", "anfangen (fing an)", "sich erinnern an + Akk".
+  static final _annotation = RegExp(r'[,;/|(\[+=:]');
+
+  /// The headword of a saved word: the part before any annotation.
+  static String headword(String saved) {
+    final cut = saved.split(_annotation).first.trim();
+    return cut.isEmpty ? saved : cut;
+  }
+
   /// Whether [sentence] contains [original] (or its base form [lemma]) in
   /// some recognisable form.
-  static bool matches(String sentence, String original, {String? lemma}) {
+  static bool matches(String sentence, String original, {String? lemma}) =>
+      formIn(sentence, original, lemma: lemma) != null;
+
+  /// The words of [sentence] that are the target's form (joined by a
+  /// space, e.g. "fängt an" is reported as "fängt"), or null when the
+  /// target is not recognisably in it. Only the headword of [original] and
+  /// of [lemma] counts.
+  static String? formIn(String sentence, String original, {String? lemma}) {
     final tokens = words(sentence);
-    if (tokens.isEmpty) return false;
-    for (final target in {original, ?lemma}) {
-      final parts = [
+    if (tokens.isEmpty) return null;
+    for (final target in {
+      headword(original),
+      ?(lemma == null ? null : headword(lemma)),
+    }) {
+      final all = [
         for (final w in words(target))
           if (!_ignored.contains(w.toLowerCase()) && w.length >= 2) w,
       ];
-      if (parts.isEmpty) continue;
-      if (parts.every((p) => tokens.any((t) => _sameWord(t, p)))) return true;
+      // In longer expressions short function words ("in Frage kommen")
+      // still count; they must be there too.
+      if (all.isEmpty) continue;
+      final found = <String>[];
+      for (final part in all) {
+        final match = tokens.where((t) => _sameWord(t, part)).firstOrNull;
+        if (match == null) break;
+        found.add(match);
+      }
+      if (found.length == all.length) return found.join(' ');
     }
-    return false;
+    return null;
   }
 
   /// Whether [token] (from the sentence) is a form of [target].

@@ -14,6 +14,7 @@ import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
+import 'generated/schema_v4.dart' as v4;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -339,6 +340,132 @@ void main() {
       },
     );
   });
+
+  test(
+    'v3 → v4 keeps every v3 row unchanged (words, FSRS cards, review '
+    'and sentence-practice history) and adds an empty appearance table',
+    () async {
+      const t = '2026-10-20T08:00:00.000Z';
+      final decks = [
+        const v3.DecksData(
+          id: 'deck-1',
+          name: 'Kafka',
+          sourceLanguage: 'de',
+          definitionLanguage: 'fa',
+          dailyNewCardLimit: 20,
+          createdAt: t,
+          updatedAt: t,
+        ),
+      ];
+      final entries = [
+        const v3.VocabularyEntriesData(
+          id: 'e-1',
+          deckId: 'deck-1',
+          original: 'Haus\nHäuser',
+          normalized: 'haus häuser',
+          sourceLanguage: 'de',
+          definitionLanguage: 'fa',
+          sourceType: 'manual',
+          enrichmentStatus: 'ready',
+          createdAt: t,
+          updatedAt: t,
+          searchKey: 'haus',
+        ),
+      ];
+      final meanings = [
+        const v3.VocabularyMeaningsData(
+          id: 'm-1',
+          entryId: 'e-1',
+          position: 0,
+          meaning: 'خانه‌ها',
+        ),
+      ];
+      final cards = [
+        const v3.FlashcardsData(
+          id: 'c-1',
+          entryId: 'e-1',
+          direction: 'reverse',
+          state: 'learning',
+          step: 1,
+          stability: 1.25,
+          difficulty: 6.5,
+          due: '2026-10-20T08:10:00.000Z',
+          lastReviewedAt: t,
+          reviewCount: 1,
+          lapseCount: 0,
+          schedulerVersion: 'fsrs-2.0.1;default;retention=0.9',
+          createdAt: t,
+          updatedAt: t,
+        ),
+      ];
+      final events = [
+        const v3.ReviewEventsData(
+          id: 'r-1',
+          entryId: 'e-1',
+          sessionId: 's',
+          direction: 'reverse',
+          outcome: 'forgotten',
+          reviewedAt: t,
+          localDay: '2026-10-20',
+        ),
+      ];
+      final practice = [
+        const v3.SentencePracticeEventsData(
+          id: 'p-1',
+          entryId: 'e-1',
+          direction: 'produce',
+          level: 'b1',
+          outcome: 'acceptable',
+          practicedAt: t,
+        ),
+      ];
+
+      List<Map<String, Object?>> json(Iterable<Insertable<Object>> rows) => [
+        for (final r in rows)
+          {
+            for (final MapEntry(:key, :value) in r.toColumns(false).entries)
+              key: (value as Variable).value,
+          },
+      ];
+
+      await verifier.testWithDataIntegrity(
+        oldVersion: 3,
+        newVersion: 4,
+        createOld: v3.DatabaseAtV3.new,
+        createNew: v4.DatabaseAtV4.new,
+        openTestedDatabase: AppDatabase.new,
+        createItems: (batch, oldDb) {
+          batch.insertAll(oldDb.decks, decks);
+          batch.insertAll(oldDb.vocabularyEntries, entries);
+          batch.insertAll(oldDb.vocabularyMeanings, meanings);
+          batch.insertAll(oldDb.flashcards, cards);
+          batch.insertAll(oldDb.reviewEvents, events);
+          batch.insertAll(oldDb.sentencePracticeEvents, practice);
+        },
+        validateItems: (newDb) async {
+          expect(json(await newDb.select(newDb.decks).get()), json(decks));
+          expect(
+            json(await newDb.select(newDb.vocabularyEntries).get()),
+            json(entries),
+          );
+          expect(
+            json(await newDb.select(newDb.vocabularyMeanings).get()),
+            json(meanings),
+          );
+          expect(json(await newDb.select(newDb.flashcards).get()), json(cards));
+          expect(
+            json(await newDb.select(newDb.reviewEvents).get()),
+            json(events),
+          );
+          expect(
+            json(await newDb.select(newDb.sentencePracticeEvents).get()),
+            json(practice),
+          );
+          expect(await newDb.select(newDb.cardAppearances).get(), isEmpty);
+        },
+      );
+    },
+  );
 
   test('FSRS review works on a database created before scheduling was '
       'active: old words become new cards, existing card rows are reused, '

@@ -875,3 +875,87 @@ Status: accepted (product owner requirement for every release).
   without notes fails the test suite.
 - `AiWortBoxApp` takes an optional locale (default Persian) so tests
   verify the English LTR layout; the shipped UI stays Persian (D8).
+
+## D57 — Room for reasoning in free-model requests; AI diagnostics (2026-10-20)
+
+Status: accepted (fix for the Build 3 report "جمله‌ها ساخته نشد" on the
+iPhone). Refines D41.
+
+- Evidence (no live key was available, so no real request was made):
+  OpenRouter's public `GET /models` on 2026-10-20 lists 18 free models, all
+  reasoning models; several default to "high"/"max" effort or make
+  reasoning mandatory; only 4 support structured outputs. OpenRouter's
+  reasoning documentation states that reasoning tokens count against
+  `max_tokens` and that a too-small limit returns `finish_reason: length`
+  with empty content. Sentence generation sent `250 + 220 × words` tokens
+  (1,350 for 5 words) and no reasoning controls, so the free model could
+  spend the whole budget reasoning. `OpenRouterChat` turned that into
+  `malformedResponse` ("پاسخ مدل قابل استفاده نبود"), and the free
+  fallback repeated the same budget, so it failed every time.
+- Fix, shared by sentence practice and AI meanings: `max_tokens` =
+  3,000 (reasoning allowance) + the expected visible answer, at most 8,000;
+  in free-only mode also `reasoning: {effort: "low", exclude: true}`
+  ("low" is accepted by models with mandatory reasoning; "none" is not).
+  With free-only off nothing is added (a catalog model without the
+  parameter could otherwise find no endpoint under `require_parameters`).
+  Sentence practice waits 90 s for generation and 60 s for a check
+  (enrichment keeps 45 s). Free-only rules, pacing, retries and the D32
+  rule are unchanged.
+- Parsing: JSON is also found after `<think>` blocks, inside a code fence
+  anywhere, or between harmless text; numeric ids are accepted; the echoed
+  word may differ by article or annotation; a saved word with annotations
+  ("das Haus, die Häuser", "anfangen (fing an)") is matched by its
+  headword; a missing or wrong `usedForm` falls back to the form found in
+  the sentence; one German word in the Persian text is allowed (three in a
+  row still count as revealing the answer). Valid items of a partly valid
+  answer are kept; none valid is `noUsableItems`.
+- Errors: `EnrichmentException` carries a `ResponseProblem`
+  (cutOffWhileReasoning, cutOff, empty, notJson, unexpectedShape,
+  noUsableItems, contradictory) with its own message for the cut-off and
+  no-usable cases, plus the list of attempts (`AiAttempt`: requested and
+  answering model, output mode, HTTP status, error, finish reason, token
+  and reasoning-token counts, content length, rejection counts). The
+  sentence-practice failure screen shows them under "Technical details";
+  each attempt is also written to the device log (`debugPrint`). Neither
+  contains the key, prompts, answers or vocabulary.
+- Not verified: a live request. If it still fails on the phone, the
+  technical details show which case it is.
+
+## D58 — Card appearance (2026-10-20)
+
+Status: accepted (product owner request for Build 4). No earlier
+requirement existed in the repository.
+
+- Storage: schema v4 table `card_appearances`, one optional row per word
+  (primary key = entry id, cascade on delete): background, text colour,
+  word size, meaning size, highlight colour, highlights (JSON), sticker,
+  `updated_at`. No row = the standard look, so older words need no
+  backfill. Separate from `vocabulary_entries` so styling never changes a
+  word's `updated_at` (AI suggestions' conflict check) or content, and never
+  touches `flashcards` or `review_events`. Saving the standard look deletes
+  the row. Additive migration, tested from real v3 data.
+- Colours are named swatches (6 backgrounds, 4 text colours, 4 markers)
+  with light and dark variants; a test checks 4.5:1 for every text colour
+  on every background, highlight and the page/answer surfaces in both
+  themes. Choices are stored by name; unknown names read as the default.
+- Sizes: 85–160 % in five steps, separately for the German word and the
+  Persian meanings; text wraps (tested at 160 % with 1.5× system text on a
+  320 pt screen).
+- Highlighting (smallest safe version): whole words of the German entry
+  and whole meanings, stored as the text itself (case-, space- and Persian
+  letter-variant-insensitive), not as character offsets. The stored word
+  is rendered unchanged (line breaks, umlauts, ZWNJ); an edit can only
+  make a highlight disappear. Arbitrary character ranges are deferred.
+- Stickers: 12 built-in emoji (no assets, no network), shown in their own
+  corner row above the text, never over it.
+- UI: "Card appearance" on the word page (app bar) and on the review card
+  after the reveal (opens on top of the session; nothing is recorded).
+  Live preview of both faces, Save, Cancel (asks before discarding),
+  Reset (to the standard look, saved with Save). Shown on the review
+  prompt card (background, sticker, text) and answer (text), and on the
+  word page.
+- Backup: optional `cardAppearances` list, files now record schema 4, so
+  the Build 3 app rejects them ("newer version") instead of silently
+  dropping appearances; schema-3 files without the list restore unchanged.
+  Merge brings an appearance only with a word it adds; replace restores
+  them all.

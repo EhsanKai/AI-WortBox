@@ -104,11 +104,13 @@ void main() {
   Future<void> reveal(WidgetTester tester) =>
       scrollAndTap(tester, find.byKey(const Key('practice.reveal')));
 
-  String textOf(WidgetTester tester, String key) => tester
-      .widget<Text>(
-        find.descendant(of: find.byKey(Key(key)), matching: find.byType(Text)),
-      )
-      .data!;
+  String textOf(WidgetTester tester, String key) {
+    final text = tester.widget<Text>(
+      find.descendant(of: find.byKey(Key(key)), matching: find.byType(Text)),
+    );
+    // Card text may be rich (highlights).
+    return text.data ?? text.textSpan!.toPlainText();
+  }
 
   TextDirection? directionOf(WidgetTester tester, String key) => tester
       .widget<Text>(

@@ -691,7 +691,9 @@ void main() {
           ((sent['messages']! as List).first as Map)['content']! as String;
       expect(system, contains('Give only meanings'));
       expect(system, isNot(contains('exampleSentence')));
-      expect(sent['max_tokens'], 200 + 250 * 3);
+      // Room for the free models' (low-effort) reasoning plus the answer.
+      expect(sent['max_tokens'], 3000 + 200 + 250 * 3);
+      expect(sent['reasoning'], {'effort': 'low', 'exclude': true});
       final user = jsonDecode(
         ((sent['messages']! as List).last as Map)['content']! as String,
       ) as Map;

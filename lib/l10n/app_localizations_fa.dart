@@ -3012,4 +3012,129 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get spBackToToday => 'بازگشت به مرور امروز';
+
+  @override
+  String get aiErrorCutOff =>
+      'مدل پیش از نوشتن پاسخ، ظرفیت خروجی‌اش را (معمولاً برای «فکر کردن») تمام کرد و پاسخی نداد. دوباره امتحان کنید؛ اگر تکرار شد، در تنظیمات هوش مصنوعی «کیفیت رایگان» را انتخاب کنید.';
+
+  @override
+  String get aiErrorNoUsable =>
+      'مدل پاسخ داد، اما هیچ موردی در آن از بررسی‌ها نگذشت (مثلاً لغت هدف در جمله نبود). دوباره امتحان کنید.';
+
+  @override
+  String get spTechnicalDetails => 'جزئیات فنی';
+
+  @override
+  String get spTechnicalNote =>
+      'بدون کلید و بدون لغت‌های شما؛ برای گزارش مشکل مفید است.';
+
+  @override
+  String get appearanceAction => 'ظاهر کارت';
+
+  @override
+  String get appearanceTitle => 'ظاهر کارت';
+
+  @override
+  String get appearancePreview => 'پیش‌نمایش';
+
+  @override
+  String get appearanceBackground => 'رنگ پس‌زمینه';
+
+  @override
+  String get appearanceTextColor => 'رنگ متن';
+
+  @override
+  String get appearanceTextSize => 'اندازهٔ متن';
+
+  @override
+  String get appearanceWordSize => 'لغت آلمانی';
+
+  @override
+  String get appearanceMeaningSize => 'معنی‌های فارسی';
+
+  @override
+  String get appearanceHighlight => 'برجسته‌سازی';
+
+  @override
+  String get appearanceHighlightHint =>
+      'رنگ ماژیک را انتخاب کنید و روی هر کلمهٔ لغت یا هر معنی بزنید تا برجسته شود. متن خود لغت تغییر نمی‌کند.';
+
+  @override
+  String get appearanceSticker => 'برچسب تصویری';
+
+  @override
+  String get appearanceNoSticker => 'بدون برچسب';
+
+  @override
+  String get appearanceStandard => 'پیش‌فرض';
+
+  @override
+  String get appearanceReset => 'بازگشت به پیش‌فرض';
+
+  @override
+  String get appearanceSave => 'ذخیره';
+
+  @override
+  String get appearanceSaved => 'ظاهر کارت ذخیره شد.';
+
+  @override
+  String get appearanceDiscardTitle => 'تغییرات کنار گذاشته شود؟';
+
+  @override
+  String get appearanceDiscardBody => 'تغییرات ظاهر این کارت ذخیره نشده است.';
+
+  @override
+  String get appearanceKeepEditing => 'ادامهٔ ویرایش';
+
+  @override
+  String get appearanceDiscard => 'کنار بگذار';
+
+  @override
+  String get appearanceNote =>
+      'ظاهر فقط برای همین کارت است. لغت، معنی‌ها، برچسب‌ها، برنامهٔ مرور (FSRS) و سابقهٔ مرور تغییر نمی‌کنند. «بازگشت به پیش‌فرض» فقط ظاهر را برمی‌گرداند.';
+
+  @override
+  String get appearanceColorSun => 'زرد';
+
+  @override
+  String get appearanceColorMint => 'سبز نعنایی';
+
+  @override
+  String get appearanceColorSky => 'آبی آسمانی';
+
+  @override
+  String get appearanceColorRose => 'صورتی';
+
+  @override
+  String get appearanceColorLavender => 'یاسی';
+
+  @override
+  String get appearanceColorSand => 'شنی';
+
+  @override
+  String get appearanceInkNavy => 'سرمه‌ای';
+
+  @override
+  String get appearanceInkGreen => 'سبز تیره';
+
+  @override
+  String get appearanceInkPlum => 'بنفش تیره';
+
+  @override
+  String get appearanceInkBrown => 'قهوه‌ای';
+
+  @override
+  String get appearanceMarkYellow => 'ماژیک زرد';
+
+  @override
+  String get appearanceMarkGreen => 'ماژیک سبز';
+
+  @override
+  String get appearanceMarkPink => 'ماژیک صورتی';
+
+  @override
+  String get appearanceMarkBlue => 'ماژیک آبی';
+
+  @override
+  String get backupCountAppearances => 'ظاهر کارت‌ها';
 }

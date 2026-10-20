@@ -4249,6 +4249,246 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'بازگشت به مرور امروز'**
   String get spBackToToday;
+
+  /// No description provided for @aiErrorCutOff.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل پیش از نوشتن پاسخ، ظرفیت خروجی‌اش را (معمولاً برای «فکر کردن») تمام کرد و پاسخی نداد. دوباره امتحان کنید؛ اگر تکرار شد، در تنظیمات هوش مصنوعی «کیفیت رایگان» را انتخاب کنید.'**
+  String get aiErrorCutOff;
+
+  /// No description provided for @aiErrorNoUsable.
+  ///
+  /// In fa, this message translates to:
+  /// **'مدل پاسخ داد، اما هیچ موردی در آن از بررسی‌ها نگذشت (مثلاً لغت هدف در جمله نبود). دوباره امتحان کنید.'**
+  String get aiErrorNoUsable;
+
+  /// No description provided for @spTechnicalDetails.
+  ///
+  /// In fa, this message translates to:
+  /// **'جزئیات فنی'**
+  String get spTechnicalDetails;
+
+  /// No description provided for @spTechnicalNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'بدون کلید و بدون لغت‌های شما؛ برای گزارش مشکل مفید است.'**
+  String get spTechnicalNote;
+
+  /// No description provided for @appearanceAction.
+  ///
+  /// In fa, this message translates to:
+  /// **'ظاهر کارت'**
+  String get appearanceAction;
+
+  /// No description provided for @appearanceTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'ظاهر کارت'**
+  String get appearanceTitle;
+
+  /// No description provided for @appearancePreview.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیش‌نمایش'**
+  String get appearancePreview;
+
+  /// No description provided for @appearanceBackground.
+  ///
+  /// In fa, this message translates to:
+  /// **'رنگ پس‌زمینه'**
+  String get appearanceBackground;
+
+  /// No description provided for @appearanceTextColor.
+  ///
+  /// In fa, this message translates to:
+  /// **'رنگ متن'**
+  String get appearanceTextColor;
+
+  /// No description provided for @appearanceTextSize.
+  ///
+  /// In fa, this message translates to:
+  /// **'اندازهٔ متن'**
+  String get appearanceTextSize;
+
+  /// No description provided for @appearanceWordSize.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت آلمانی'**
+  String get appearanceWordSize;
+
+  /// No description provided for @appearanceMeaningSize.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی‌های فارسی'**
+  String get appearanceMeaningSize;
+
+  /// No description provided for @appearanceHighlight.
+  ///
+  /// In fa, this message translates to:
+  /// **'برجسته‌سازی'**
+  String get appearanceHighlight;
+
+  /// No description provided for @appearanceHighlightHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'رنگ ماژیک را انتخاب کنید و روی هر کلمهٔ لغت یا هر معنی بزنید تا برجسته شود. متن خود لغت تغییر نمی‌کند.'**
+  String get appearanceHighlightHint;
+
+  /// No description provided for @appearanceSticker.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب تصویری'**
+  String get appearanceSticker;
+
+  /// No description provided for @appearanceNoSticker.
+  ///
+  /// In fa, this message translates to:
+  /// **'بدون برچسب'**
+  String get appearanceNoSticker;
+
+  /// No description provided for @appearanceStandard.
+  ///
+  /// In fa, this message translates to:
+  /// **'پیش‌فرض'**
+  String get appearanceStandard;
+
+  /// No description provided for @appearanceReset.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگشت به پیش‌فرض'**
+  String get appearanceReset;
+
+  /// No description provided for @appearanceSave.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره'**
+  String get appearanceSave;
+
+  /// No description provided for @appearanceSaved.
+  ///
+  /// In fa, this message translates to:
+  /// **'ظاهر کارت ذخیره شد.'**
+  String get appearanceSaved;
+
+  /// No description provided for @appearanceDiscardTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'تغییرات کنار گذاشته شود؟'**
+  String get appearanceDiscardTitle;
+
+  /// No description provided for @appearanceDiscardBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'تغییرات ظاهر این کارت ذخیره نشده است.'**
+  String get appearanceDiscardBody;
+
+  /// No description provided for @appearanceKeepEditing.
+  ///
+  /// In fa, this message translates to:
+  /// **'ادامهٔ ویرایش'**
+  String get appearanceKeepEditing;
+
+  /// No description provided for @appearanceDiscard.
+  ///
+  /// In fa, this message translates to:
+  /// **'کنار بگذار'**
+  String get appearanceDiscard;
+
+  /// No description provided for @appearanceNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'ظاهر فقط برای همین کارت است. لغت، معنی‌ها، برچسب‌ها، برنامهٔ مرور (FSRS) و سابقهٔ مرور تغییر نمی‌کنند. «بازگشت به پیش‌فرض» فقط ظاهر را برمی‌گرداند.'**
+  String get appearanceNote;
+
+  /// No description provided for @appearanceColorSun.
+  ///
+  /// In fa, this message translates to:
+  /// **'زرد'**
+  String get appearanceColorSun;
+
+  /// No description provided for @appearanceColorMint.
+  ///
+  /// In fa, this message translates to:
+  /// **'سبز نعنایی'**
+  String get appearanceColorMint;
+
+  /// No description provided for @appearanceColorSky.
+  ///
+  /// In fa, this message translates to:
+  /// **'آبی آسمانی'**
+  String get appearanceColorSky;
+
+  /// No description provided for @appearanceColorRose.
+  ///
+  /// In fa, this message translates to:
+  /// **'صورتی'**
+  String get appearanceColorRose;
+
+  /// No description provided for @appearanceColorLavender.
+  ///
+  /// In fa, this message translates to:
+  /// **'یاسی'**
+  String get appearanceColorLavender;
+
+  /// No description provided for @appearanceColorSand.
+  ///
+  /// In fa, this message translates to:
+  /// **'شنی'**
+  String get appearanceColorSand;
+
+  /// No description provided for @appearanceInkNavy.
+  ///
+  /// In fa, this message translates to:
+  /// **'سرمه‌ای'**
+  String get appearanceInkNavy;
+
+  /// No description provided for @appearanceInkGreen.
+  ///
+  /// In fa, this message translates to:
+  /// **'سبز تیره'**
+  String get appearanceInkGreen;
+
+  /// No description provided for @appearanceInkPlum.
+  ///
+  /// In fa, this message translates to:
+  /// **'بنفش تیره'**
+  String get appearanceInkPlum;
+
+  /// No description provided for @appearanceInkBrown.
+  ///
+  /// In fa, this message translates to:
+  /// **'قهوه‌ای'**
+  String get appearanceInkBrown;
+
+  /// No description provided for @appearanceMarkYellow.
+  ///
+  /// In fa, this message translates to:
+  /// **'ماژیک زرد'**
+  String get appearanceMarkYellow;
+
+  /// No description provided for @appearanceMarkGreen.
+  ///
+  /// In fa, this message translates to:
+  /// **'ماژیک سبز'**
+  String get appearanceMarkGreen;
+
+  /// No description provided for @appearanceMarkPink.
+  ///
+  /// In fa, this message translates to:
+  /// **'ماژیک صورتی'**
+  String get appearanceMarkPink;
+
+  /// No description provided for @appearanceMarkBlue.
+  ///
+  /// In fa, this message translates to:
+  /// **'ماژیک آبی'**
+  String get appearanceMarkBlue;
+
+  /// No description provided for @backupCountAppearances.
+  ///
+  /// In fa, this message translates to:
+  /// **'ظاهر کارت‌ها'**
+  String get backupCountAppearances;
 }
 
 class _AppLocalizationsDelegate

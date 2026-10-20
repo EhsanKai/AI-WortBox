@@ -10,6 +10,8 @@ import 'package:ai_wortbox/features/about/domain/release_notes.dart';
 import 'package:ai_wortbox/features/backup/data/backup_codec.dart';
 import 'package:ai_wortbox/features/backup/data/backup_service.dart';
 import 'package:ai_wortbox/features/backup/data/safety_backup_store.dart';
+import 'package:ai_wortbox/features/card_appearance/data/drift_card_appearance_repository.dart';
+import 'package:ai_wortbox/features/card_appearance/domain/card_appearance.dart';
 import 'package:ai_wortbox/features/decks/data/drift_deck_repository.dart';
 import 'package:ai_wortbox/features/decks/domain/deck.dart';
 import 'package:ai_wortbox/features/review/data/drift_study_repository.dart';
@@ -114,6 +116,7 @@ void main() {
         'entryTags': 1,
         'reviewEvents': 6,
         'sentencePractice': 1,
+        'cardAppearances': 1,
       });
       // The deleted word's history is kept with no word.
       expect(
@@ -644,6 +647,133 @@ void main() {
       final service = serviceFor(target);
       await service.restore(await service.read(backup), RestoreMode.merge);
       expect(await SettingsStore(target).read('review.direction'), 'reverse');
+    });
+  });
+
+  group('card appearance (schema v4)', () {
+    test(
+      'is backed up and restored exactly, and the file says schema 4 '
+      '(build 3, schema 3, rejects it instead of dropping appearances)',
+      () async {
+        final json = jsonDecode(utf8.decode(backup)) as Map<String, dynamic>;
+        expect(json['schemaVersion'], 4);
+        expect(rows(json, 'cardAppearances'), hasLength(1));
+
+        final target = openTestDatabase();
+        addTearDown(target.close);
+        final service = serviceFor(target);
+        await service.restore(await service.read(backup), RestoreMode.replace);
+        final look = await DriftCardAppearanceRepository(
+          target,
+          clock: FixedClock(DateTime.utc(2026)),
+        ).get(seeded.haus);
+        expect(look.background, CardColor.mint);
+        expect(look.wordScale, 1.4);
+        expect(look.sticker, CardSticker.star);
+        expect(look.isHighlighted(HighlightField.meaning, 'منزل'), isTrue);
+        expect(look.isHighlighted(HighlightField.word, 'Haus'), isTrue);
+      },
+    );
+
+    test('an older backup (schema 3, no appearance list or count) still '
+        'restores, with standard appearances', () async {
+      final older = edited(backup, (f) {
+        f['schemaVersion'] = 3;
+        (f['data'] as Map<String, dynamic>).remove('cardAppearances');
+        counts(f).remove('cardAppearances');
+      });
+      final target = openTestDatabase();
+      addTearDown(target.close);
+      final service = serviceFor(target);
+      final v = await service.read(older);
+      expect(v.snapshot.cardAppearances, isEmpty);
+      await service.restore(v, RestoreMode.replace);
+      expect(await target.select(target.cardAppearances).get(), isEmpty);
+      expect(await target.select(target.vocabularyEntries).get(), hasLength(3));
+    });
+
+    test(
+      'invalid appearance values are rejected before anything is written',
+      () async {
+        final cases = <String, void Function(Map<String, dynamic>)>{
+          'colour': (f) => row(f, 'cardAppearances')['background'] = 'neon',
+          'sticker': (f) => row(f, 'cardAppearances')['sticker'] = 'unicorn',
+          'scale': (f) => row(f, 'cardAppearances')['wordScale'] = 9,
+          'highlights': (f) =>
+              row(f, 'cardAppearances')['highlights'] = '[{"f":"x","t":"a"}]',
+          'not json': (f) => row(f, 'cardAppearances')['highlights'] = '[',
+        };
+        for (final MapEntry(:key, :value) in cases.entries) {
+          await expectLater(
+            serviceFor(source).read(edited(backup, value)),
+            throwsA(
+              isA<BackupException>().having(
+                (e) => e.error,
+                'error',
+                BackupError.invalidValue,
+              ),
+            ),
+            reason: key,
+          );
+        }
+        await expectLater(
+          serviceFor(source).read(
+            edited(
+              backup,
+              (f) => row(f, 'cardAppearances')['entryId'] = 'nope',
+            ),
+          ),
+          throwsA(
+            isA<BackupException>().having(
+              (e) => e.error,
+              'error',
+              BackupError.brokenReference,
+            ),
+          ),
+        );
+        await expectLater(
+          serviceFor(source).read(
+            edited(
+              backup,
+              (f) => rows(
+                f,
+                'cardAppearances',
+              ).add(Map.of(row(f, 'cardAppearances'))),
+            ),
+          ),
+          throwsA(
+            isA<BackupException>().having(
+              (e) => e.error,
+              'error',
+              BackupError.duplicateId,
+            ),
+          ),
+        );
+      },
+    );
+
+    test('merge brings the appearance of added words only; a word already '
+        'on the device keeps its own look', () async {
+      final target = openTestDatabase();
+      addTearDown(target.close);
+      final service = serviceFor(target);
+      await service.restore(await service.read(backup), RestoreMode.merge);
+      final looks = DriftCardAppearanceRepository(
+        target,
+        clock: FixedClock(DateTime.utc(2026)),
+      );
+      expect((await looks.get(seeded.haus)).background, CardColor.mint);
+      await looks.save(
+        seeded.haus,
+        const CardAppearance(background: CardColor.sky),
+      );
+
+      final r = await service.restore(
+        await service.read(backup),
+        RestoreMode.merge,
+      );
+      expect(r.cardAppearancesAdded, 0);
+      expect((await looks.get(seeded.haus)).background, CardColor.sky);
     });
   });
 

@@ -4748,6 +4748,587 @@ class SentencePracticeEventsCompanion
   }
 }
 
+class $CardAppearancesTable extends CardAppearances
+    with TableInfo<$CardAppearancesTable, CardAppearanceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CardAppearancesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _entryIdMeta = const VerificationMeta(
+    'entryId',
+  );
+  @override
+  late final GeneratedColumn<String> entryId = GeneratedColumn<String>(
+    'entry_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES vocabulary_entries (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _backgroundMeta = const VerificationMeta(
+    'background',
+  );
+  @override
+  late final GeneratedColumn<String> background = GeneratedColumn<String>(
+    'background',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _inkMeta = const VerificationMeta('ink');
+  @override
+  late final GeneratedColumn<String> ink = GeneratedColumn<String>(
+    'ink',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _wordScaleMeta = const VerificationMeta(
+    'wordScale',
+  );
+  @override
+  late final GeneratedColumn<double> wordScale = GeneratedColumn<double>(
+    'word_scale',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _meaningScaleMeta = const VerificationMeta(
+    'meaningScale',
+  );
+  @override
+  late final GeneratedColumn<double> meaningScale = GeneratedColumn<double>(
+    'meaning_scale',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _highlightColorMeta = const VerificationMeta(
+    'highlightColor',
+  );
+  @override
+  late final GeneratedColumn<String> highlightColor = GeneratedColumn<String>(
+    'highlight_color',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _highlightsMeta = const VerificationMeta(
+    'highlights',
+  );
+  @override
+  late final GeneratedColumn<String> highlights = GeneratedColumn<String>(
+    'highlights',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _stickerMeta = const VerificationMeta(
+    'sticker',
+  );
+  @override
+  late final GeneratedColumn<String> sticker = GeneratedColumn<String>(
+    'sticker',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    entryId,
+    background,
+    ink,
+    wordScale,
+    meaningScale,
+    highlightColor,
+    highlights,
+    sticker,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'card_appearances';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CardAppearanceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('entry_id')) {
+      context.handle(
+        _entryIdMeta,
+        entryId.isAcceptableOrUnknown(data['entry_id']!, _entryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entryIdMeta);
+    }
+    if (data.containsKey('background')) {
+      context.handle(
+        _backgroundMeta,
+        background.isAcceptableOrUnknown(data['background']!, _backgroundMeta),
+      );
+    }
+    if (data.containsKey('ink')) {
+      context.handle(
+        _inkMeta,
+        ink.isAcceptableOrUnknown(data['ink']!, _inkMeta),
+      );
+    }
+    if (data.containsKey('word_scale')) {
+      context.handle(
+        _wordScaleMeta,
+        wordScale.isAcceptableOrUnknown(data['word_scale']!, _wordScaleMeta),
+      );
+    }
+    if (data.containsKey('meaning_scale')) {
+      context.handle(
+        _meaningScaleMeta,
+        meaningScale.isAcceptableOrUnknown(
+          data['meaning_scale']!,
+          _meaningScaleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('highlight_color')) {
+      context.handle(
+        _highlightColorMeta,
+        highlightColor.isAcceptableOrUnknown(
+          data['highlight_color']!,
+          _highlightColorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('highlights')) {
+      context.handle(
+        _highlightsMeta,
+        highlights.isAcceptableOrUnknown(data['highlights']!, _highlightsMeta),
+      );
+    }
+    if (data.containsKey('sticker')) {
+      context.handle(
+        _stickerMeta,
+        sticker.isAcceptableOrUnknown(data['sticker']!, _stickerMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {entryId};
+  @override
+  CardAppearanceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CardAppearanceRow(
+      entryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entry_id'],
+      )!,
+      background: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}background'],
+      ),
+      ink: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ink'],
+      ),
+      wordScale: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}word_scale'],
+      )!,
+      meaningScale: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}meaning_scale'],
+      )!,
+      highlightColor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}highlight_color'],
+      ),
+      highlights: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}highlights'],
+      )!,
+      sticker: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sticker'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CardAppearancesTable createAlias(String alias) {
+    return $CardAppearancesTable(attachedDatabase, alias);
+  }
+}
+
+class CardAppearanceRow extends DataClass
+    implements Insertable<CardAppearanceRow> {
+  final String entryId;
+  final String? background;
+  final String? ink;
+  final double wordScale;
+  final double meaningScale;
+  final String? highlightColor;
+
+  /// JSON list of `{"f": "word"|"meaning", "t": text}`.
+  final String highlights;
+  final String? sticker;
+  final DateTime updatedAt;
+  const CardAppearanceRow({
+    required this.entryId,
+    this.background,
+    this.ink,
+    required this.wordScale,
+    required this.meaningScale,
+    this.highlightColor,
+    required this.highlights,
+    this.sticker,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['entry_id'] = Variable<String>(entryId);
+    if (!nullToAbsent || background != null) {
+      map['background'] = Variable<String>(background);
+    }
+    if (!nullToAbsent || ink != null) {
+      map['ink'] = Variable<String>(ink);
+    }
+    map['word_scale'] = Variable<double>(wordScale);
+    map['meaning_scale'] = Variable<double>(meaningScale);
+    if (!nullToAbsent || highlightColor != null) {
+      map['highlight_color'] = Variable<String>(highlightColor);
+    }
+    map['highlights'] = Variable<String>(highlights);
+    if (!nullToAbsent || sticker != null) {
+      map['sticker'] = Variable<String>(sticker);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CardAppearancesCompanion toCompanion(bool nullToAbsent) {
+    return CardAppearancesCompanion(
+      entryId: Value(entryId),
+      background: background == null && nullToAbsent
+          ? const Value.absent()
+          : Value(background),
+      ink: ink == null && nullToAbsent ? const Value.absent() : Value(ink),
+      wordScale: Value(wordScale),
+      meaningScale: Value(meaningScale),
+      highlightColor: highlightColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(highlightColor),
+      highlights: Value(highlights),
+      sticker: sticker == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sticker),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CardAppearanceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CardAppearanceRow(
+      entryId: serializer.fromJson<String>(json['entryId']),
+      background: serializer.fromJson<String?>(json['background']),
+      ink: serializer.fromJson<String?>(json['ink']),
+      wordScale: serializer.fromJson<double>(json['wordScale']),
+      meaningScale: serializer.fromJson<double>(json['meaningScale']),
+      highlightColor: serializer.fromJson<String?>(json['highlightColor']),
+      highlights: serializer.fromJson<String>(json['highlights']),
+      sticker: serializer.fromJson<String?>(json['sticker']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'entryId': serializer.toJson<String>(entryId),
+      'background': serializer.toJson<String?>(background),
+      'ink': serializer.toJson<String?>(ink),
+      'wordScale': serializer.toJson<double>(wordScale),
+      'meaningScale': serializer.toJson<double>(meaningScale),
+      'highlightColor': serializer.toJson<String?>(highlightColor),
+      'highlights': serializer.toJson<String>(highlights),
+      'sticker': serializer.toJson<String?>(sticker),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CardAppearanceRow copyWith({
+    String? entryId,
+    Value<String?> background = const Value.absent(),
+    Value<String?> ink = const Value.absent(),
+    double? wordScale,
+    double? meaningScale,
+    Value<String?> highlightColor = const Value.absent(),
+    String? highlights,
+    Value<String?> sticker = const Value.absent(),
+    DateTime? updatedAt,
+  }) => CardAppearanceRow(
+    entryId: entryId ?? this.entryId,
+    background: background.present ? background.value : this.background,
+    ink: ink.present ? ink.value : this.ink,
+    wordScale: wordScale ?? this.wordScale,
+    meaningScale: meaningScale ?? this.meaningScale,
+    highlightColor: highlightColor.present
+        ? highlightColor.value
+        : this.highlightColor,
+    highlights: highlights ?? this.highlights,
+    sticker: sticker.present ? sticker.value : this.sticker,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CardAppearanceRow copyWithCompanion(CardAppearancesCompanion data) {
+    return CardAppearanceRow(
+      entryId: data.entryId.present ? data.entryId.value : this.entryId,
+      background: data.background.present
+          ? data.background.value
+          : this.background,
+      ink: data.ink.present ? data.ink.value : this.ink,
+      wordScale: data.wordScale.present ? data.wordScale.value : this.wordScale,
+      meaningScale: data.meaningScale.present
+          ? data.meaningScale.value
+          : this.meaningScale,
+      highlightColor: data.highlightColor.present
+          ? data.highlightColor.value
+          : this.highlightColor,
+      highlights: data.highlights.present
+          ? data.highlights.value
+          : this.highlights,
+      sticker: data.sticker.present ? data.sticker.value : this.sticker,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardAppearanceRow(')
+          ..write('entryId: $entryId, ')
+          ..write('background: $background, ')
+          ..write('ink: $ink, ')
+          ..write('wordScale: $wordScale, ')
+          ..write('meaningScale: $meaningScale, ')
+          ..write('highlightColor: $highlightColor, ')
+          ..write('highlights: $highlights, ')
+          ..write('sticker: $sticker, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    entryId,
+    background,
+    ink,
+    wordScale,
+    meaningScale,
+    highlightColor,
+    highlights,
+    sticker,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CardAppearanceRow &&
+          other.entryId == this.entryId &&
+          other.background == this.background &&
+          other.ink == this.ink &&
+          other.wordScale == this.wordScale &&
+          other.meaningScale == this.meaningScale &&
+          other.highlightColor == this.highlightColor &&
+          other.highlights == this.highlights &&
+          other.sticker == this.sticker &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CardAppearancesCompanion extends UpdateCompanion<CardAppearanceRow> {
+  final Value<String> entryId;
+  final Value<String?> background;
+  final Value<String?> ink;
+  final Value<double> wordScale;
+  final Value<double> meaningScale;
+  final Value<String?> highlightColor;
+  final Value<String> highlights;
+  final Value<String?> sticker;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CardAppearancesCompanion({
+    this.entryId = const Value.absent(),
+    this.background = const Value.absent(),
+    this.ink = const Value.absent(),
+    this.wordScale = const Value.absent(),
+    this.meaningScale = const Value.absent(),
+    this.highlightColor = const Value.absent(),
+    this.highlights = const Value.absent(),
+    this.sticker = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CardAppearancesCompanion.insert({
+    required String entryId,
+    this.background = const Value.absent(),
+    this.ink = const Value.absent(),
+    this.wordScale = const Value.absent(),
+    this.meaningScale = const Value.absent(),
+    this.highlightColor = const Value.absent(),
+    this.highlights = const Value.absent(),
+    this.sticker = const Value.absent(),
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : entryId = Value(entryId),
+       updatedAt = Value(updatedAt);
+  static Insertable<CardAppearanceRow> custom({
+    Expression<String>? entryId,
+    Expression<String>? background,
+    Expression<String>? ink,
+    Expression<double>? wordScale,
+    Expression<double>? meaningScale,
+    Expression<String>? highlightColor,
+    Expression<String>? highlights,
+    Expression<String>? sticker,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (entryId != null) 'entry_id': entryId,
+      if (background != null) 'background': background,
+      if (ink != null) 'ink': ink,
+      if (wordScale != null) 'word_scale': wordScale,
+      if (meaningScale != null) 'meaning_scale': meaningScale,
+      if (highlightColor != null) 'highlight_color': highlightColor,
+      if (highlights != null) 'highlights': highlights,
+      if (sticker != null) 'sticker': sticker,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CardAppearancesCompanion copyWith({
+    Value<String>? entryId,
+    Value<String?>? background,
+    Value<String?>? ink,
+    Value<double>? wordScale,
+    Value<double>? meaningScale,
+    Value<String?>? highlightColor,
+    Value<String>? highlights,
+    Value<String?>? sticker,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CardAppearancesCompanion(
+      entryId: entryId ?? this.entryId,
+      background: background ?? this.background,
+      ink: ink ?? this.ink,
+      wordScale: wordScale ?? this.wordScale,
+      meaningScale: meaningScale ?? this.meaningScale,
+      highlightColor: highlightColor ?? this.highlightColor,
+      highlights: highlights ?? this.highlights,
+      sticker: sticker ?? this.sticker,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (entryId.present) {
+      map['entry_id'] = Variable<String>(entryId.value);
+    }
+    if (background.present) {
+      map['background'] = Variable<String>(background.value);
+    }
+    if (ink.present) {
+      map['ink'] = Variable<String>(ink.value);
+    }
+    if (wordScale.present) {
+      map['word_scale'] = Variable<double>(wordScale.value);
+    }
+    if (meaningScale.present) {
+      map['meaning_scale'] = Variable<double>(meaningScale.value);
+    }
+    if (highlightColor.present) {
+      map['highlight_color'] = Variable<String>(highlightColor.value);
+    }
+    if (highlights.present) {
+      map['highlights'] = Variable<String>(highlights.value);
+    }
+    if (sticker.present) {
+      map['sticker'] = Variable<String>(sticker.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardAppearancesCompanion(')
+          ..write('entryId: $entryId, ')
+          ..write('background: $background, ')
+          ..write('ink: $ink, ')
+          ..write('wordScale: $wordScale, ')
+          ..write('meaningScale: $meaningScale, ')
+          ..write('highlightColor: $highlightColor, ')
+          ..write('highlights: $highlights, ')
+          ..write('sticker: $sticker, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4763,6 +5344,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $SentencePracticeEventsTable sentencePracticeEvents =
       $SentencePracticeEventsTable(this);
+  late final $CardAppearancesTable cardAppearances = $CardAppearancesTable(
+    this,
+  );
   late final Index idxEntriesDeckNormalized = Index(
     'idx_entries_deck_normalized',
     'CREATE INDEX idx_entries_deck_normalized ON vocabulary_entries (deck_id, normalized)',
@@ -4797,6 +5381,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     reviewEvents,
     appSettings,
     sentencePracticeEvents,
+    cardAppearances,
     idxEntriesDeckNormalized,
     idxFlashcardsDue,
     idxEntryTagsTag,
@@ -4855,6 +5440,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       result: [
         TableUpdate('sentence_practice_events', kind: UpdateKind.delete),
       ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'vocabulary_entries',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('card_appearances', kind: UpdateKind.delete)],
     ),
   ]);
   @override
@@ -5392,6 +5984,26 @@ final class $$VocabularyEntriesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$CardAppearancesTable, List<CardAppearanceRow>>
+  _cardAppearancesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.cardAppearances,
+    aliasName: 'vocabulary_entries__id__card_appearances__entry_id',
+  );
+
+  $$CardAppearancesTableProcessedTableManager get cardAppearancesRefs {
+    final manager = $$CardAppearancesTableTableManager(
+      $_db,
+      $_db.cardAppearances,
+    ).filter((f) => f.entryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cardAppearancesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VocabularyEntriesTableFilterComposer
@@ -5655,6 +6267,31 @@ class $$VocabularyEntriesTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> cardAppearancesRefs(
+    Expression<bool> Function($$CardAppearancesTableFilterComposer f) f,
+  ) {
+    final $$CardAppearancesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cardAppearances,
+      getReferencedColumn: (t) => t.entryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardAppearancesTableFilterComposer(
+            $db: $db,
+            $table: $db.cardAppearances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -6038,6 +6675,31 @@ class $$VocabularyEntriesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> cardAppearancesRefs<T extends Object>(
+    Expression<T> Function($$CardAppearancesTableAnnotationComposer a) f,
+  ) {
+    final $$CardAppearancesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cardAppearances,
+      getReferencedColumn: (t) => t.entryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardAppearancesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cardAppearances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$VocabularyEntriesTableTableManager
@@ -6060,6 +6722,7 @@ class $$VocabularyEntriesTableTableManager
             bool entryTagsRefs,
             bool reviewEventsRefs,
             bool sentencePracticeEventsRefs,
+            bool cardAppearancesRefs,
           })
         > {
   $$VocabularyEntriesTableTableManager(
@@ -6192,6 +6855,7 @@ class $$VocabularyEntriesTableTableManager
                 entryTagsRefs = false,
                 reviewEventsRefs = false,
                 sentencePracticeEventsRefs = false,
+                cardAppearancesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -6201,6 +6865,7 @@ class $$VocabularyEntriesTableTableManager
                     if (entryTagsRefs) db.entryTags,
                     if (reviewEventsRefs) db.reviewEvents,
                     if (sentencePracticeEventsRefs) db.sentencePracticeEvents,
+                    if (cardAppearancesRefs) db.cardAppearances,
                   ],
                   addJoins:
                       <
@@ -6339,6 +7004,27 @@ class $$VocabularyEntriesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (cardAppearancesRefs)
+                        await $_getPrefetchedData<
+                          VocabularyEntryRow,
+                          $VocabularyEntriesTable,
+                          CardAppearanceRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VocabularyEntriesTableReferences
+                              ._cardAppearancesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VocabularyEntriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cardAppearancesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.entryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6366,6 +7052,7 @@ typedef $$VocabularyEntriesTableProcessedTableManager =
         bool entryTagsRefs,
         bool reviewEventsRefs,
         bool sentencePracticeEventsRefs,
+        bool cardAppearancesRefs,
       })
     >;
 typedef $$VocabularyMeaningsTableCreateCompanionBuilder =
@@ -8735,6 +9422,418 @@ typedef $$SentencePracticeEventsTableProcessedTableManager =
       SentencePracticeEventRow,
       PrefetchHooks Function({bool entryId})
     >;
+typedef $$CardAppearancesTableCreateCompanionBuilder =
+    CardAppearancesCompanion Function({
+      required String entryId,
+      Value<String?> background,
+      Value<String?> ink,
+      Value<double> wordScale,
+      Value<double> meaningScale,
+      Value<String?> highlightColor,
+      Value<String> highlights,
+      Value<String?> sticker,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CardAppearancesTableUpdateCompanionBuilder =
+    CardAppearancesCompanion Function({
+      Value<String> entryId,
+      Value<String?> background,
+      Value<String?> ink,
+      Value<double> wordScale,
+      Value<double> meaningScale,
+      Value<String?> highlightColor,
+      Value<String> highlights,
+      Value<String?> sticker,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$CardAppearancesTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CardAppearancesTable,
+          CardAppearanceRow
+        > {
+  $$CardAppearancesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VocabularyEntriesTable _entryIdTable(_$AppDatabase db) => db
+      .vocabularyEntries
+      .createAlias('card_appearances__entry_id__vocabulary_entries__id');
+
+  $$VocabularyEntriesTableProcessedTableManager get entryId {
+    final $_column = $_itemColumn<String>('entry_id')!;
+
+    final manager = $$VocabularyEntriesTableTableManager(
+      $_db,
+      $_db.vocabularyEntries,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CardAppearancesTableFilterComposer
+    extends Composer<_$AppDatabase, $CardAppearancesTable> {
+  $$CardAppearancesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get background => $composableBuilder(
+    column: $table.background,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ink => $composableBuilder(
+    column: $table.ink,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get wordScale => $composableBuilder(
+    column: $table.wordScale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get meaningScale => $composableBuilder(
+    column: $table.meaningScale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get highlightColor => $composableBuilder(
+    column: $table.highlightColor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get highlights => $composableBuilder(
+    column: $table.highlights,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sticker => $composableBuilder(
+    column: $table.sticker,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VocabularyEntriesTableFilterComposer get entryId {
+    final $$VocabularyEntriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableFilterComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CardAppearancesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CardAppearancesTable> {
+  $$CardAppearancesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get background => $composableBuilder(
+    column: $table.background,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ink => $composableBuilder(
+    column: $table.ink,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get wordScale => $composableBuilder(
+    column: $table.wordScale,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get meaningScale => $composableBuilder(
+    column: $table.meaningScale,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get highlightColor => $composableBuilder(
+    column: $table.highlightColor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get highlights => $composableBuilder(
+    column: $table.highlights,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sticker => $composableBuilder(
+    column: $table.sticker,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VocabularyEntriesTableOrderingComposer get entryId {
+    final $$VocabularyEntriesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableOrderingComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CardAppearancesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CardAppearancesTable> {
+  $$CardAppearancesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get background => $composableBuilder(
+    column: $table.background,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ink =>
+      $composableBuilder(column: $table.ink, builder: (column) => column);
+
+  GeneratedColumn<double> get wordScale =>
+      $composableBuilder(column: $table.wordScale, builder: (column) => column);
+
+  GeneratedColumn<double> get meaningScale => $composableBuilder(
+    column: $table.meaningScale,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get highlightColor => $composableBuilder(
+    column: $table.highlightColor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get highlights => $composableBuilder(
+    column: $table.highlights,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sticker =>
+      $composableBuilder(column: $table.sticker, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$VocabularyEntriesTableAnnotationComposer get entryId {
+    final $$VocabularyEntriesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.entryId,
+          referencedTable: $db.vocabularyEntries,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$VocabularyEntriesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.vocabularyEntries,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$CardAppearancesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CardAppearancesTable,
+          CardAppearanceRow,
+          $$CardAppearancesTableFilterComposer,
+          $$CardAppearancesTableOrderingComposer,
+          $$CardAppearancesTableAnnotationComposer,
+          $$CardAppearancesTableCreateCompanionBuilder,
+          $$CardAppearancesTableUpdateCompanionBuilder,
+          (CardAppearanceRow, $$CardAppearancesTableReferences),
+          CardAppearanceRow,
+          PrefetchHooks Function({bool entryId})
+        > {
+  $$CardAppearancesTableTableManager(
+    _$AppDatabase db,
+    $CardAppearancesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CardAppearancesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CardAppearancesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CardAppearancesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> entryId = const Value.absent(),
+                Value<String?> background = const Value.absent(),
+                Value<String?> ink = const Value.absent(),
+                Value<double> wordScale = const Value.absent(),
+                Value<double> meaningScale = const Value.absent(),
+                Value<String?> highlightColor = const Value.absent(),
+                Value<String> highlights = const Value.absent(),
+                Value<String?> sticker = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CardAppearancesCompanion(
+                entryId: entryId,
+                background: background,
+                ink: ink,
+                wordScale: wordScale,
+                meaningScale: meaningScale,
+                highlightColor: highlightColor,
+                highlights: highlights,
+                sticker: sticker,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String entryId,
+                Value<String?> background = const Value.absent(),
+                Value<String?> ink = const Value.absent(),
+                Value<double> wordScale = const Value.absent(),
+                Value<double> meaningScale = const Value.absent(),
+                Value<String?> highlightColor = const Value.absent(),
+                Value<String> highlights = const Value.absent(),
+                Value<String?> sticker = const Value.absent(),
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CardAppearancesCompanion.insert(
+                entryId: entryId,
+                background: background,
+                ink: ink,
+                wordScale: wordScale,
+                meaningScale: meaningScale,
+                highlightColor: highlightColor,
+                highlights: highlights,
+                sticker: sticker,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CardAppearancesTable, CardAppearanceRow>(table),
+                  $$CardAppearancesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({entryId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (entryId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.entryId,
+                        referencedTable: $$CardAppearancesTableReferences
+                            ._entryIdTable(db),
+                        referencedColumn: $$CardAppearancesTableReferences
+                            ._entryIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CardAppearancesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CardAppearancesTable,
+      CardAppearanceRow,
+      $$CardAppearancesTableFilterComposer,
+      $$CardAppearancesTableOrderingComposer,
+      $$CardAppearancesTableAnnotationComposer,
+      $$CardAppearancesTableCreateCompanionBuilder,
+      $$CardAppearancesTableUpdateCompanionBuilder,
+      (CardAppearanceRow, $$CardAppearancesTableReferences),
+      CardAppearanceRow,
+      PrefetchHooks Function({bool entryId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8759,4 +9858,6 @@ class $AppDatabaseManager {
         _db,
         _db.sentencePracticeEvents,
       );
+  $$CardAppearancesTableTableManager get cardAppearances =>
+      $$CardAppearancesTableTableManager(_db, _db.cardAppearances);
 }

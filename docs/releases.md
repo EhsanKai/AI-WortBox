@@ -59,6 +59,7 @@ internal terms). Persian and English have the same number of lines.
 
 | Build | Version | Date | Notes |
 | --- | --- | --- | --- |
+| 4 | 1.0.0 | 2026-10-20 | Sentence-generation fix (unconfirmed live), card appearance |
 | 3 | 1.0.0 | 2026-10-20 | Backup/restore, About screen, AI sentence practice |
 | 2 | 1.0.0 | not recorded | Missing-meaning filter, AI meanings for selected words |
 | 1 | 1.0.0 | not recorded | First build (Phases 1–5); no in-app notes |

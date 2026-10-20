@@ -64,8 +64,8 @@ void main() {
         ),
       );
 
-  test('creates schema version 3 with all tables', () async {
-    expect(db.schemaVersion, 3);
+  test('creates schema version 4 with all tables', () async {
+    expect(db.schemaVersion, 4);
     final tables = await db
         .customSelect(
           "SELECT name FROM sqlite_master WHERE type = 'table' "
@@ -75,6 +75,7 @@ void main() {
         .get();
     expect(tables, [
       'app_settings',
+      'card_appearances',
       'decks',
       'entry_tags',
       'flashcards',

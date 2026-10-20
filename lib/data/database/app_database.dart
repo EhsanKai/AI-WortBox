@@ -23,6 +23,7 @@ part 'app_database.g.dart';
     ReviewEvents,
     AppSettings,
     SentencePracticeEvents,
+    CardAppearances,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -36,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   // `dart run drift_dev make-migrations` to export the schema and generate
   // migration tests. See docs/architecture.md.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -66,6 +67,11 @@ class AppDatabase extends _$AppDatabase {
         // its index; no existing row or column is touched.
         await m.createTable(schema.sentencePracticeEvents);
         await m.createIndex(schema.idxSentencePracticeEntry);
+      },
+      from3To4: (m, schema) async {
+        // v4: card appearance. Purely additive: one new table; no existing
+        // row or column is touched.
+        await m.createTable(schema.cardAppearances);
       },
     ),
     beforeOpen: (details) async {

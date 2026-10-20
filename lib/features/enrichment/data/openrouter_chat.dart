@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
+
 import '../../../core/error/app_exception.dart';
 import '../domain/ai_model_catalog.dart';
 import '../domain/enrichment.dart';
@@ -9,7 +13,15 @@ import 'openrouter_client.dart';
 
 /// A validated answer of one chat request.
 class ChatAnswer<T> {
-  const ChatAnswer(this.value, {required this.model, this.cost});
+  const ChatAnswer(
+    this.value, {
+    required this.model,
+    this.cost,
+    this.attempts = const [],
+  });
+
+  /// Every attempt, the last one successful.
+  final List<AiAttempt> attempts;
 
   final T value;
 
@@ -73,44 +85,125 @@ class OpenRouterChat {
     }
   }
 
+  /// Output room reserved for (low-effort) reasoning on top of the
+  /// visible answer. Every free model on OpenRouter is a reasoning model
+  /// (October 2026), and reasoning tokens count against `max_tokens`: with
+  /// too small a limit the model spends it all reasoning and returns no
+  /// answer (`finish_reason: length`, empty content).
+  static const reasoningAllowance = 3000;
+
+  /// Highest `max_tokens` sent (within every free model's output limit).
+  static const maxOutputTokens = 8000;
+
+  /// `max_tokens` and reasoning controls for an answer of about
+  /// [visibleTokens] tokens. In free-only mode reasoning is asked to be
+  /// brief and left out of the response; with free-only off nothing is
+  /// added (the chosen catalog model may not support the parameter, and
+  /// `require_parameters` would then find no endpoint).
+  static Map<String, Object?> outputControls({
+    required int visibleTokens,
+    required bool freeOnly,
+  }) => {
+    'max_tokens': min(maxOutputTokens, reasoningAllowance + visibleTokens),
+    if (freeOnly) 'reasoning': {'effort': 'low', 'exclude': true},
+  };
+
   /// Sends the request [body] builds for each attempt and returns [parse]'s
   /// result for the first usable answer. [parse] receives the model's text
   /// and throws `EnrichmentException(malformedResponse)` for an unusable
   /// answer (another free model may then be tried).
+  ///
+  /// [tag] names the feature in the diagnostic log; every attempt is logged
+  /// and attached to a failure ([EnrichmentException.attempts]) without the
+  /// key or any content.
   Future<ChatAnswer<T>> send<T>({
     required String apiKey,
     required AiPreferences prefs,
     required Map<String, Object?> Function(ModelAttempt attempt) body,
     required T Function(String content) parse,
     EnrichmentCancellation? cancellation,
+    Duration? timeout,
+    String tag = 'ai',
   }) async {
     final (attempts, verifiedIds) = await _plan(prefs);
     final budget = RetryBudget(client.maxRetries);
+    final log = <AiAttempt>[];
     for (var a = 0; ; a++) {
       final attempt = attempts[a];
+      Map<String, Object?>? json;
       try {
-        final json = await client.chatCompletion(
+        json = await client.chatCompletion(
           apiKey: apiKey,
           body: body(attempt),
           cancellation: cancellation,
           budget: budget,
           free: prefs.freeOnly,
+          timeout: timeout,
         );
         final usedModel = json['model'] is String
             ? json['model']! as String
             : attempt.model;
         if (prefs.freeOnly) _enforceZeroCost(json, usedModel, verifiedIds);
         final value = parse(_content(json));
+        _record(tag, log, attempt, json, null);
         await _quietly(() async => _localState?.recordModelUsed(usedModel));
-        return ChatAnswer(value, model: usedModel, cost: _cost(json));
+        return ChatAnswer(
+          value,
+          model: usedModel,
+          cost: _cost(json),
+          attempts: List.unmodifiable(log),
+        );
       } on EnrichmentException catch (e) {
+        _record(tag, log, attempt, json, e);
         final hasNext = a + 1 < attempts.length;
-        if (!prefs.freeOnly || !hasNext || !_canFallBack(e)) rethrow;
-        // Another free model may succeed; it counts against the same
-        // retry budget as same-model retries.
-        if (!budget.tryConsume()) rethrow;
+        final fallBack =
+            prefs.freeOnly &&
+            hasNext &&
+            _canFallBack(e) &&
+            // Another free model may succeed; it counts against the same
+            // retry budget as same-model retries.
+            budget.tryConsume();
+        if (!fallBack) throw e.withAttempts(log);
       }
     }
+  }
+
+  static void _record(
+    String tag,
+    List<AiAttempt> log,
+    ModelAttempt attempt,
+    Map<String, Object?>? json,
+    EnrichmentException? error,
+  ) {
+    final usage = json?['usage'];
+    final details = usage is Map ? usage['completion_tokens_details'] : null;
+    final choices = json?['choices'];
+    final first = choices is List && choices.isNotEmpty ? choices.first : null;
+    final message = first is Map ? first['message'] : null;
+    final content = message is Map ? message['content'] : null;
+    int? number(Object? v) => v is num ? v.toInt() : null;
+    final entry = AiAttempt(
+      model: attempt.model,
+      outputMode: attempt.outputMode.name,
+      answeredBy: json?['model'] is String ? json!['model']! as String : null,
+      statusCode: error?.statusCode ?? (json == null ? null : 200),
+      error: error?.error,
+      problem: error?.problem,
+      finishReason: first is Map && first['finish_reason'] is String
+          ? first['finish_reason']! as String
+          : null,
+      completionTokens: usage is Map
+          ? number(usage['completion_tokens'])
+          : null,
+      reasoningTokens: details is Map
+          ? number(details['reasoning_tokens'])
+          : null,
+      contentLength: content is String ? content.length : null,
+      detail: error?.detail,
+    );
+    log.add(entry);
+    // Local diagnostics only: model ids, statuses and counts.
+    debugPrint('[$tag] attempt ${log.length}: $entry');
   }
 
   Future<(List<ModelAttempt>, Set<String>)> _plan(AiPreferences prefs) async {
@@ -171,12 +264,23 @@ class OpenRouterChat {
     final first = choices is List && choices.isNotEmpty ? choices.first : null;
     final message = first is Map ? first['message'] : null;
     final content = message is Map ? message['content'] : null;
+    final text = content is String ? content.trim() : '';
     // A truncated answer is not valid JSON we can trust.
-    if (content is! String ||
-        (first is Map && first['finish_reason'] == 'length')) {
-      throw const EnrichmentException(EnrichmentError.malformedResponse);
+    if (first is Map && first['finish_reason'] == 'length') {
+      throw EnrichmentException(
+        EnrichmentError.malformedResponse,
+        problem: text.isEmpty
+            ? ResponseProblem.cutOffWhileReasoning
+            : ResponseProblem.cutOff,
+      );
     }
-    return content;
+    if (text.isEmpty) {
+      throw const EnrichmentException(
+        EnrichmentError.malformedResponse,
+        problem: ResponseProblem.empty,
+      );
+    }
+    return text;
   }
 
   static double? _cost(Map<String, Object?> json) {

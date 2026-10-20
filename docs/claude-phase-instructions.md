@@ -12,7 +12,8 @@ phase. They complement the product specification and
    (D42–D47: FSRS review, review direction, hidden answers, photo word
    selection, iOS speech fix, bulk delete), then D48–D53, then the
    **Build 3** release scope (D54–D56: full backup/restore, the About
-   screen with release notes, AI sentence practice). No later phase
+   screen with release notes, AI sentence practice), then **Build 4**
+   (D57 sentence-generation fix, D58 card appearance). No later phase
    exists; other proposals are not approved.
 2. At the end of each phase: report and **stop**. Do not start the next phase
    without explicit approval.

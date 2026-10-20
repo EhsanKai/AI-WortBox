@@ -67,8 +67,8 @@ keeps its own navigation stack.
 
 ## Database
 
-Drift, schema version **3** (v1 → v2 in Phase 5, D33; v2 → v3 in Build 3,
-D55). DateTimes are
+Drift, schema version **4** (v1 → v2 in Phase 5, D33; v2 → v3 in Build 3,
+D55; v3 → v4 in Build 4, D58). DateTimes are
 stored as ISO-8601 text and always written in UTC, so text comparisons on
 due dates are correct. Enum columns
 store the enum value's `name`. Foreign keys are enabled in `beforeOpen`.
@@ -83,6 +83,7 @@ store the enum value's `name`. Foreign keys are enabled in `beforeOpen`.
 | `entry_tags` (v2) | Tag assignments | PK `(entry_id, tag_id)`; FK → entries and tags (cascade); index `tag_id` |
 | `review_events` (v2) | Recorded practice answers: session, direction, outcome, UTC time, local day | FK → entries (**set null**: history is kept); index `local_day` |
 | `app_settings` (v2) | Non-secret key-value settings (study reminder) | PK `key` |
+| `card_appearances` (v4) | Optional look of a word's card: colours, sizes, highlights (JSON), sticker; presentation only | PK/FK `entry_id` → entries (cascade) |
 | `sentence_practice_events` (v3) | Sentence-practice history: word, direction, level, outcome, UTC time; no answers or AI text | FK → entries (cascade); index `entry_id` |
 
 `vocabulary_entries` gained `marked_difficult_at` (manual mark, not content:
@@ -101,10 +102,10 @@ never writes to `flashcards`, so progress is never reset by a definition edit
    `app_database.steps.dart` and migration tests under `test/drift/`.
 4. Implement `onUpgrade` with `stepByStep(...)`, run tests.
 
-Exported schemas (v1–v3) are checked by
+Exported schemas (v1–v4) are checked by
 `test/drift/app_database/schema_test.dart`; `migration_test.dart` migrates
-every version step and checks that v1 data survives v1 → v2 and v2 data
-(every table) survives v2 → v3 unchanged.
+every version step and checks that v1 data survives v1 → v2, v2 data
+(every table) survives v2 → v3, and v3 data survives v3 → v4 unchanged.
 
 ## Vocabulary
 
@@ -376,6 +377,29 @@ OpenRouterEnrichmentService ─ OpenRouterChat ─ OpenRouterClient (shared)
   plan, zero-cost check, free fallback and retry budget.
 - Tests override `appInfoSourceProvider`, `safetyBackupStoreProvider`,
   `backupFileSourceProvider` and use mocked HTTP for sentence practice.
+
+## Build 4 (D57, D58)
+
+- **AI requests:** `OpenRouterChat.outputControls` gives every request room
+  for the free models' reasoning (`max_tokens` = 3,000 + visible answer,
+  ≤ 8,000) and, in free-only mode, `reasoning: {effort: low, exclude:
+  true}`. `send` records an `AiAttempt` per attempt (no key or content),
+  logs it with `debugPrint`, and attaches the list to the final
+  `EnrichmentException` (with a `ResponseProblem`). `EnrichmentParser`
+  extracts JSON after `<think>` blocks, from fences anywhere or between
+  harmless text.
+- **Card appearance** (`features/card_appearance`): `CardAppearance`
+  (domain, pure), `DriftCardAppearanceRepository` (only
+  `card_appearances`), `cardAppearanceProvider` (stream per word),
+  `CardPalette` (light/dark colours), `AppearanceCardFrame`,
+  `HighlightedText`, `cardTextStyle`, and `CardAppearanceScreen` (pushed on
+  the current navigator from the word page and the review card).
+
+```
+EntryDetail / review _Card ─ cardAppearanceProvider ─ CardAppearanceRepository
+        └ AppearanceCardFrame + HighlightedText (+ cardTextStyle)
+CardAppearanceScreen ─ draft (live preview) ─ save on "Save" only
+```
 
 ## Security
 

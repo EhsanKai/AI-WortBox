@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:ai_wortbox/data/database/app_database.dart';
 import 'package:ai_wortbox/features/sentence_practice/domain/sentence_practice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 
 import '../helpers/ai_fakes.dart';
 import '../helpers/app_harness.dart';
@@ -168,6 +170,45 @@ void main() {
     await tapKey(tester, 'sp.retryGeneration');
     expect(find.byKey(const Key('sp.prompt')), findsOneWidget);
     expect(api.completionCalls, 2);
+  });
+
+  testWidgets('an answer cut off while the model was reasoning gets its '
+      'own message and content-free technical details; retry works', (
+    tester,
+  ) async {
+    await seedLearningData(db);
+    final cutOff = http.Response.bytes(
+      utf8.encode(
+        jsonEncode({
+          'model': 'minimax/minimax-m3.1-flash:free',
+          'choices': [
+            {
+              'finish_reason': 'length',
+              'message': {'role': 'assistant', 'content': null},
+            },
+          ],
+          'usage': {
+            'completion_tokens': 1350,
+            'completion_tokens_details': {'reasoning_tokens': 1350},
+          },
+        }),
+      ),
+      200,
+      headers: {'content-type': 'application/json'},
+    );
+    api.completions = [cutOff, cutOff, generated];
+    await open(tester);
+    await start(tester);
+
+    expect(find.textContaining('ظرفیت خروجی'), findsOneWidget);
+    await scrollAndTap(tester, find.byKey(const Key('sp.technicalDetails')));
+    expect(find.textContaining('finish=length'), findsWidgets);
+    expect(find.textContaining('reasoning 1350'), findsWidgets);
+    expect(find.textContaining(testApiKey), findsNothing);
+
+    await scrollAndTap(tester, find.byKey(const Key('sp.retryGeneration')));
+    expect(find.byKey(const Key('sp.prompt')), findsOneWidget);
+    expect(api.completionCalls, 3);
   });
 
   testWidgets('an answer that cannot be used is reported as such', (

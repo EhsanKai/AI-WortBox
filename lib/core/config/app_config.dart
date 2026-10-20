@@ -71,6 +71,12 @@ abstract final class AppConfig {
   /// other words are available.
   static const Duration sentencePracticeRecent = Duration(days: 3);
 
+  /// Time limits for generating a session and for checking one answer
+  /// (longer than enrichment: several sentences, and free models reason
+  /// before answering).
+  static const Duration sentenceGenerationTimeout = Duration(seconds: 90);
+  static const Duration sentenceCheckTimeout = Duration(seconds: 60);
+
   /// Longest answer the learner can submit, in characters.
   static const int sentenceAnswerMaxLength = 400;
 

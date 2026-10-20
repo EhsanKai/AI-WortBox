@@ -1,6 +1,8 @@
 import 'package:ai_wortbox/core/id/id_generator.dart';
 import 'package:ai_wortbox/core/time/clock.dart';
 import 'package:ai_wortbox/data/database/app_database.dart';
+import 'package:ai_wortbox/features/card_appearance/data/drift_card_appearance_repository.dart';
+import 'package:ai_wortbox/features/card_appearance/domain/card_appearance.dart';
 import 'package:ai_wortbox/features/decks/data/drift_deck_repository.dart';
 import 'package:ai_wortbox/features/decks/domain/deck.dart';
 import 'package:ai_wortbox/features/review/data/drift_review_repository.dart';
@@ -119,6 +121,25 @@ Future<SeededIds> seedLearningData(
     level: SentenceLevel.b1,
     outcome: SentencePracticeOutcome.minorErrors,
   );
+  // A styled card (mixed German/Persian highlights) and one on the word
+  // that is deleted below (its appearance goes with it).
+  final looks = DriftCardAppearanceRepository(db, clock: c);
+  await looks.save(
+    haus.id,
+    CardAppearance(
+      background: CardColor.mint,
+      ink: CardInk.green,
+      wordScale: 1.4,
+      meaningScale: 1.2,
+      highlightColor: HighlightColor.pink,
+      highlights: {
+        const CardHighlight(HighlightField.word, 'Haus'),
+        const CardHighlight(HighlightField.meaning, 'منزل'),
+      },
+      sticker: CardSticker.star,
+    ),
+  );
+  await looks.save(deleted.id, const CardAppearance(sticker: CardSticker.fire));
   // History of a deleted word is kept with a null word id.
   await words.deleteEntry(deleted.id);
   return (
@@ -150,5 +171,6 @@ Future<Map<String, List<Map<String, Object?>>>> dumpLearningData(
     'entry_tags': await rows('entry_tags', 'entry_id, tag_id'),
     'review_events': await rows('review_events', 'id'),
     'sentence_practice_events': await rows('sentence_practice_events', 'id'),
+    'card_appearances': await rows('card_appearances', 'entry_id'),
   };
 }

@@ -7,6 +7,7 @@ import '../../../core/config/app_config.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/text/text_normalizer.dart';
 import '../../../data/database/app_database.dart';
+import '../../card_appearance/domain/card_appearance.dart';
 import '../../review/domain/flashcard.dart';
 import '../../review/domain/review_event.dart';
 import '../../sentence_practice/domain/sentence_practice.dart';
@@ -27,6 +28,7 @@ class BackupSnapshot {
     this.entryTags = const [],
     this.reviewEvents = const [],
     this.sentencePractice = const [],
+    this.cardAppearances = const [],
   });
 
   final List<DeckRow> decks;
@@ -42,6 +44,9 @@ class BackupSnapshot {
   final List<ReviewEventRow> reviewEvents;
   final List<SentencePracticeEventRow> sentencePractice;
 
+  /// Card appearance per word (schema v4; absent in older files).
+  final List<CardAppearanceRow> cardAppearances;
+
   BackupCounts get counts => BackupCounts(
     decks: decks.length,
     entries: entries.length,
@@ -51,6 +56,7 @@ class BackupSnapshot {
     entryTags: entryTags.length,
     reviewEvents: reviewEvents.length,
     sentencePractice: sentencePractice.length,
+    cardAppearances: cardAppearances.length,
   );
 }
 
@@ -65,6 +71,7 @@ class BackupCounts {
     required this.entryTags,
     required this.reviewEvents,
     required this.sentencePractice,
+    this.cardAppearances = 0,
   });
 
   final int decks;
@@ -75,6 +82,7 @@ class BackupCounts {
   final int entryTags;
   final int reviewEvents;
   final int sentencePractice;
+  final int cardAppearances;
 
   Map<String, int> toJson() => {
     'decks': decks,
@@ -85,6 +93,7 @@ class BackupCounts {
     'entryTags': entryTags,
     'reviewEvents': reviewEvents,
     'sentencePractice': sentencePractice,
+    'cardAppearances': cardAppearances,
   };
 
   @override
@@ -156,6 +165,9 @@ abstract final class BackupCodec {
       'sentencePractice': [
         for (final s in snapshot.sentencePractice) _practice(s),
       ],
+      'cardAppearances': [
+        for (final a in snapshot.cardAppearances) _appearance(a),
+      ],
     };
     final file = {
       'format': formatName,
@@ -217,6 +229,9 @@ abstract final class BackupCodec {
     final counts = root.map('counts');
     final expected = snapshot.counts.toJson();
     for (final MapEntry(:key, :value) in expected.entries) {
+      // Lists added in later schema versions are absent (with their count)
+      // from older files.
+      if (value == 0 && counts.json[key] == null) continue;
       if (counts.integer(key) != value) {
         throw BackupException(
           BackupError.invalidValue,
@@ -325,6 +340,18 @@ abstract final class BackupCodec {
     'outcome': r.outcome.name,
     'reviewedAt': _date(r.reviewedAt),
     'localDay': r.localDay,
+  };
+
+  static Map<String, Object?> _appearance(CardAppearanceRow a) => {
+    'entryId': a.entryId,
+    'background': a.background,
+    'ink': a.ink,
+    'wordScale': a.wordScale,
+    'meaningScale': a.meaningScale,
+    'highlightColor': a.highlightColor,
+    'highlights': a.highlights,
+    'sticker': a.sticker,
+    'updatedAt': _date(a.updatedAt),
   };
 
   static Map<String, Object?> _practice(SentencePracticeEventRow s) => {
@@ -455,6 +482,23 @@ class _Validator {
   void _exists(Set<String> ids, String? id, String location) {
     if (id != null && !ids.contains(id)) {
       throw BackupException(BackupError.brokenReference, location: location);
+    }
+  }
+
+  /// A JSON list of `{"f": "word"|"meaning", "t": text}`.
+  static bool _validHighlights(String json) {
+    try {
+      final list = jsonDecode(json);
+      return list is List &&
+          list.every(
+            (h) =>
+                h is Map &&
+                HighlightField.values.any((f) => f.name == h['f']) &&
+                h['t'] is String &&
+                (h['t'] as String).trim().isNotEmpty,
+          );
+    } on FormatException {
+      return false;
     }
   }
 
@@ -663,7 +707,57 @@ class _Validator {
       practice.add(row);
     }
 
+    final appearances = <CardAppearanceRow>[];
+    final styled = <String>{};
+    for (final r in data.list('cardAppearances')) {
+      String? choice<T extends Enum>(String key, List<T> values) {
+        final name = r.optString(key);
+        if (name != null && !values.any((v) => v.name == name)) {
+          throw BackupException(
+            BackupError.invalidValue,
+            location: '${r.path}.$key',
+          );
+        }
+        return name;
+      }
+
+      double scale(String key) {
+        final value = r.optDouble(key) ?? 1;
+        if (value < CardAppearance.minScale ||
+            value > CardAppearance.maxScale) {
+          throw BackupException(
+            BackupError.invalidValue,
+            location: '${r.path}.$key',
+          );
+        }
+        return value;
+      }
+
+      final highlights = r.optString('highlights') ?? '[]';
+      if (!_validHighlights(highlights)) {
+        throw BackupException(
+          BackupError.invalidValue,
+          location: '${r.path}.highlights',
+        );
+      }
+      final row = CardAppearanceRow(
+        entryId: r.string('entryId'),
+        background: choice('background', CardColor.values),
+        ink: choice('ink', CardInk.values),
+        wordScale: scale('wordScale'),
+        meaningScale: scale('meaningScale'),
+        highlightColor: choice('highlightColor', HighlightColor.values),
+        highlights: highlights,
+        sticker: choice('sticker', CardSticker.values),
+        updatedAt: r.date('updatedAt'),
+      );
+      _exists(entryIds, row.entryId, '${r.path}.entryId');
+      _unique(styled, row.entryId, '${r.path}.entryId');
+      appearances.add(row);
+    }
+
     return BackupSnapshot(
+      cardAppearances: appearances,
       decks: decks,
       entries: entries,
       meanings: meanings,

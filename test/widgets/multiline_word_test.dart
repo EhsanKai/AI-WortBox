@@ -93,7 +93,7 @@ void main() {
 
     await openPractice(tester);
     final text = tester.widget<Text>(wordText());
-    expect(text.data, nachbar);
+    expect(plainText(text), nachbar);
     expect(text.textDirection, TextDirection.ltr);
     // Exactly two lines of the multi-line headword (24 px × 1.35).
     final height = tester.getSize(wordText()).height;
@@ -120,7 +120,7 @@ void main() {
       nachbar,
     );
     await scrollTo(tester, wordText());
-    expect(tester.widget<Text>(wordText()).data, nachbar);
+    expect(plainText(tester.widget<Text>(wordText())), nachbar);
     await unmountApp(tester);
   });
 
@@ -132,7 +132,7 @@ void main() {
     await openPractice(tester);
     expect(wordText(), findsNothing);
     await scrollAndTap(tester, find.byKey(const Key('practice.reveal')));
-    expect(tester.widget<Text>(wordText()).data, nachbar);
+    expect(plainText(tester.widget<Text>(wordText())), nachbar);
     expect(tester.getSize(wordText()).height, closeTo(2 * 24 * 1.35, 4));
     await unmountApp(tester);
   });
@@ -142,7 +142,7 @@ void main() {
   ) async {
     await addWord('das Haus', 'خانه');
     await openPractice(tester);
-    expect(tester.widget<Text>(wordText()).data, 'das Haus');
+    expect(plainText(tester.widget<Text>(wordText())), 'das Haus');
     expect(tester.getSize(wordText()).height, closeTo(30 * 1.25, 4));
     await unmountApp(tester);
   });
@@ -161,3 +161,6 @@ void main() {
     await unmountApp(tester);
   });
 }
+
+/// The rendered string of [text], plain or rich (card highlights).
+String plainText(Text text) => text.data ?? text.textSpan!.toPlainText();

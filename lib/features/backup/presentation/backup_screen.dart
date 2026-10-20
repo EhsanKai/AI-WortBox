@@ -290,6 +290,11 @@ class _PreviewView extends ConsumerWidget {
                       file.sentencePractice,
                       device.sentencePractice,
                     ),
+                    row(
+                      l10n.backupCountAppearances,
+                      file.cardAppearances,
+                      device.cardAppearances,
+                    ),
                   ],
                 ),
               ],

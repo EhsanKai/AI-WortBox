@@ -116,6 +116,7 @@ class OpenRouterEnrichmentService implements VocabularyEnrichmentService {
         (id: '${n + 1}', request: requests[i]),
     ];
     final answer = await _chat.send(
+      tag: 'enrichment',
       apiKey: apiKey,
       prefs: prefs,
       cancellation: cancellation,
@@ -271,11 +272,14 @@ class OpenRouterEnrichmentService implements VocabularyEnrichmentService {
         if (freeOnly) 'max_price': zeroMaxPrice,
       },
       'temperature': 0.2,
-      'max_tokens': meaningsOnly
-          ? 200 + 250 * words.length
-          : single
-          ? 2000
-          : 400 + 600 * words.length,
+      ...OpenRouterChat.outputControls(
+        visibleTokens: meaningsOnly
+            ? 200 + 250 * words.length
+            : single
+            ? 2000
+            : 400 + 600 * words.length,
+        freeOnly: freeOnly,
+      ),
     };
   }
 

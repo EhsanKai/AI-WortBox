@@ -193,6 +193,16 @@ String errorMessage(AppLocalizations l10n, Object error) => switch (error) {
     ScanError.ocrUnavailable => l10n.scanErrorOcrUnavailable,
     ScanError.ocrFailed => l10n.scanErrorOcrFailed,
   },
+  EnrichmentException(
+    error: EnrichmentError.malformedResponse,
+    problem: ResponseProblem.cutOffWhileReasoning || ResponseProblem.cutOff,
+  ) =>
+    l10n.aiErrorCutOff,
+  EnrichmentException(
+    error: EnrichmentError.malformedResponse,
+    problem: ResponseProblem.noUsableItems,
+  ) =>
+    l10n.aiErrorNoUsable,
   EnrichmentException(:final error) => switch (error) {
     EnrichmentError.notConfigured => l10n.aiErrorNotConfigured,
     EnrichmentError.invalidKey => l10n.aiErrorInvalidKey,

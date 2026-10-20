@@ -38,6 +38,7 @@ class RestoreResult {
     this.tagsAdded = 0,
     this.reviewEventsAdded = 0,
     this.sentencePracticeAdded = 0,
+    this.cardAppearancesAdded = 0,
   });
 
   final RestoreMode mode;
@@ -59,6 +60,7 @@ class RestoreResult {
   final int tagsAdded;
   final int reviewEventsAdded;
   final int sentencePracticeAdded;
+  final int cardAppearancesAdded;
 }
 
 /// Creates and restores full backups of the learning data. Every restore
@@ -124,6 +126,7 @@ class BackupService {
       entryTags: await count(_db.entryTags),
       reviewEvents: await count(_db.reviewEvents),
       sentencePractice: await count(_db.sentencePracticeEvents),
+      cardAppearances: await count(_db.cardAppearances),
     );
   });
 
@@ -165,11 +168,13 @@ class BackupService {
     entryTags: await _db.select(_db.entryTags).get(),
     reviewEvents: await _db.select(_db.reviewEvents).get(),
     sentencePractice: await _db.select(_db.sentencePracticeEvents).get(),
+    cardAppearances: await _db.select(_db.cardAppearances).get(),
   );
 
   Future<RestoreResult> _replace(BackupSnapshot s) async {
     // Children first; settings (app_settings) are not learning data and stay.
     await _db.delete(_db.entryTags).go();
+    await _db.delete(_db.cardAppearances).go();
     await _db.delete(_db.sentencePracticeEvents).go();
     await _db.delete(_db.reviewEvents).go();
     await _db.delete(_db.flashcards).go();
@@ -190,10 +195,12 @@ class BackupService {
         ..insertAll(_db.tags, s.tags)
         ..insertAll(_db.entryTags, s.entryTags)
         ..insertAll(_db.reviewEvents, s.reviewEvents)
-        ..insertAll(_db.sentencePracticeEvents, s.sentencePractice);
+        ..insertAll(_db.sentencePracticeEvents, s.sentencePractice)
+        ..insertAll(_db.cardAppearances, s.cardAppearances);
     });
     return RestoreResult(
       mode: RestoreMode.replace,
+      cardAppearancesAdded: s.cardAppearances.length,
       decksAdded: s.decks.length,
       entriesAdded: s.entries.length,
       flashcardsAdded: s.flashcards.length,
@@ -332,6 +339,13 @@ class BackupService {
           p.copyWith(entryId: entryMap[p.entryId]),
     ];
 
+    // A word's appearance comes along only with a word added here; a word
+    // already on the device keeps its own look.
+    final newAppearances = [
+      for (final a in s.cardAppearances)
+        if (added.contains(a.entryId)) a,
+    ];
+
     await _db.batch((b) {
       b
         ..insertAll(_db.decks, newDecks)
@@ -341,10 +355,12 @@ class BackupService {
         ..insertAll(_db.tags, newTags)
         ..insertAll(_db.entryTags, newPairs)
         ..insertAll(_db.reviewEvents, newReviews)
-        ..insertAll(_db.sentencePracticeEvents, newPractice);
+        ..insertAll(_db.sentencePracticeEvents, newPractice)
+        ..insertAll(_db.cardAppearances, newAppearances);
     });
     return RestoreResult(
       mode: RestoreMode.merge,
+      cardAppearancesAdded: newAppearances.length,
       decksAdded: decksAdded,
       decksMatched: decksMatched,
       entriesAdded: newEntries.length,

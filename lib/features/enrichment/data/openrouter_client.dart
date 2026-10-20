@@ -147,6 +147,7 @@ class OpenRouterClient {
     EnrichmentCancellation? cancellation,
     RetryBudget? budget,
     bool free = false,
+    Duration? timeout,
   }) async {
     final payload = jsonEncode(body);
     final retries = budget ?? RetryBudget(maxRetries);
@@ -165,7 +166,7 @@ class OpenRouterClient {
                   },
                   body: payload,
                 )
-                .timeout(requestTimeout),
+                .timeout(timeout ?? requestTimeout),
             cancellation,
           ),
           free: free,

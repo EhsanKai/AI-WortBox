@@ -16,7 +16,7 @@ default, Persian → German or both).
 - **[Installation guide](docs/installation.md)**: build it onto your own
   iPhone with Xcode, distribute it through TestFlight, set up the optional
   OpenRouter key, and troubleshoot.
-- Current release: **1.0.0, build 3** ([release notes](assets/release_notes.json),
+- Current release: **1.0.0, build 4** ([release notes](assets/release_notes.json),
   [release process](docs/releases.md)). In the app: Settings → About AI
   WortBox shows the installed version, build and its changes.
 - TestFlight status: **not yet available.** Uploading needs a paid Apple
@@ -138,6 +138,20 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
   choose.
 - **Anki import:** Add → Import from Anki (`.apkg`), through the same
   preview and duplicate handling as CSV.
+
+### Build 4 (1.0.0+4)
+
+- **Sentence practice fix:** requests to the free models (all of which
+  "think" before answering) now leave room for an answer and keep the
+  thinking short; answers with extra text are accepted and partly valid
+  answers keep their good exercises. If generation still fails, the error
+  says why and "Technical details" shows what happened (no key, none of
+  your words). Not yet confirmed with a real OpenRouter request.
+- **Card appearance** (word page or review card → Card appearance):
+  background and text colour, separate sizes for the German word and the
+  meanings, highlighted words or meanings, and a sticker, per word, with a
+  live preview, Save, Cancel and Reset. Included in backups; never changes
+  the word, its review schedule or history.
 
 ### Build 3 (1.0.0+3)
 

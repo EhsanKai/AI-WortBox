@@ -1,5 +1,7 @@
 import 'package:ai_wortbox/app/theme.dart';
 import 'package:ai_wortbox/core/design/app_colors.dart';
+import 'package:ai_wortbox/features/card_appearance/domain/card_appearance.dart';
+import 'package:ai_wortbox/features/card_appearance/presentation/card_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -71,6 +73,33 @@ void main() {
           );
         }
       });
+
+      test(
+        'card appearance: every text colour is readable (4.5:1) on every '
+        'card background, the page and answer surfaces and every highlight',
+        () {
+          final b = theme.brightness;
+          final backgrounds = <String, Color>{
+            for (final c in CardColor.values)
+              'bg.${c.name}':
+                  CardPalette.background(c, b) ?? s.surfaceContainerLow,
+            'surface': s.surface,
+            'answer': s.surfaceContainerHigh,
+            for (final h in HighlightColor.values)
+              'mark.${h.name}': CardPalette.highlight(h, b),
+          };
+          for (final ink in CardInk.values) {
+            final fg = CardPalette.ink(ink, b) ?? s.onSurface;
+            for (final MapEntry(:key, value: bg) in backgrounds.entries) {
+              expect(
+                contrast(fg, bg),
+                greaterThanOrEqualTo(4.5),
+                reason: 'ink.${ink.name} on $key ($name)',
+              );
+            }
+          }
+        },
+      );
 
       test('input and control outlines meet 3:1', () {
         for (final bg in [s.surface, s.surfaceContainerLow, c.inputFill]) {

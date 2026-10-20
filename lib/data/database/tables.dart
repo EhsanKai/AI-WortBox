@@ -205,3 +205,27 @@ class SentencePracticeEvents extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
+
+/// How a word's card looks (schema v4): colours, text sizes, highlights and
+/// a sticker. One optional row per word; no row means the standard look.
+/// Presentation only, kept apart from the content so styling a card never
+/// changes the word's `updated_at` or its review state. Choices are stored
+/// by name (unknown names read as the default).
+@DataClassName('CardAppearanceRow')
+class CardAppearances extends Table {
+  TextColumn get entryId =>
+      text().references(VocabularyEntries, #id, onDelete: KeyAction.cascade)();
+  TextColumn get background => text().nullable()();
+  TextColumn get ink => text().nullable()();
+  RealColumn get wordScale => real().withDefault(const Constant(1))();
+  RealColumn get meaningScale => real().withDefault(const Constant(1))();
+  TextColumn get highlightColor => text().nullable()();
+
+  /// JSON list of `{"f": "word"|"meaning", "t": text}`.
+  TextColumn get highlights => text().withDefault(const Constant('[]'))();
+  TextColumn get sticker => text().nullable()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {entryId};
+}

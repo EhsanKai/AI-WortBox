@@ -200,7 +200,10 @@ abstract final class EnrichmentParser {
   static ParsedEnrichment parse(String content, {required String original}) {
     final map = _decode(content);
     if (map is! Map) {
-      throw const EnrichmentException(EnrichmentError.malformedResponse);
+      throw const EnrichmentException(
+        EnrichmentError.malformedResponse,
+        problem: ResponseProblem.unexpectedShape,
+      );
     }
     return parseMap(map.cast<String, Object?>(), original: original);
   }
@@ -235,7 +238,10 @@ abstract final class EnrichmentParser {
         {...decoded, 'id': words.single.id, 'word': words.single.original},
       ];
     } else {
-      throw const EnrichmentException(EnrichmentError.malformedResponse);
+      throw const EnrichmentException(
+        EnrichmentError.malformedResponse,
+        problem: ResponseProblem.unexpectedShape,
+      );
     }
 
     String key(String s) => TextNormalizer.vocabularyKey(s);
@@ -280,7 +286,10 @@ abstract final class EnrichmentParser {
       );
     }
     if (!results.values.any((r) => r is ParsedEnrichment)) {
-      throw const EnrichmentException(EnrichmentError.malformedResponse);
+      throw const EnrichmentException(
+        EnrichmentError.malformedResponse,
+        problem: ResponseProblem.noUsableItems,
+      );
     }
     return results;
   }
@@ -314,7 +323,10 @@ abstract final class EnrichmentParser {
       }
     }
     if (meanings.isEmpty) {
-      throw const EnrichmentException(EnrichmentError.malformedResponse);
+      throw const EnrichmentException(
+        EnrichmentError.malformedResponse,
+        problem: ResponseProblem.noUsableItems,
+      );
     }
     if (meaningsOnly) {
       return ParsedEnrichment(
@@ -408,19 +420,48 @@ abstract final class EnrichmentParser {
   /// Throws `malformedResponse` when it is not a JSON object or array.
   static Object? decodeJson(String content) => _decode(content);
 
+  static final _thinking = RegExp(
+    r'<(think|thinking|reasoning)>[\s\S]*?</\1>',
+    caseSensitive: false,
+  );
+  static final _fence = RegExp(r'```(?:json|JSON)?\s*([\s\S]*?)\s*```');
+
   static Object? _decode(String content) {
-    var text = content.trim();
-    // Some models wrap JSON in a Markdown code fence despite the schema.
-    final fence = RegExp(r'^```(?:json)?\s*([\s\S]*?)\s*```$');
-    final match = fence.firstMatch(text);
-    if (match != null) text = match.group(1)!;
-    try {
-      final decoded = jsonDecode(text);
-      if (decoded is Map || decoded is List) return decoded;
-    } on FormatException {
-      // Fall through.
+    // Some models put their reasoning into the answer text.
+    final text = content.replaceAll(_thinking, '').trim();
+    if (text.isEmpty) {
+      throw const EnrichmentException(
+        EnrichmentError.malformedResponse,
+        problem: ResponseProblem.empty,
+      );
     }
-    throw const EnrichmentException(EnrichmentError.malformedResponse);
+    final candidates = <String>[
+      text,
+      // JSON inside a Markdown code fence, anywhere in the text.
+      for (final m in _fence.allMatches(text)) m.group(1)!,
+      // JSON with harmless text before or after it: from the first opening
+      // bracket to the last matching closing one.
+      ?_outermost(text, '{', '}'),
+      ?_outermost(text, '[', ']'),
+    ];
+    for (final candidate in candidates) {
+      try {
+        final decoded = jsonDecode(candidate);
+        if (decoded is Map || decoded is List) return decoded;
+      } on FormatException {
+        // Try the next candidate.
+      }
+    }
+    throw const EnrichmentException(
+      EnrichmentError.malformedResponse,
+      problem: ResponseProblem.notJson,
+    );
+  }
+
+  static String? _outermost(String text, String open, String close) {
+    final start = text.indexOf(open);
+    final end = text.lastIndexOf(close);
+    return start >= 0 && end > start ? text.substring(start, end + 1) : null;
   }
 
   static String? _text(Object? value, int maxLength) {

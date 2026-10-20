@@ -149,15 +149,40 @@ void main() {
       expect(r.rejected, [haus]);
     });
 
-    test('a usedForm that is not in the sentence is rejected', () {
+    test('a missing or wrong usedForm falls back to the form found in the '
+        'sentence', () {
+      for (final item in [
+        {...hausItem(), 'usedForm': 'Häuser'},
+        {...hausItem()}..remove('usedForm'),
+      ]) {
+        final r = SentencePracticeParser.parseExercises(content([item]), [
+          haus,
+        ]);
+        expect(r.exercises.single.usedForm, 'Haus');
+      }
+    });
+
+    test('lenient where it is safe: numeric ids, an echoed word with an '
+        'article, a saved word with annotations, one German word in the '
+        'Persian text', () {
+      const annotated = PracticeWord(
+        entryId: 'e-x',
+        original: 'das Haus, die Häuser',
+        meanings: ['خانه'],
+      );
       final r = SentencePracticeParser.parseExercises(
         content([
-          {...hausItem(), 'usedForm': 'Häuser'},
-          gehenItem(),
+          {
+            ...hausItem(),
+            'id': 1,
+            'word': 'das Haus',
+            'persian': 'خانهٔ ما (Haus) باغ بزرگی دارد.',
+          },
         ]),
-        [haus, gehen],
+        [annotated],
       );
-      expect(r.rejected, [haus]);
+      expect(r.exercises.single.word, annotated);
+      expect(r.exercises.single.usedForm, 'Haus');
     });
 
     test('items about another word, wrong ids, duplicates and invalid '
@@ -167,9 +192,8 @@ void main() {
         {...hausItem(), 'id': '9'},
         {...hausItem(), 'persian': 'Unser Haus ist groß.'},
         {...hausItem(), 'german': 'خانهٔ ما بزرگ است.'},
-        {...hausItem(), 'persian': 'خانهٔ ما Unser Haus بزرگ است.'},
+        {...hausItem(), 'persian': 'خانهٔ ما Unser Haus hat بزرگ است.'},
         {...hausItem(), 'german': ''},
-        {...hausItem(), 'usedForm': null},
         {...hausItem(), 'german': 'Haus ${'sehr ' * 80}'},
       ];
       for (final bad in cases) {

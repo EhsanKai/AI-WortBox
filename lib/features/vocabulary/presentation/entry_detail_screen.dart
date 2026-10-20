@@ -15,6 +15,9 @@ import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../card_appearance/domain/card_appearance.dart';
+import '../../card_appearance/presentation/card_appearance_screen.dart';
+import '../../card_appearance/presentation/card_style.dart';
 import '../../speech/presentation/speak_button.dart';
 import '../../tags/presentation/entry_tags_sheet.dart';
 import '../../tags/presentation/tag_providers.dart';
@@ -118,6 +121,12 @@ class EntryDetailScreen extends ConsumerWidget {
                   context.push(AppRoutes.entryEnrich(deckId, entryId)),
             ),
             IconButton(
+              key: const Key('entryDetail.appearance'),
+              tooltip: l10n.appearanceAction,
+              icon: const Icon(Icons.palette_outlined),
+              onPressed: () => openCardAppearance(context, entryId),
+            ),
+            IconButton(
               key: const Key('entryDetail.edit'),
               tooltip: l10n.actionEdit,
               icon: const Icon(Icons.edit_outlined),
@@ -161,6 +170,9 @@ class _EntryDetails extends ConsumerWidget {
     final theme = Theme.of(context);
     final colors = context.colors;
     final muted = theme.colorScheme.onSurfaceVariant;
+    final appearance =
+        ref.watch(cardAppearanceProvider(entry.id)).value ??
+        CardAppearance.standard;
 
     Widget section(String title, List<Widget> children) => Padding(
       padding: const EdgeInsets.only(top: AppSpace.xl),
@@ -183,57 +195,64 @@ class _EntryDetails extends ConsumerWidget {
         AppSpace.xxl,
       ),
       children: [
-        // The headword card.
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpace.lg + AppSpace.xs),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: AutoDirectionText(
-                        entry.original,
-                        key: const Key('entryDetail.word'),
-                        style: AppTypography.headword,
+        // The headword card, in the card's own appearance.
+        AppearanceCardFrame(
+          key: const Key('entryDetail.card'),
+          appearance: appearance,
+          padding: const EdgeInsets.all(AppSpace.lg + AppSpace.xs),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: HighlightedText(
+                      entry.original,
+                      key: const Key('entryDetail.word'),
+                      field: HighlightField.word,
+                      appearance: appearance,
+                      style: cardTextStyle(
+                        context,
+                        AppTypography.headword,
+                        appearance,
+                        appearance.wordScale,
                       ),
                     ),
-                    SpeakButton(
-                      key: const Key('entryDetail.speakWord'),
-                      text: entry.original,
-                      language: entry.sourceLanguage,
-                    ),
-                  ],
+                  ),
+                  SpeakButton(
+                    key: const Key('entryDetail.speakWord'),
+                    text: entry.original,
+                    language: entry.sourceLanguage,
+                  ),
+                ],
+              ),
+              if (entry.isDifficult) ...[
+                const SizedBox(height: AppSpace.xs),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: StatusBadge(
+                    key: const Key('entryDetail.difficultBadge'),
+                    label: l10n.entryDifficult,
+                    tone: StatusTone.warning,
+                    icon: Icons.flag,
+                  ),
                 ),
-                if (entry.isDifficult) ...[
-                  const SizedBox(height: AppSpace.xs),
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: StatusBadge(
-                      key: const Key('entryDetail.difficultBadge'),
-                      label: l10n.entryDifficult,
-                      tone: StatusTone.warning,
-                      icon: Icons.flag,
-                    ),
-                  ),
-                ],
-                if (grammar.isNotEmpty) ...[
-                  const SizedBox(height: AppSpace.xs),
-                  AutoDirectionText(
-                    grammar,
-                    style: AppTypography.germanBody.copyWith(color: muted),
-                  ),
-                ],
-                if (entry.lemma != null) ...[
-                  const SizedBox(height: AppSpace.sm),
-                  Text(
-                    '${l10n.entryLemma}: ${bidiIsolate(entry.lemma!)}',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: muted),
-                  ),
-                ],
               ],
-            ),
+              if (grammar.isNotEmpty) ...[
+                const SizedBox(height: AppSpace.xs),
+                AutoDirectionText(
+                  grammar,
+                  style: AppTypography.germanBody.copyWith(color: muted),
+                ),
+              ],
+              if (entry.lemma != null) ...[
+                const SizedBox(height: AppSpace.sm),
+                Text(
+                  '${l10n.entryLemma}: ${bidiIsolate(entry.lemma!)}',
+                  style: theme.textTheme.bodyMedium?.copyWith(color: muted),
+                ),
+              ],
+            ],
           ),
         ),
         section(l10n.entryMeanings, [
@@ -274,10 +293,15 @@ class _EntryDetails extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        AutoDirectionText(
+                        HighlightedText(
                           meaning.text,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontSize: 17,
+                          field: HighlightField.meaning,
+                          appearance: appearance,
+                          style: cardTextStyle(
+                            context,
+                            theme.textTheme.titleMedium?.copyWith(fontSize: 17),
+                            appearance,
+                            appearance.meaningScale,
                           ),
                         ),
                         if (meaning.explanation != null)

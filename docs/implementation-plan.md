@@ -28,7 +28,8 @@ to formatting, static analysis and host-side automated tests.
 | 3 | Photo/gallery input, German OCR, word and expression selection | **Complete** (`77287d7`) |
 | 4 | AI enrichment with the user's own OpenRouter key (BYOK) | **Complete** (`eaa0278`); live OpenRouter and real-device/platform verification outstanding |
 | 5 | Search, tags, export, Anki, TTS, reminders, practice and statistics (scope selected by the product owner) | **Complete** (`0402972`, follow-ups `aae5d5e`, `721ae7b`) |
-| Build 3 | Release `1.0.0+3`: full backup/restore, About screen with release notes, AI sentence practice (product owner request, D54–D56) | **Complete** (see below) |
+| Build 3 | Release `1.0.0+3`: full backup/restore, About screen with release notes, AI sentence practice (product owner request, D54–D56) | **Complete** (`9abe9da`) |
+| Build 4 | Release `1.0.0+4`: sentence-generation fix (D57), card appearance (D58) | **Complete** (see below); the fix is not yet confirmed with a live request |
 
 ## Phase 1 — Foundation and local persistence — Complete (`73fa370`)
 
@@ -175,6 +176,16 @@ Approved and implemented together (decisions D54–D56):
 
 Schema **v3** (one additive table). One dependency: `package_info_plus`.
 Live OpenRouter calls are still unverified (mocked HTTP only).
+
+## Build 4 — release 1.0.0+4 (product owner request)
+
+| Item | What is implemented |
+| --- | --- |
+| Sentence-generation fix (D57) | Room for the free models' reasoning in `max_tokens`, brief excluded reasoning in free-only mode, longer timeouts for sentence practice, more tolerant JSON extraction and validation, partial results kept, distinct cut-off/no-usable messages, content-free diagnostics in the app and the device log. |
+| Card appearance (D58) | Per-word background, text colour, word and meaning sizes, highlighted words/meanings, sticker; editor with live preview, Save/Cancel/Reset from the word page and the review card; schema v4 (`card_appearances`); included in backups. |
+
+Deferred: highlighting arbitrary character ranges, user-added sticker
+images, global card themes.
 
 ## Proposed feature register
 
@@ -433,7 +444,8 @@ Evaluated and implemented in Phase 5 (product owner selection), D39–D40.
 
 ## Schema change and migration policy
 
-The current schema is **v3** (Build 3, D55: `sentence_practice_events`);
+The current schema is **v4** (Build 4, D58: `card_appearances`; Build 3,
+D55: `sentence_practice_events`);
 v2 came with Phase 5 (D33); Phases 2–4 made no schema changes.
 Before any schema change:
 

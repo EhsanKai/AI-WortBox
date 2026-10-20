@@ -170,16 +170,102 @@ enum EnrichmentError {
   paidModelBlocked,
 }
 
+/// Why an answer was unusable (with [EnrichmentError.malformedResponse]).
+enum ResponseProblem {
+  /// The model used its whole output budget before writing any answer
+  /// (typically on reasoning): `finish_reason: length`, no content.
+  cutOffWhileReasoning,
+
+  /// The answer was cut off at the output limit.
+  cutOff,
+
+  /// The model returned no text.
+  empty,
+
+  /// The text contains no JSON object.
+  notJson,
+
+  /// JSON, but not the requested structure.
+  unexpectedShape,
+
+  /// The structure was right, but no item passed the checks (e.g. the
+  /// target word was missing from every sentence).
+  noUsableItems,
+
+  /// The answer contradicted itself (e.g. "correct" with the target word
+  /// missing).
+  contradictory,
+}
+
+/// What happened to one attempt of a request, for diagnostics. Contains
+/// model ids, statuses and counts only: never the key, prompts, answers or
+/// vocabulary.
+class AiAttempt {
+  const AiAttempt({
+    required this.model,
+    required this.outputMode,
+    this.answeredBy,
+    this.statusCode,
+    this.error,
+    this.problem,
+    this.finishReason,
+    this.completionTokens,
+    this.reasoningTokens,
+    this.contentLength,
+    this.detail,
+  });
+
+  /// The model requested (e.g. `openrouter/free`).
+  final String model;
+
+  /// How JSON was requested (`jsonSchema`, `jsonObject`, `promptOnly`).
+  final String outputMode;
+
+  /// The model that actually answered, when known.
+  final String? answeredBy;
+  final int? statusCode;
+
+  /// Null when the attempt succeeded.
+  final EnrichmentError? error;
+  final ResponseProblem? problem;
+  final String? finishReason;
+  final int? completionTokens;
+  final int? reasoningTokens;
+  final int? contentLength;
+
+  /// Content-free notes, e.g. why generated items were rejected.
+  final String? detail;
+
+  @override
+  String toString() => [
+    '$model${answeredBy != null && answeredBy != model ? ' → $answeredBy' : ''}',
+    outputMode,
+    if (statusCode != null) 'HTTP $statusCode',
+    error == null ? 'ok' : error!.name,
+    ?problem?.name,
+    if (finishReason != null) 'finish=$finishReason',
+    if (completionTokens != null)
+      'tokens=$completionTokens'
+          '${reasoningTokens != null ? ' (reasoning $reasoningTokens)' : ''}',
+    if (contentLength != null) 'chars=$contentLength',
+    ?detail,
+  ].join(' · ');
+}
+
 /// A failed AI request.
 ///
 /// Never contains the API key, request or response bodies, or vocabulary
-/// content: only the reason and the HTTP status, so it is safe to log.
+/// content: only the reason, the HTTP status and content-free diagnostics,
+/// so it is safe to log.
 final class EnrichmentException extends AppException {
   const EnrichmentException(
     this.error, {
     this.statusCode,
     this.retryAt,
     this.upstream = false,
+    this.problem,
+    this.detail,
+    this.attempts = const [],
   });
 
   final EnrichmentError error;
@@ -196,6 +282,27 @@ final class EnrichmentException extends AppException {
   /// different free model may succeed.
   final bool upstream;
 
+  /// Why the answer was unusable, for [EnrichmentError.malformedResponse].
+  final ResponseProblem? problem;
+
+  /// Content-free diagnostic note (e.g. rejection reasons and counts).
+  final String? detail;
+
+  /// Every attempt of the request (set by `OpenRouterChat`).
+  final List<AiAttempt> attempts;
+
+  /// This failure with the attempts that led to it.
+  EnrichmentException withAttempts(List<AiAttempt> attempts) =>
+      EnrichmentException(
+        error,
+        statusCode: statusCode,
+        retryAt: retryAt,
+        upstream: upstream,
+        problem: problem,
+        detail: detail,
+        attempts: List.unmodifiable(attempts),
+      );
+
   /// Whether retrying later could succeed without the user changing
   /// anything (key, credits, model).
   bool get isTemporary => switch (error) {
@@ -210,7 +317,8 @@ final class EnrichmentException extends AppException {
   @override
   String toString() =>
       'EnrichmentException($error, status: $statusCode'
-      '${upstream ? ', upstream' : ''})';
+      '${upstream ? ', upstream' : ''}'
+      '${problem != null ? ', ${problem!.name}' : ''})';
 }
 
 /// Entries changed after an enrichment proposal was made, so it was not

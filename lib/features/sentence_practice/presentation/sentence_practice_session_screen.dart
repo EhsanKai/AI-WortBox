@@ -88,30 +88,84 @@ class _GenerationFailed extends StatelessWidget {
     final notConfigured =
         error is EnrichmentException &&
         (error as EnrichmentException).error == EnrichmentError.notConfigured;
-    return EmptyStateView(
+    final attempts = error is EnrichmentException
+        ? (error as EnrichmentException).attempts
+        : const <AiAttempt>[];
+    final theme = Theme.of(context);
+    return ListView(
       key: const Key('sp.generationFailed'),
-      icon: Icons.cloud_off_outlined,
-      tone: StatusTone.danger,
-      title: l10n.spGenerationFailedTitle,
-      message: '${errorMessage(l10n, error)}\n\n${l10n.spGenerationFailedHint}',
-      action: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FilledButton.icon(
-            key: const Key('sp.retryGeneration'),
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh),
-            label: Text(l10n.actionRetry),
+      children: [
+        EmptyStateView(
+          scrollable: false,
+          icon: Icons.cloud_off_outlined,
+          tone: StatusTone.danger,
+          title: l10n.spGenerationFailedTitle,
+          message:
+              '${errorMessage(l10n, error)}\n\n${l10n.spGenerationFailedHint}',
+          action: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FilledButton.icon(
+                key: const Key('sp.retryGeneration'),
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: Text(l10n.actionRetry),
+              ),
+              if (notConfigured) ...[
+                const SizedBox(height: AppSpace.sm),
+                TextButton(
+                  onPressed: () => context.go(AppRoutes.aiSettings),
+                  child: Text(l10n.spOpenAiSettings),
+                ),
+              ],
+            ],
           ),
-          if (notConfigured) ...[
-            const SizedBox(height: AppSpace.sm),
-            TextButton(
-              onPressed: () => context.go(AppRoutes.aiSettings),
-              child: Text(l10n.spOpenAiSettings),
+        ),
+        if (attempts.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpace.gutter),
+            child: Card(
+              child: ExpansionTile(
+                key: const Key('sp.technicalDetails'),
+                shape: const Border(),
+                title: Text(l10n.spTechnicalDetails),
+                subtitle: Text(l10n.spTechnicalNote),
+                children: [
+                  for (final (i, a) in attempts.indexed)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpace.lg,
+                        0,
+                        AppSpace.lg,
+                        AppSpace.sm,
+                      ),
+                      child: SelectableText(
+                        '${i + 1}. $a',
+                        textDirection: TextDirection.ltr,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ),
+                  if ((error as EnrichmentException).detail case final d?)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpace.lg,
+                        0,
+                        AppSpace.lg,
+                        AppSpace.lg,
+                      ),
+                      child: SelectableText(
+                        d,
+                        textDirection: TextDirection.ltr,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ],
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

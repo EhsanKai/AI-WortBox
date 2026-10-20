@@ -17,6 +17,9 @@ import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../card_appearance/domain/card_appearance.dart';
+import '../../card_appearance/presentation/card_appearance_screen.dart';
+import '../../card_appearance/presentation/card_style.dart';
 import '../../decks/presentation/deck_providers.dart';
 import '../../speech/presentation/speak_button.dart';
 import '../../tags/presentation/entry_tags_sheet.dart';
@@ -331,6 +334,9 @@ class _Card extends ConsumerWidget {
     // shows at once; the session's copy is used while it loads (or if the
     // word was deleted meanwhile).
     final entry = ref.watch(entryProvider(card.entry.id)).value ?? card.entry;
+    final appearance =
+        ref.watch(cardAppearanceProvider(entry.id)).value ??
+        CardAppearance.standard;
 
     return ListView(
       // A new card must never reuse the previous card's revealed widgets.
@@ -364,14 +370,20 @@ class _Card extends ConsumerWidget {
           style: theme.textTheme.titleSmall,
         ),
         const SizedBox(height: AppSpace.sm),
-        Card(
+        AppearanceCardFrame(
           key: const Key('practice.prompt'),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpace.xl),
-            child: card.asksMeaning
-                ? _GermanSide(entry: entry, centered: true)
-                : _MeaningSide(entry: entry, centered: true),
-          ),
+          appearance: appearance,
+          child: card.asksMeaning
+              ? _GermanSide(
+                  entry: entry,
+                  appearance: appearance,
+                  centered: true,
+                )
+              : _MeaningSide(
+                  entry: entry,
+                  appearance: appearance,
+                  centered: true,
+                ),
         ),
         const SizedBox(height: AppSpace.lg),
         if (!revealed)
@@ -410,8 +422,12 @@ class _Card extends ConsumerWidget {
                     onEdit: () => _edit(context, entry),
                   ),
                   card.asksMeaning
-                      ? _MeaningSide(entry: entry, explanations: true)
-                      : _GermanSide(entry: entry),
+                      ? _MeaningSide(
+                          entry: entry,
+                          appearance: appearance,
+                          explanations: true,
+                        )
+                      : _GermanSide(entry: entry, appearance: appearance),
                   _AnswerDetails(entry: entry),
                 ],
               ),
@@ -508,6 +524,14 @@ class _AnswerActions extends ConsumerWidget {
           ),
         ),
         TextButton.icon(
+          key: const Key('practice.appearance'),
+          onPressed: enabled
+              ? () => openCardAppearance(context, entry.id)
+              : null,
+          icon: const Icon(Icons.palette_outlined),
+          label: Text(l10n.appearanceAction),
+        ),
+        TextButton.icon(
           key: const Key('practice.tags.edit'),
           onPressed: enabled
               ? () => showEntryTagsSheet(
@@ -527,22 +551,34 @@ class _AnswerActions extends ConsumerWidget {
 /// The German side: the word with pronunciation. Line breaks the user
 /// entered are kept; long lines still wrap.
 class _GermanSide extends StatelessWidget {
-  const _GermanSide({required this.entry, this.centered = false});
+  const _GermanSide({
+    required this.entry,
+    required this.appearance,
+    this.centered = false,
+  });
 
   final VocabularyEntry entry;
+  final CardAppearance appearance;
   final bool centered;
 
   @override
   Widget build(BuildContext context) => Row(
     children: [
       Expanded(
-        child: AutoDirectionText(
+        child: HighlightedText(
           entry.original,
           key: const Key('practice.word'),
+          field: HighlightField.word,
+          appearance: appearance,
           textAlign: centered ? TextAlign.center : null,
-          style: entry.original.contains('\n')
-              ? AppTypography.headwordMultiline
-              : AppTypography.headword,
+          style: cardTextStyle(
+            context,
+            entry.original.contains('\n')
+                ? AppTypography.headwordMultiline
+                : AppTypography.headword,
+            appearance,
+            appearance.wordScale,
+          ),
         ),
       ),
       SpeakButton(text: entry.original, language: entry.sourceLanguage),
@@ -554,11 +590,13 @@ class _GermanSide extends StatelessWidget {
 class _MeaningSide extends StatelessWidget {
   const _MeaningSide({
     required this.entry,
+    required this.appearance,
     this.centered = false,
     this.explanations = false,
   });
 
   final VocabularyEntry entry;
+  final CardAppearance appearance;
   final bool centered;
   final bool explanations;
 
@@ -574,11 +612,18 @@ class _MeaningSide extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AutoDirectionText(
+                HighlightedText(
                   meaning.text,
                   key: const Key('practice.meaning'),
+                  field: HighlightField.meaning,
+                  appearance: appearance,
                   textAlign: centered ? TextAlign.center : null,
-                  style: theme.textTheme.headlineSmall,
+                  style: cardTextStyle(
+                    context,
+                    theme.textTheme.headlineSmall,
+                    appearance,
+                    appearance.meaningScale,
+                  ),
                 ),
                 if (explanations && meaning.explanation != null)
                   AutoDirectionText(

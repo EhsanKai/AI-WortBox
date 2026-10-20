@@ -12,6 +12,8 @@ import '../data/database/app_database.dart';
 import '../features/backup/data/backup_file_source.dart';
 import '../features/backup/data/backup_service.dart';
 import '../features/backup/data/safety_backup_store.dart';
+import '../features/card_appearance/data/drift_card_appearance_repository.dart';
+import '../features/card_appearance/domain/card_appearance.dart';
 import '../features/csv_import/data/csv_file_source.dart';
 import '../features/decks/data/drift_deck_repository.dart';
 import '../features/decks/domain/deck_repository.dart';
@@ -105,6 +107,14 @@ final sentencePracticeRepositoryProvider = Provider<SentencePracticeRepository>(
     ref.watch(appDatabaseProvider),
     clock: ref.watch(clockProvider),
     ids: ref.watch(idGeneratorProvider),
+  ),
+);
+
+/// Card appearance (colours, sizes, highlights, stickers) per word.
+final cardAppearanceRepositoryProvider = Provider<CardAppearanceRepository>(
+  (ref) => DriftCardAppearanceRepository(
+    ref.watch(appDatabaseProvider),
+    clock: ref.watch(clockProvider),
   ),
 );
 

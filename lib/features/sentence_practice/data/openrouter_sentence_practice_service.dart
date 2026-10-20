@@ -1,5 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
+import '../../../core/config/app_config.dart';
+
 import '../../enrichment/data/openrouter_chat.dart';
 import '../../enrichment/domain/enrichment.dart';
 import '../../enrichment/domain/free_model_policy.dart';
@@ -41,7 +45,13 @@ class OpenRouterSentencePracticeService implements SentencePracticeAi {
         freeOnly: prefs.freeOnly,
       ),
       parse: (content) => SentencePracticeParser.parseExercises(content, words),
+      timeout: AppConfig.sentenceGenerationTimeout,
+      tag: 'sentence.generate',
     );
+    if (answer.value.rejectionSummary case final summary?) {
+      // Content-free: counts of rejection reasons only.
+      debugPrint('[sentence.generate] partly usable: $summary');
+    }
     return answer.value;
   }
 
@@ -68,6 +78,8 @@ class OpenRouterSentencePracticeService implements SentencePracticeAi {
         freeOnly: prefs.freeOnly,
       ),
       parse: SentencePracticeParser.parseFeedback,
+      timeout: AppConfig.sentenceCheckTimeout,
+      tag: 'sentence.check',
     );
     return result.value;
   }
@@ -85,7 +97,8 @@ class OpenRouterSentencePracticeService implements SentencePracticeAi {
     schema: exercisesSchema,
     freeOnly: freeOnly,
     temperature: 0.7,
-    maxTokens: 250 + 220 * words.length,
+    // German + Persian sentence and the JSON around it, per word.
+    visibleTokens: 300 + 250 * words.length,
     user: {
       'level': level.cefr,
       'exercise': direction == SentencePracticeDirection.understand
@@ -122,7 +135,7 @@ class OpenRouterSentencePracticeService implements SentencePracticeAi {
     schema: feedbackSchema,
     freeOnly: freeOnly,
     temperature: 0.2,
-    maxTokens: 900,
+    visibleTokens: 1000,
     user: {
       'level': level.cefr,
       'target_word': exercise.word.original,
@@ -142,7 +155,7 @@ class OpenRouterSentencePracticeService implements SentencePracticeAi {
     required Map<String, Object?> user,
     required bool freeOnly,
     required double temperature,
-    required int maxTokens,
+    required int visibleTokens,
   }) {
     final schemaMode = attempt.outputMode == StructuredOutputMode.jsonSchema;
     return {
@@ -172,7 +185,10 @@ class OpenRouterSentencePracticeService implements SentencePracticeAi {
         if (freeOnly) 'max_price': OpenRouterChat.zeroMaxPrice,
       },
       'temperature': temperature,
-      'max_tokens': maxTokens,
+      ...OpenRouterChat.outputControls(
+        visibleTokens: visibleTokens,
+        freeOnly: freeOnly,
+      ),
     };
   }
 

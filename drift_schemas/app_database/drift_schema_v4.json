@@ -1,0 +1,1487 @@
+{
+  "_meta": {
+    "description": "This file contains a serialized version of schema entities for drift.",
+    "version": "1.3.0"
+  },
+  "options": {
+    "store_date_time_values_as_text": true
+  },
+  "entities": [
+    {
+      "id": 0,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "decks",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 1,
+                  "max": 80
+                }
+              }
+            ]
+          },
+          {
+            "name": "source_language",
+            "getter_name": "sourceLanguage",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 2,
+                  "max": 16
+                }
+              }
+            ]
+          },
+          {
+            "name": "definition_language",
+            "getter_name": "definitionLanguage",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 2,
+                  "max": 16
+                }
+              }
+            ]
+          },
+          {
+            "name": "daily_new_card_limit",
+            "getter_name": "dailyNewCardLimit",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "check": {
+                  "dart_expression": {
+                    "elements": [
+                      {
+                        "lexeme": "ComparableExpr",
+                        "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+                      },
+                      "(",
+                      {
+                        "lexeme": "dailyNewCardLimit",
+                        "tag": "dailyNewCardLimit"
+                      },
+                      ").isBetweenValues(0,1000)"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "vocabulary_entries",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "deck_id",
+            "getter_name": "deckId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES decks (id) ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES decks (id) ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "decks",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "original",
+            "getter_name": "original",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 1,
+                  "max": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "normalized",
+            "getter_name": "normalized",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "lemma",
+            "getter_name": "lemma",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "source_language",
+            "getter_name": "sourceLanguage",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 2,
+                  "max": 16
+                }
+              }
+            ]
+          },
+          {
+            "name": "definition_language",
+            "getter_name": "definitionLanguage",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 2,
+                  "max": 16
+                }
+              }
+            ]
+          },
+          {
+            "name": "part_of_speech",
+            "getter_name": "partOfSpeech",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "example_sentence",
+            "getter_name": "exampleSentence",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "example_translation",
+            "getter_name": "exampleTranslation",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "grammar_info",
+            "getter_name": "grammarInfo",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "notes",
+            "getter_name": "notes",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "source_context",
+            "getter_name": "sourceContext",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "source_type",
+            "getter_name": "sourceType",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<VocabularySourceType>(VocabularySourceType.values)",
+              "dart_type_name": "VocabularySourceType"
+            }
+          },
+          {
+            "name": "enrichment_status",
+            "getter_name": "enrichmentStatus",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<EnrichmentStatus>(EnrichmentStatus.values)",
+              "dart_type_name": "EnrichmentStatus"
+            }
+          },
+          {
+            "name": "enrichment_metadata",
+            "getter_name": "enrichmentMetadata",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "user_edited_at",
+            "getter_name": "userEditedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "marked_difficult_at",
+            "getter_name": "markedDifficultAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "search_key",
+            "getter_name": "searchKey",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "vocabulary_meanings",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "entry_id",
+            "getter_name": "entryId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "vocabulary_entries",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "position",
+            "getter_name": "position",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "meaning",
+            "getter_name": "meaning",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 1,
+                  "max": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "explanation",
+            "getter_name": "explanation",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ],
+        "unique_keys": [
+          [
+            "entry_id",
+            "position"
+          ]
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "flashcards",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "entry_id",
+            "getter_name": "entryId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "vocabulary_entries",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "direction",
+            "getter_name": "direction",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<CardDirection>(CardDirection.values)",
+              "dart_type_name": "CardDirection"
+            }
+          },
+          {
+            "name": "state",
+            "getter_name": "state",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<CardState>(CardState.values)",
+              "dart_type_name": "CardState"
+            }
+          },
+          {
+            "name": "step",
+            "getter_name": "step",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "stability",
+            "getter_name": "stability",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "difficulty",
+            "getter_name": "difficulty",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "due",
+            "getter_name": "due",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "last_reviewed_at",
+            "getter_name": "lastReviewedAt",
+            "moor_type": "dateTime",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "review_count",
+            "getter_name": "reviewCount",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "lapse_count",
+            "getter_name": "lapseCount",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "scheduler_version",
+            "getter_name": "schedulerVersion",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ],
+        "unique_keys": [
+          [
+            "entry_id",
+            "direction"
+          ]
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "tags",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 1,
+                  "max": 40
+                }
+              }
+            ]
+          },
+          {
+            "name": "name_key",
+            "getter_name": "nameKey",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "UNIQUE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "UNIQUE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "unique"
+            ]
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "references": [
+        1,
+        4
+      ],
+      "type": "table",
+      "data": {
+        "name": "entry_tags",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "entry_id",
+            "getter_name": "entryId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "vocabulary_entries",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "tag_id",
+            "getter_name": "tagId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES tags (id) ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES tags (id) ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "tags",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "entry_id",
+          "tag_id"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "review_events",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "entry_id",
+            "getter_name": "entryId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES vocabulary_entries (id) ON DELETE SET NULL",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES vocabulary_entries (id) ON DELETE SET NULL"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "vocabulary_entries",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "setNull"
+                }
+              }
+            ]
+          },
+          {
+            "name": "session_id",
+            "getter_name": "sessionId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "direction",
+            "getter_name": "direction",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<CardDirection>(CardDirection.values)",
+              "dart_type_name": "CardDirection"
+            }
+          },
+          {
+            "name": "outcome",
+            "getter_name": "outcome",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<ReviewOutcome>(ReviewOutcome.values)",
+              "dart_type_name": "ReviewOutcome"
+            }
+          },
+          {
+            "name": "reviewed_at",
+            "getter_name": "reviewedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "local_day",
+            "getter_name": "localDay",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "allowed-lengths": {
+                  "min": 10,
+                  "max": 10
+                }
+              }
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "app_settings",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "key",
+            "getter_name": "key",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "value",
+            "getter_name": "value",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "key"
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "sentence_practice_events",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "entry_id",
+            "getter_name": "entryId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "vocabulary_entries",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "direction",
+            "getter_name": "direction",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<SentencePracticeDirection>(SentencePracticeDirection.values)",
+              "dart_type_name": "SentencePracticeDirection"
+            }
+          },
+          {
+            "name": "level",
+            "getter_name": "level",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<SentenceLevel>(SentenceLevel.values)",
+              "dart_type_name": "SentenceLevel"
+            }
+          },
+          {
+            "name": "outcome",
+            "getter_name": "outcome",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<SentencePracticeOutcome>(SentencePracticeOutcome.values)",
+              "dart_type_name": "SentencePracticeOutcome"
+            }
+          },
+          {
+            "name": "practiced_at",
+            "getter_name": "practicedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "id"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "card_appearances",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "entry_id",
+            "getter_name": "entryId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES vocabulary_entries (id) ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "vocabulary_entries",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "background",
+            "getter_name": "background",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "ink",
+            "getter_name": "ink",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "word_scale",
+            "getter_name": "wordScale",
+            "moor_type": "double",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('1.0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "meaning_scale",
+            "getter_name": "meaningScale",
+            "moor_type": "double",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('1.0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "highlight_color",
+            "getter_name": "highlightColor",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "highlights",
+            "getter_name": "highlights",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('\\'[]\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "sticker",
+            "getter_name": "sticker",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "updated_at",
+            "getter_name": "updatedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "entry_id"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_entries_deck_normalized",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          {
+            "column": "deck_id",
+            "order_by": null
+          },
+          {
+            "column": "normalized",
+            "order_by": null
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "references": [
+        3
+      ],
+      "type": "index",
+      "data": {
+        "on": 3,
+        "name": "idx_flashcards_due",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          {
+            "column": "due",
+            "order_by": null
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "references": [
+        5
+      ],
+      "type": "index",
+      "data": {
+        "on": 5,
+        "name": "idx_entry_tags_tag",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          {
+            "column": "tag_id",
+            "order_by": null
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_review_events_day",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          {
+            "column": "local_day",
+            "order_by": null
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "references": [
+        8
+      ],
+      "type": "index",
+      "data": {
+        "on": 8,
+        "name": "idx_sentence_practice_entry",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          {
+            "column": "entry_id",
+            "order_by": null
+          }
+        ]
+      }
+    }
+  ],
+  "fixed_sql": [
+    {
+      "name": "decks",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"decks\" (\"id\" TEXT NOT NULL, \"name\" TEXT NOT NULL, \"source_language\" TEXT NOT NULL, \"definition_language\" TEXT NOT NULL, \"daily_new_card_limit\" INTEGER NOT NULL CHECK(\"daily_new_card_limit\" BETWEEN 0 AND 1000), \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "vocabulary_entries",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"vocabulary_entries\" (\"id\" TEXT NOT NULL, \"deck_id\" TEXT NOT NULL REFERENCES decks (id) ON DELETE CASCADE, \"original\" TEXT NOT NULL, \"normalized\" TEXT NOT NULL, \"lemma\" TEXT NULL, \"source_language\" TEXT NOT NULL, \"definition_language\" TEXT NOT NULL, \"part_of_speech\" TEXT NULL, \"example_sentence\" TEXT NULL, \"example_translation\" TEXT NULL, \"grammar_info\" TEXT NULL, \"notes\" TEXT NULL, \"source_context\" TEXT NULL, \"source_type\" TEXT NOT NULL, \"enrichment_status\" TEXT NOT NULL, \"enrichment_metadata\" TEXT NULL, \"user_edited_at\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, \"marked_difficult_at\" TEXT NULL, \"search_key\" TEXT NOT NULL DEFAULT '', PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "vocabulary_meanings",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"vocabulary_meanings\" (\"id\" TEXT NOT NULL, \"entry_id\" TEXT NOT NULL REFERENCES vocabulary_entries (id) ON DELETE CASCADE, \"position\" INTEGER NOT NULL, \"meaning\" TEXT NOT NULL, \"explanation\" TEXT NULL, PRIMARY KEY (\"id\"), UNIQUE (\"entry_id\", \"position\"));"
+        }
+      ]
+    },
+    {
+      "name": "flashcards",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"flashcards\" (\"id\" TEXT NOT NULL, \"entry_id\" TEXT NOT NULL REFERENCES vocabulary_entries (id) ON DELETE CASCADE, \"direction\" TEXT NOT NULL, \"state\" TEXT NOT NULL, \"step\" INTEGER NULL, \"stability\" REAL NULL, \"difficulty\" REAL NULL, \"due\" TEXT NOT NULL, \"last_reviewed_at\" TEXT NULL, \"review_count\" INTEGER NOT NULL DEFAULT 0, \"lapse_count\" INTEGER NOT NULL DEFAULT 0, \"scheduler_version\" TEXT NULL, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, PRIMARY KEY (\"id\"), UNIQUE (\"entry_id\", \"direction\"));"
+        }
+      ]
+    },
+    {
+      "name": "tags",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"tags\" (\"id\" TEXT NOT NULL, \"name\" TEXT NOT NULL, \"name_key\" TEXT NOT NULL UNIQUE, \"created_at\" TEXT NOT NULL, \"updated_at\" TEXT NOT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "entry_tags",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"entry_tags\" (\"entry_id\" TEXT NOT NULL REFERENCES vocabulary_entries (id) ON DELETE CASCADE, \"tag_id\" TEXT NOT NULL REFERENCES tags (id) ON DELETE CASCADE, \"created_at\" TEXT NOT NULL, PRIMARY KEY (\"entry_id\", \"tag_id\"));"
+        }
+      ]
+    },
+    {
+      "name": "review_events",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"review_events\" (\"id\" TEXT NOT NULL, \"entry_id\" TEXT NULL REFERENCES vocabulary_entries (id) ON DELETE SET NULL, \"session_id\" TEXT NOT NULL, \"direction\" TEXT NOT NULL, \"outcome\" TEXT NOT NULL, \"reviewed_at\" TEXT NOT NULL, \"local_day\" TEXT NOT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "app_settings",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"app_settings\" (\"key\" TEXT NOT NULL, \"value\" TEXT NOT NULL, PRIMARY KEY (\"key\"));"
+        }
+      ]
+    },
+    {
+      "name": "sentence_practice_events",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"sentence_practice_events\" (\"id\" TEXT NOT NULL, \"entry_id\" TEXT NOT NULL REFERENCES vocabulary_entries (id) ON DELETE CASCADE, \"direction\" TEXT NOT NULL, \"level\" TEXT NOT NULL, \"outcome\" TEXT NOT NULL, \"practiced_at\" TEXT NOT NULL, PRIMARY KEY (\"id\"));"
+        }
+      ]
+    },
+    {
+      "name": "card_appearances",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"card_appearances\" (\"entry_id\" TEXT NOT NULL REFERENCES vocabulary_entries (id) ON DELETE CASCADE, \"background\" TEXT NULL, \"ink\" TEXT NULL, \"word_scale\" REAL NOT NULL DEFAULT 1.0, \"meaning_scale\" REAL NOT NULL DEFAULT 1.0, \"highlight_color\" TEXT NULL, \"highlights\" TEXT NOT NULL DEFAULT '[]', \"sticker\" TEXT NULL, \"updated_at\" TEXT NOT NULL, PRIMARY KEY (\"entry_id\"));"
+        }
+      ]
+    },
+    {
+      "name": "idx_entries_deck_normalized",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_entries_deck_normalized ON vocabulary_entries (deck_id, normalized)"
+        }
+      ]
+    },
+    {
+      "name": "idx_flashcards_due",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_flashcards_due ON flashcards (due)"
+        }
+      ]
+    },
+    {
+      "name": "idx_entry_tags_tag",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_entry_tags_tag ON entry_tags (tag_id)"
+        }
+      ]
+    },
+    {
+      "name": "idx_review_events_day",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_review_events_day ON review_events (local_day)"
+        }
+      ]
+    },
+    {
+      "name": "idx_sentence_practice_entry",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_sentence_practice_entry ON sentence_practice_events (entry_id)"
+        }
+      ]
+    }
+  ]
+}

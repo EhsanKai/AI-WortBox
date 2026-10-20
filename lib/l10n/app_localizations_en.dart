@@ -3107,4 +3107,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spBackToToday => 'Back to Today';
+
+  @override
+  String get aiErrorCutOff =>
+      'The model used up its output before writing an answer (usually on \"thinking\") and returned nothing. Try again; if it keeps happening, choose \"Quality Free\" in AI settings.';
+
+  @override
+  String get aiErrorNoUsable =>
+      'The model answered, but nothing in it passed the checks (for example, the target word was missing from the sentence). Try again.';
+
+  @override
+  String get spTechnicalDetails => 'Technical details';
+
+  @override
+  String get spTechnicalNote =>
+      'Contains no key and none of your words; useful when reporting a problem.';
+
+  @override
+  String get appearanceAction => 'Card appearance';
+
+  @override
+  String get appearanceTitle => 'Card appearance';
+
+  @override
+  String get appearancePreview => 'Preview';
+
+  @override
+  String get appearanceBackground => 'Background colour';
+
+  @override
+  String get appearanceTextColor => 'Text colour';
+
+  @override
+  String get appearanceTextSize => 'Text size';
+
+  @override
+  String get appearanceWordSize => 'German word';
+
+  @override
+  String get appearanceMeaningSize => 'Persian meanings';
+
+  @override
+  String get appearanceHighlight => 'Highlighting';
+
+  @override
+  String get appearanceHighlightHint =>
+      'Pick a marker colour, then tap a word of the German entry or a meaning to highlight it. The text itself is not changed.';
+
+  @override
+  String get appearanceSticker => 'Sticker';
+
+  @override
+  String get appearanceNoSticker => 'None';
+
+  @override
+  String get appearanceStandard => 'Default';
+
+  @override
+  String get appearanceReset => 'Reset';
+
+  @override
+  String get appearanceSave => 'Save';
+
+  @override
+  String get appearanceSaved => 'Card appearance saved.';
+
+  @override
+  String get appearanceDiscardTitle => 'Discard changes?';
+
+  @override
+  String get appearanceDiscardBody =>
+      'The changes to this card\'s appearance are not saved.';
+
+  @override
+  String get appearanceKeepEditing => 'Keep editing';
+
+  @override
+  String get appearanceDiscard => 'Discard';
+
+  @override
+  String get appearanceNote =>
+      'The appearance applies to this card only. The word, meanings, tags, review schedule (FSRS) and review history do not change. \"Reset\" only resets the appearance.';
+
+  @override
+  String get appearanceColorSun => 'Yellow';
+
+  @override
+  String get appearanceColorMint => 'Mint';
+
+  @override
+  String get appearanceColorSky => 'Sky blue';
+
+  @override
+  String get appearanceColorRose => 'Rose';
+
+  @override
+  String get appearanceColorLavender => 'Lavender';
+
+  @override
+  String get appearanceColorSand => 'Sand';
+
+  @override
+  String get appearanceInkNavy => 'Navy';
+
+  @override
+  String get appearanceInkGreen => 'Dark green';
+
+  @override
+  String get appearanceInkPlum => 'Plum';
+
+  @override
+  String get appearanceInkBrown => 'Brown';
+
+  @override
+  String get appearanceMarkYellow => 'Yellow marker';
+
+  @override
+  String get appearanceMarkGreen => 'Green marker';
+
+  @override
+  String get appearanceMarkPink => 'Pink marker';
+
+  @override
+  String get appearanceMarkBlue => 'Blue marker';
+
+  @override
+  String get backupCountAppearances => 'Card appearances';
 }

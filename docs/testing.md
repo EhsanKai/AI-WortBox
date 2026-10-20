@@ -41,6 +41,64 @@ bundled by `package:sqlite3` (no device needed).
 `utf16le_bom.txt`, `persian_first.csv`, `sep_hint.csv`. `.gitattributes`
 marks them `-text` so Git never changes their bytes.
 
+## Build 4 results (1.0.0+4, 2026-10-20)
+
+- `dart format --output=none --set-exit-if-changed lib test`: 252 files,
+  0 changed
+- `flutter analyze`: no issues
+- `flutter test`: **810 passed, 3 skipped, 0 failed** (773 in Build 3; the
+  3 skipped are the opt-in live OpenRouter tests: no key available)
+- `git diff --check`: clean
+- `flutter build ios --release`: `Runner.app` `Info.plist` reads 1.0.0 /
+  build 4 / `com.aiwortbox.aiWortbox`; the bundled release notes list
+  builds 4, 3, 2.
+- Installed over build 3 on the iPhone 14 Pro Max (no uninstall); the
+  device then reported 1.0.0 (4). Launching remotely was refused because
+  the phone was locked. Nothing in the app was operated on the phone by
+  the developer.
+- **Not verified:** any real OpenRouter request. The sentence-generation
+  fix is supported by OpenRouter's public model list and documentation
+  (D57) and by mocked tests only.
+
+New and extended suites: `sentence_service_test.dart` (reasoning budget
+and controls, cut-off-while-reasoning fixture with diagnostics, JSON after
+`<think>`/in fences/with extra text, partial success, no usable items,
+403/502/500, free-only off), `domain_test.dart` (headword matching,
+numeric ids, lenient usedForm), `sentence_practice_flow_test.dart`
+(cut-off message, technical details, retry),
+`card_appearance_test.dart` (defaults, persistence, isolation, reset,
+unknown values, cascade, no side effects), `card_appearance_flow_test.dart`
+(editor, preview, save, cancel, reset, review card, large text, RTL/LTR),
+`contrast_test.dart` (every card text colour on every background/marker),
+`backup_service_test.dart` (appearances round trip, schema-3 files,
+invalid values, merge rule), `migration_test.dart` (v3 → v4).
+
+## Manual checklist (Build 4, on the iPhone)
+
+1. Settings → About: 1.0.0, build 4, with this build's notes.
+2. **Live sentence generation (the reported problem):** Today → AI
+   sentence practice → Write, B1, 3 words → Start. Expected: exercises
+   appear within about a minute. If it fails, open "Technical details"
+   and note each line (model, `finish=…`, tokens, reasoning tokens,
+   problem). `finish=length` with high reasoning tokens means the budget
+   is still too small; `noUsableItems` lists why sentences were rejected.
+   Neither contains your key or words. Try once with AI settings → "Quality
+   Free" as well.
+3. Check an answer; then turn on airplane mode, type an answer and check
+   it: an error appears and the typed answer stays.
+4. Word page → palette icon (Card appearance): pick a background, a text
+   colour, a larger word size, tap a word and a meaning to highlight
+   them, pick a sticker; the preview follows. Cancel → "Discard" → the
+   word page looks as before. Repeat and Save → the word page shows the
+   new look.
+5. Start a review that includes that word: the question card shows the
+   colour and sticker; after "Show answer", "Card appearance" opens the
+   editor; Cancel returns to the card; the due count is unchanged.
+6. Reset → Save: the standard look returns; the word and its meanings are
+   unchanged.
+7. Settings → Backup and restore → save a backup; choose it again: the
+   preview lists "Card appearances".
+
 ## Build 3 results (1.0.0+3, 2026-10-20)
 
 - `dart format --output=none --set-exit-if-changed lib test`: 245 files,
