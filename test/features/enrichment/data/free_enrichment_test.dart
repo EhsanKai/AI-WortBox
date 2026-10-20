@@ -626,6 +626,147 @@ void main() {
     });
   });
 
+  group('meanings only (completing words without a meaning)', () {
+    EnrichmentRequest meaningsFor(String original, [String? context]) =>
+        EnrichmentRequest(
+          original: original,
+          sourceContext: context,
+          sourceLanguage: Language.german,
+          definitionLanguage: Language.persian,
+          scope: EnrichmentScope.meanings,
+        );
+
+    test('several words in one free request that asks only for meanings; '
+        'answers in another order are matched by id; extra fields are '
+        'discarded', () async {
+      final words = [
+        meaningsFor('ging', 'Am Morgen ging sie in die Stadt.'),
+        meaningsFor('Tisch'),
+        meaningsFor('Mühe'),
+      ];
+      api.completions = [
+        completionResponse({
+          'items': [
+            {
+              'id': '3',
+              'word': 'Mühe',
+              'meanings': [
+                {'text': 'زحمت', 'explanation': null},
+              ],
+              'isAmbiguous': false,
+            },
+            {
+              'id': '1',
+              'word': 'ging',
+              // Not requested: must not be saved.
+              'lemma': 'gehen',
+              'exampleSentence': 'Wir gehen.',
+              'exampleTranslation': 'ما می‌رویم.',
+              'meanings': [
+                {'text': 'رفت', 'explanation': null},
+              ],
+              'isAmbiguous': false,
+            },
+            {
+              'id': '2',
+              'word': 'Tisch',
+              'meanings': [
+                {'text': 'میز', 'explanation': null},
+              ],
+              'isAmbiguous': false,
+            },
+          ],
+        }, cost: 0),
+      ];
+      final outcomes = await service().enrichBatch(words);
+      expect(api.completionCalls, 1);
+      final sent = body(0);
+      expect(sent['model'], 'openrouter/free');
+      expect((sent['provider']! as Map)['max_price'], {
+        'prompt': 0,
+        'completion': 0,
+        'request': 0,
+      });
+      final system =
+          ((sent['messages']! as List).first as Map)['content']! as String;
+      expect(system, contains('Give only meanings'));
+      expect(system, isNot(contains('exampleSentence')));
+      expect(sent['max_tokens'], 200 + 250 * 3);
+      final user = jsonDecode(
+        ((sent['messages']! as List).last as Map)['content']! as String,
+      ) as Map;
+      expect([
+        for (final w in user['words'] as List) (w as Map).keys.toSet(),
+      ], everyElement({'id', 'word', 'sentence_context', 'existing_meanings'}));
+      expect(api.requests.single.body, isNot(contains(testApiKey)));
+
+      final proposals = [
+        for (final o in outcomes) (o as EnrichmentSucceeded).proposal,
+      ];
+      expect(
+        [for (final p in proposals) p.meanings.single.text],
+        ['رفت', 'میز', 'زحمت'],
+      );
+      expect(proposals.first.lemma, isNull);
+      expect(proposals.first.exampleSentence, isNull);
+    });
+
+    test('a single word also uses the meanings-only batch format', () async {
+      api.completions = [
+        completionResponse({
+          'items': [
+            {
+              'id': '1',
+              'word': 'ging',
+              'meanings': [
+                {'text': 'رفت', 'explanation': null},
+              ],
+              'isAmbiguous': true,
+            },
+          ],
+        }),
+      ];
+      final outcome = (await service().enrichBatch([meaningsFor('ging')]))
+          .single;
+      expect(
+        ((body(0)['response_format']! as Map)['json_schema']! as Map)['name'],
+        'vocabulary_meanings',
+      );
+      expect((outcome as EnrichmentSucceeded).proposal.isAmbiguous, isTrue);
+    });
+
+    test('meanings-only and full results never answer each other from the '
+        'cache', () {
+      expect(
+        EnrichmentCache.keyFor(meaningsFor('ging')),
+        isNot(EnrichmentCache.keyFor(word('ging'))),
+      );
+    });
+
+    test('mixing scopes in one batch is refused before anything is sent', () {
+      expect(
+        () => service().enrichBatch([meaningsFor('ging'), tisch]),
+        throwsArgumentError,
+      );
+      expect(api.requests, isEmpty);
+    });
+
+    test('a failed request never exposes the key', () async {
+      api.completions = [errorResponse(401, message: 'No auth credentials')];
+      try {
+        await service().enrichBatch([
+          meaningsFor('ging'),
+          meaningsFor('Tisch'),
+        ]);
+        fail('expected an EnrichmentException');
+      } on EnrichmentException catch (e) {
+        expect(e.error, EnrichmentError.invalidKey);
+        expect(e.toString(), isNot(contains(testApiKey)));
+      }
+      expect(api.completionCalls, 1);
+    });
+  });
+
   group('cache', () {
     test('a cached word is not sent again; statistics count the hit', () async {
       api.completions = [completionResponse(enrichmentContent())];

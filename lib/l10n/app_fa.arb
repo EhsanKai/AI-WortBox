@@ -1327,5 +1327,56 @@
   "coachEmptyBody": "به مرور معمول ادامه دهید. وقتی لغتی را در چند جلسهٔ مرور به یاد نیاورید، اینجا نمایش داده می‌شود.",
   "coachGoToReview": "رفتن به مرور",
   "practiceEmptyCoach": "در فهرست «نیاز به تمرین» لغتی با معنی فارسی نیست.",
-  "practiceRepeat": "تکرار در همین جلسه (مرحلهٔ یادگیری)"
+  "practiceRepeat": "تکرار در همین جلسه (مرحلهٔ یادگیری)",
+  "filterMissingMeaning": "بدون معنی",
+  "selectionEnrich": "معنی با هوش مصنوعی برای انتخاب‌شده‌ها",
+  "enrichReadySelection": "{count, plural, other{{count} لغت انتخاب‌شدهٔ بدون معنی به OpenRouter فرستاده می‌شود؛ فقط خود لغت و جمله‌اش.}} فقط معنی فارسی خواسته می‌شود و پیش از ذخیره، همهٔ پیشنهادها را بررسی می‌کنید.",
+  "@enrichReadySelection": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichSelectionExcluded": "{count, plural, other{{count} لغت انتخاب‌شده معنی دارند؛ فرستاده نمی‌شوند و معنی‌شان تغییر نمی‌کند.}}",
+  "@enrichSelectionExcluded": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichSelectionOverflow": "در هر بار حداکثر {max} لغت فرستاده می‌شود؛ {count} لغت دیگر را می‌توانید دفعهٔ بعد کامل کنید.",
+  "@enrichSelectionOverflow": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichSelectionEmptyBody": "هیچ‌کدام از لغت‌های انتخاب‌شده بدون معنی نیست. معنی‌های موجود اینجا تغییر نمی‌کنند.",
+  "enrichProgressDetail": "{ok} پاسخ گرفت · {failed} ناموفق",
+  "@enrichProgressDetail": {
+    "placeholders": {
+      "ok": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "failed": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "enrichEditMeaning": "ویرایش معنی",
+  "enrichEdited": "ویرایش‌شده توسط شما",
+  "enrichBackToWords": "بازگشت به لغت‌ها",
+  "aiErrorBusy": "این لغت در اجرای دیگری در حال درخواست است. پس از پایان آن دوباره امتحان کنید."
 }

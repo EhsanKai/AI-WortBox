@@ -534,5 +534,16 @@
   "coachEmptyBody": "Keep doing your normal reviews. Words you fail to remember in several review sessions will appear here.",
   "coachGoToReview": "Go to review",
   "practiceEmptyCoach": "No word with a Persian meaning is on the “needs practice” list.",
-  "practiceRepeat": "Again in this session (learning step)"
+  "practiceRepeat": "Again in this session (learning step)",
+  "filterMissingMeaning": "Missing meaning",
+  "selectionEnrich": "AI meanings for selected",
+  "enrichReadySelection": "{count, plural, =1{1 selected word without a meaning will be sent to OpenRouter: only the word and its sentence.} other{{count} selected words without a meaning will be sent to OpenRouter: only each word and its sentence.}} Only Persian meanings are requested, and you review every suggestion before anything is saved.",
+  "enrichSelectionExcluded": "{count, plural, =1{1 selected word already has a meaning; it is not sent and its meaning does not change.} other{{count} selected words already have a meaning; they are not sent and their meanings do not change.}}",
+  "enrichSelectionOverflow": "At most {max} words are sent per run; {count} more can be completed in a next run.",
+  "enrichSelectionEmptyBody": "None of the selected words is missing a meaning. Existing meanings are not changed here.",
+  "enrichProgressDetail": "{ok} answered · {failed} failed",
+  "enrichEditMeaning": "Edit meaning",
+  "enrichEdited": "Edited by you",
+  "enrichBackToWords": "Back to words",
+  "aiErrorBusy": "This word is already being requested in another run. Try again when it has finished."
 }

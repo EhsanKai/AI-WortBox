@@ -2389,4 +2389,85 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get practiceRepeat => 'Again in this session (learning step)';
+
+  @override
+  String get filterMissingMeaning => 'Missing meaning';
+
+  @override
+  String get selectionEnrich => 'AI meanings for selected';
+
+  @override
+  String enrichReadySelection(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$countString selected words without a meaning will be sent to OpenRouter: only each word and its sentence.',
+      one: '1 selected word without a meaning will be sent to OpenRouter: only the word and its sentence.',
+    );
+    return '$_temp0 Only Persian meanings are requested, and you review every suggestion before anything is saved.';
+  }
+
+  @override
+  String enrichSelectionExcluded(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$countString selected words already have a meaning; they are not sent and their meanings do not change.',
+      one: '1 selected word already has a meaning; it is not sent and its meaning does not change.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String enrichSelectionOverflow(int max, int count) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'At most $maxString words are sent per run; $countString more can be completed in a next run.';
+  }
+
+  @override
+  String get enrichSelectionEmptyBody =>
+      'None of the selected words is missing a meaning. Existing meanings are not changed here.';
+
+  @override
+  String enrichProgressDetail(int ok, int failed) {
+    final intl.NumberFormat okNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String okString = okNumberFormat.format(ok);
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+
+    return '$okString answered · $failedString failed';
+  }
+
+  @override
+  String get enrichEditMeaning => 'Edit meaning';
+
+  @override
+  String get enrichEdited => 'Edited by you';
+
+  @override
+  String get enrichBackToWords => 'Back to words';
+
+  @override
+  String get aiErrorBusy =>
+      'This word is already being requested in another run. Try again when it has finished.';
 }

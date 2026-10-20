@@ -261,7 +261,12 @@ EnrichmentScreen ── EnrichmentController ── VocabularyRepository.applyEn
   (Persian meanings, German example + Persian translation as a pair,
   German lemma, length limits, control characters removed),
   `EnrichmentPlan` (what may be added or filled, defaults), the curated
-  `AiModelCatalog`.
+  `AiModelCatalog`. `EnrichmentScope.meanings` (D53) asks only for
+  meanings with its own schema; `selectionCandidates` and
+  `nextBatchLength` pick and size the batches of a selection run.
+- **Targets (D53)**: `EnrichmentTarget.deck` (resumable), `.entry` and
+  `.selection` (words selected in `VocabularyBrowser`, meanings only).
+  `EnrichmentJobRegistry` keeps two sessions from sending the same word.
 - **Data** (`features/enrichment/data`): `OpenRouterClient` maps the
   documented statuses (400/401/402/403/408/429/502/503, and 200 with an
   `error` body). It retries automatically only requests OpenRouter rejected

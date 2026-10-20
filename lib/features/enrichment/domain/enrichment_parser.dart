@@ -65,6 +65,30 @@ const Map<String, Object?> batchEnrichmentResponseSchema = {
   },
 };
 
+/// JSON Schema for a meanings-only batch ([EnrichmentScope.meanings]): the
+/// id, the echoed word, the meanings and the ambiguity hint, nothing else.
+const Map<String, Object?> meaningsBatchResponseSchema = {
+  'type': 'object',
+  'additionalProperties': false,
+  'required': ['items'],
+  'properties': {
+    'items': {
+      'type': 'array',
+      'items': {
+        'type': 'object',
+        'additionalProperties': false,
+        'required': ['id', 'word', 'meanings', 'isAmbiguous'],
+        'properties': {
+          'id': {'type': 'string'},
+          'word': {'type': 'string'},
+          'meanings': _meaningsSchema,
+          'isAmbiguous': {'type': 'boolean'},
+        },
+      },
+    },
+  },
+};
+
 const _fieldNames = [
   'meanings',
   'partOfSpeech',
@@ -75,24 +99,26 @@ const _fieldNames = [
   'isAmbiguous',
 ];
 
-const Map<String, Object?> _fieldSchemas = {
-  'meanings': {
-    'type': 'array',
-    'description':
-        'Persian (Farsi) meanings in Persian script; the first one is the '
-        'sense used in the sentence context.',
-    'items': {
-      'type': 'object',
-      'additionalProperties': false,
-      'required': ['text', 'explanation'],
-      'properties': {
-        'text': {'type': 'string'},
-        'explanation': {
-          'type': ['string', 'null'],
-        },
+const Map<String, Object?> _meaningsSchema = {
+  'type': 'array',
+  'description':
+      'Persian (Farsi) meanings in Persian script; the first one is the '
+      'sense used in the sentence context.',
+  'items': {
+    'type': 'object',
+    'additionalProperties': false,
+    'required': ['text', 'explanation'],
+    'properties': {
+      'text': {'type': 'string'},
+      'explanation': {
+        'type': ['string', 'null'],
       },
     },
   },
+};
+
+const Map<String, Object?> _fieldSchemas = {
+  'meanings': _meaningsSchema,
   'partOfSpeech': {
     'type': ['string', 'null'],
     'enum': [
@@ -187,8 +213,16 @@ abstract final class EnrichmentParser {
   ///
   /// Items are matched by `id` and must echo the requested `word`; an item
   /// without an id is accepted only when its word identifies exactly one
-  /// requested word.
-  static Map<String, Object> parseBatch(String content, List<BatchWord> words) {
+  /// requested word. Unknown ids are ignored. A word answered by more than
+  /// one item is rejected (it is unclear which answer is meant).
+  ///
+  /// With [meaningsOnly], only meanings and the ambiguity hint are kept;
+  /// any other field in the answer is discarded.
+  static Map<String, Object> parseBatch(
+    String content,
+    List<BatchWord> words, {
+    bool meaningsOnly = false,
+  }) {
     final decoded = _decode(content);
     final List<Object?> items;
     if (decoded is Map && decoded['items'] is List) {
@@ -207,6 +241,7 @@ abstract final class EnrichmentParser {
     String key(String s) => TextNormalizer.vocabularyKey(s);
     final byId = {for (final w in words) w.id: w};
     final results = <String, Object>{};
+    final answered = <String>{};
     for (final raw in items) {
       if (raw is! Map) continue;
       final item = raw.cast<String, Object?>();
@@ -222,9 +257,18 @@ abstract final class EnrichmentParser {
       }
       // The answer must be about the word that was asked for.
       if (target == null || key(target.original) != key(word)) continue;
-      if (results[target.id] is ParsedEnrichment) continue; // First wins.
+      if (!answered.add(target.id)) {
+        results[target.id] = const EnrichmentException(
+          EnrichmentError.malformedResponse,
+        );
+        continue;
+      }
       try {
-        results[target.id] = parseMap(item, original: target.original);
+        results[target.id] = parseMap(
+          item,
+          original: target.original,
+          meaningsOnly: meaningsOnly,
+        );
       } on EnrichmentException catch (e) {
         results[target.id] = e;
       }
@@ -245,6 +289,7 @@ abstract final class EnrichmentParser {
   static ParsedEnrichment parseMap(
     Map<String, Object?> map, {
     required String original,
+    bool meaningsOnly = false,
   }) {
     final meanings = <ProposedMeaning>[];
     final seen = <String>{};
@@ -270,6 +315,12 @@ abstract final class EnrichmentParser {
     }
     if (meanings.isEmpty) {
       throw const EnrichmentException(EnrichmentError.malformedResponse);
+    }
+    if (meaningsOnly) {
+      return ParsedEnrichment(
+        meanings: List.unmodifiable(meanings),
+        isAmbiguous: map['isAmbiguous'] == true,
+      );
     }
 
     var example = _german(map['exampleSentence'], AppConfig.maxTextFieldLength);

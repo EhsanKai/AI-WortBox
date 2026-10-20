@@ -3307,6 +3307,72 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'تکرار در همین جلسه (مرحلهٔ یادگیری)'**
   String get practiceRepeat;
+
+  /// No description provided for @filterMissingMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'بدون معنی'**
+  String get filterMissingMeaning;
+
+  /// No description provided for @selectionEnrich.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی با هوش مصنوعی برای انتخاب‌شده‌ها'**
+  String get selectionEnrich;
+
+  /// No description provided for @enrichReadySelection.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت انتخاب‌شدهٔ بدون معنی به OpenRouter فرستاده می‌شود؛ فقط خود لغت و جمله‌اش.}} فقط معنی فارسی خواسته می‌شود و پیش از ذخیره، همهٔ پیشنهادها را بررسی می‌کنید.'**
+  String enrichReadySelection(int count);
+
+  /// No description provided for @enrichSelectionExcluded.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, other{{count} لغت انتخاب‌شده معنی دارند؛ فرستاده نمی‌شوند و معنی‌شان تغییر نمی‌کند.}}'**
+  String enrichSelectionExcluded(int count);
+
+  /// No description provided for @enrichSelectionOverflow.
+  ///
+  /// In fa, this message translates to:
+  /// **'در هر بار حداکثر {max} لغت فرستاده می‌شود؛ {count} لغت دیگر را می‌توانید دفعهٔ بعد کامل کنید.'**
+  String enrichSelectionOverflow(int max, int count);
+
+  /// No description provided for @enrichSelectionEmptyBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'هیچ‌کدام از لغت‌های انتخاب‌شده بدون معنی نیست. معنی‌های موجود اینجا تغییر نمی‌کنند.'**
+  String get enrichSelectionEmptyBody;
+
+  /// No description provided for @enrichProgressDetail.
+  ///
+  /// In fa, this message translates to:
+  /// **'{ok} پاسخ گرفت · {failed} ناموفق'**
+  String enrichProgressDetail(int ok, int failed);
+
+  /// No description provided for @enrichEditMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'ویرایش معنی'**
+  String get enrichEditMeaning;
+
+  /// No description provided for @enrichEdited.
+  ///
+  /// In fa, this message translates to:
+  /// **'ویرایش‌شده توسط شما'**
+  String get enrichEdited;
+
+  /// No description provided for @enrichBackToWords.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگشت به لغت‌ها'**
+  String get enrichBackToWords;
+
+  /// No description provided for @aiErrorBusy.
+  ///
+  /// In fa, this message translates to:
+  /// **'این لغت در اجرای دیگری در حال درخواست است. پس از پایان آن دوباره امتحان کنید.'**
+  String get aiErrorBusy;
 }
 
 class _AppLocalizationsDelegate

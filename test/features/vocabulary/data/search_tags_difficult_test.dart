@@ -368,6 +368,110 @@ void main() {
     });
   });
 
+  group('missing meaning filter', () {
+    Future<VocabularyEntry> blankMeaning(String word, String text) async {
+      final entry = await add(a1, word, []);
+      // The app never saves a blank meaning, but older or imported data
+      // may contain one; it must not count as a meaning.
+      await db
+          .into(db.vocabularyMeanings)
+          .insert(
+            VocabularyMeaningsCompanion.insert(
+              id: 'blank-$word',
+              entryId: entry.id,
+              position: 0,
+              meaning: text,
+            ),
+          );
+      return entry;
+    }
+
+    setUp(() async {
+      await add(a1, 'das Haus', ['خانه']);
+      await add(a1, 'ging', []);
+      // Optional fields do not make a meaning.
+      clock.advance(const Duration(minutes: 1));
+      await vocab.createEntry(
+        VocabularyDraft(
+          deckId: a1.id,
+          original: 'Mühe',
+          exampleSentence: 'Das macht Mühe.',
+          notes: 'oft mit "sich geben"',
+          grammarInfo: 'die Mühe, -, -n',
+        ),
+      );
+      await blankMeaning('Tisch', '   ');
+      await blankMeaning('Stuhl', '\t\u00A0\n');
+      await add(b1, 'Schiff', []);
+      // A valid meaning without example or notes is not missing.
+      await add(b1, 'Baum', ['درخت']);
+    });
+
+    const missing = VocabularyQuery(missingMeaningOnly: true);
+
+    test('no meaning, blank and whitespace-only meanings are missing; a '
+        'valid meaning is not, even without optional fields', () async {
+      expect(await search(missing), [
+        'Schiff',
+        'Stuhl',
+        'Tisch',
+        'Mühe',
+        'ging',
+      ]);
+      final all = await vocab.search(const VocabularyQuery());
+      expect(
+        [
+          for (final e in all)
+            if (e.lacksMeaning) e.original,
+        ],
+        await search(missing),
+        reason: 'VocabularyEntry.lacksMeaning follows the same rule',
+      );
+      expect(missing.isFiltered, isTrue);
+    });
+
+    test('combines with deck, text, tag and difficult filters', () async {
+      expect(
+        await search(VocabularyQuery(deckId: b1.id, missingMeaningOnly: true)),
+        ['Schiff'],
+      );
+      expect(await search(missing.copyWith(text: 'mü')), ['Mühe']);
+      final ging = (await vocab.search(const VocabularyQuery(text: 'ging')))
+          .single;
+      await vocab.setDifficult(ging.id, difficult: true);
+      expect(await search(missing.copyWith(difficultOnly: true)), ['ging']);
+      final tag = await tags.createTag('Kapitel 1');
+      final haus = (await vocab.search(const VocabularyQuery(text: 'Haus')))
+          .single;
+      await tags.setEntryTags(haus.id, {tag.id});
+      await tags.setEntryTags(ging.id, {tag.id});
+      expect(await search(missing.copyWith(tagId: () => tag.id)), ['ging']);
+      // Without the filter, the tag still lists both.
+      expect(await search(VocabularyQuery(tagId: tag.id)), [
+        'ging',
+        'das Haus',
+      ]);
+    });
+
+    test('a word leaves the list as soon as it gets a meaning', () async {
+      final stream = vocab.watchSearch(missing);
+      final ging = (await vocab.search(const VocabularyQuery(text: 'ging')))
+          .single;
+      await vocab.updateEntry(
+        ging.id,
+        VocabularyDraft(
+          deckId: a1.id,
+          original: 'ging',
+          meanings: const [VocabularyMeaning('رفت')],
+        ),
+      );
+      expect(
+        (await stream.first).map((e) => e.original),
+        isNot(contains('ging')),
+      );
+    });
+  });
+
   test('tags, difficult marks, review events and settings persist after '
       'closing and reopening the database file', () async {
     final dir = await Directory.systemTemp.createTemp('aiwb_restart');

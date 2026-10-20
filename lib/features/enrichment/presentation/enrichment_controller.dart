@@ -2,16 +2,78 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/error/app_exception.dart';
+import '../../../core/text/text_normalizer.dart';
 import '../../vocabulary/domain/vocabulary_entry.dart';
 import '../data/ai_local_store.dart';
 import '../domain/enrichment.dart';
 import '../domain/enrichment_plan.dart';
 import 'free_usage_controller.dart';
 
-/// Which entries a session enriches: one entry (on request, even if it
-/// already has meanings) or the deck's entries without meanings.
-typedef EnrichmentTarget = ({String deckId, String? entryId});
+/// Which entries a session enriches.
+@immutable
+class EnrichmentTarget {
+  /// The deck's entries without meanings (an interrupted run resumes).
+  const EnrichmentTarget.deck(String this.deckId)
+    : entryId = null,
+      entryIds = const [];
+
+  /// One entry, on request, even if it already has meanings.
+  const EnrichmentTarget.entry(String this.deckId, String this.entryId)
+    : entryIds = const [];
+
+  /// Entries the user selected in a word list (from any deck). Only those
+  /// without a meaning are sent, and only meanings are requested.
+  const EnrichmentTarget.selection(this.entryIds)
+    : deckId = null,
+      entryId = null;
+
+  final String? deckId;
+  final String? entryId;
+
+  /// In list order; used by [EnrichmentTarget.selection] only.
+  final List<String> entryIds;
+
+  bool get isSelection => deckId == null;
+
+  /// A deck run is remembered until saved, so it can be resumed.
+  bool get isResumable => deckId != null && entryId == null;
+
+  EnrichmentScope get scope =>
+      isSelection ? EnrichmentScope.meanings : EnrichmentScope.full;
+
+  @override
+  bool operator ==(Object other) =>
+      other is EnrichmentTarget &&
+      other.deckId == deckId &&
+      other.entryId == entryId &&
+      listEquals(other.entryIds, entryIds);
+
+  @override
+  int get hashCode => Object.hash(deckId, entryId, Object.hashAll(entryIds));
+}
+
+/// Entry ids that a running session is requesting right now. Two sessions
+/// (e.g. a deck run and a selection) never send the same word at the same
+/// time: the second one marks it [EnrichmentError.busy] instead.
+class EnrichmentJobRegistry {
+  final _busy = <String>{};
+
+  /// Claims every id in [ids] that no other session holds; returns those.
+  Set<String> claim(Iterable<String> ids) => {
+    for (final id in ids)
+      if (_busy.add(id)) id,
+  };
+
+  void release(Iterable<String> ids) => _busy.removeAll(ids);
+
+  bool isBusy(String id) => _busy.contains(id);
+}
+
+final enrichmentJobRegistryProvider = Provider<EnrichmentJobRegistry>(
+  (ref) => EnrichmentJobRegistry(),
+);
 
 enum EnrichmentPhase {
   /// Waiting for the user to start (nothing has been sent).
@@ -39,6 +101,7 @@ class EnrichmentItem {
     this.error,
     this.meanings = const {},
     this.fields = const {},
+    this.edits = const {},
   });
 
   final VocabularyEntry entry;
@@ -50,7 +113,14 @@ class EnrichmentItem {
   final Set<int> meanings;
   final Set<EnrichmentField> fields;
 
+  /// The user's corrections of suggested meanings (index → text).
+  final Map<int, String> edits;
+
   bool get hasSelection => meanings.isNotEmpty || fields.isNotEmpty;
+
+  /// The text of suggested meaning [index] as it would be saved.
+  String meaningText(int index) =>
+      edits[index] ?? plan!.newMeanings[index].text;
 
   EnrichmentItem copyWith({
     ItemStatus? status,
@@ -58,6 +128,7 @@ class EnrichmentItem {
     Object? Function()? error,
     Set<int>? meanings,
     Set<EnrichmentField>? fields,
+    Map<int, String>? edits,
   }) => EnrichmentItem(
     entry: entry,
     status: status ?? this.status,
@@ -65,6 +136,7 @@ class EnrichmentItem {
     error: error != null ? error() : this.error,
     meanings: meanings ?? this.meanings,
     fields: fields ?? this.fields,
+    edits: edits ?? this.edits,
   );
 }
 
@@ -79,6 +151,8 @@ class EnrichmentState {
     this.costUsd,
     this.resumedCount,
     this.freeOnly = true,
+    this.excludedCount = 0,
+    this.overflowCount = 0,
   });
 
   final EnrichmentPhase phase;
@@ -100,6 +174,13 @@ class EnrichmentState {
   /// Free-only mode was on when the session was loaded.
   final bool freeOnly;
 
+  /// Selected words left out because they already have a meaning.
+  final int excludedCount;
+
+  /// Selected words without a meaning beyond [AppConfig.aiMaxBatchSize],
+  /// left for a later run.
+  final int overflowCount;
+
   /// The run stopped for a reason that may pass by itself (an account
   /// rate limit), so retrying later makes sense.
   bool get canRetryAfterStop =>
@@ -113,6 +194,17 @@ class EnrichmentState {
       .length;
 
   int get selectedCount => items.where((i) => i.hasSelection).length;
+
+  /// Words answered (with or without new suggestions).
+  int get succeededCount => items
+      .where(
+        (i) =>
+            i.status == ItemStatus.proposed || i.status == ItemStatus.skipped,
+      )
+      .length;
+
+  int get failedCount =>
+      items.where((i) => i.status == ItemStatus.failed).length;
 
   bool get hasFailures => items.any((i) => i.status == ItemStatus.failed);
 
@@ -132,6 +224,8 @@ class EnrichmentState {
     costUsd: costUsd != null ? costUsd() : this.costUsd,
     resumedCount: resumedCount,
     freeOnly: freeOnly,
+    excludedCount: excludedCount,
+    overflowCount: overflowCount,
   );
 }
 
@@ -141,9 +235,16 @@ class EnrichmentController extends Notifier<EnrichmentState> {
   final EnrichmentTarget target;
   EnrichmentCancellation? _cancellation;
 
+  /// Ids this session holds in [EnrichmentJobRegistry] while running.
+  Set<String>? _claimed;
+
   @override
   EnrichmentState build() {
-    ref.onDispose(() => _cancellation?.cancel());
+    final registry = ref.read(enrichmentJobRegistryProvider);
+    ref.onDispose(() {
+      _cancellation?.cancel();
+      if (_claimed case final ids?) registry.release(ids);
+    });
     Future.microtask(_load);
     return const EnrichmentState(phase: EnrichmentPhase.ready);
   }
@@ -154,14 +255,28 @@ class EnrichmentController extends Notifier<EnrichmentState> {
     final repository = ref.read(vocabularyRepositoryProvider);
     final List<VocabularyEntry> entries;
     int? resumed;
-    if (target.entryId case final id?) {
+    var excluded = 0;
+    var overflow = 0;
+    if (target.isSelection) {
+      final selected = <VocabularyEntry>[];
+      for (final id in target.entryIds.toSet()) {
+        if (await repository.getEntry(id) case final entry?) {
+          selected.add(entry);
+        }
+      }
+      final eligible = selectionCandidates(selected);
+      excluded = selected.length - eligible.length;
+      entries = eligible.take(AppConfig.aiMaxBatchSize).toList();
+      overflow = eligible.length - entries.length;
+    } else if (target.entryId case final id?) {
       final entry = await repository.getEntry(id);
       entries = entry == null ? const [] : [entry];
     } else {
-      final all = await repository.getEntries(target.deckId);
+      final deckId = target.deckId!;
+      final all = await repository.getEntries(deckId);
       // An unfinished earlier run continues with its own words; those
       // already saved (or deleted) are no longer candidates.
-      final job = await _quietly(() => _local.readJob(target.deckId));
+      final job = await _quietly(() => _local.readJob(deckId));
       final pending = job == null
           ? const <VocabularyEntry>[]
           : batchCandidates([
@@ -172,7 +287,7 @@ class EnrichmentController extends Notifier<EnrichmentState> {
         entries = pending;
         resumed = pending.length;
       } else {
-        if (job != null) await _quietly(() => _local.clearJob(target.deckId));
+        if (job != null) await _quietly(() => _local.clearJob(deckId));
         entries = batchCandidates(all);
       }
     }
@@ -189,6 +304,8 @@ class EnrichmentController extends Notifier<EnrichmentState> {
       items: [for (final e in entries) EnrichmentItem(entry: e)],
       resumedCount: resumed,
       freeOnly: prefs.freeOnly,
+      excludedCount: excluded,
+      overflowCount: overflow,
     );
   }
 
@@ -204,46 +321,89 @@ class EnrichmentController extends Notifier<EnrichmentState> {
   /// Re-checks the key, e.g. after returning from the settings screen.
   Future<void> reload() => _load();
 
-  /// Sends the queued items in batches of the configured size (one request
-  /// per batch, one request at a time). Words already answered come from
-  /// the cache without a request; a failed batch or word does not affect
-  /// the words already answered.
+  /// Sends the queued items in batches (one request per batch, one request
+  /// at a time). A batch holds at most the configured number of words and
+  /// at most [AppConfig.aiMaxBatchInputChars] characters of input. Words
+  /// already answered come from the cache without a request; a failed batch
+  /// or word does not affect the words already answered.
+  ///
+  /// A batch whose answer is unusable as a whole (invalid JSON, cut off) is
+  /// sent once more as two smaller batches: the model did answer, so
+  /// nothing is ambiguous, and a smaller answer is more likely to be
+  /// complete. Timeouts and network errors are never re-sent automatically.
   Future<void> start() async {
     if (state.phase != EnrichmentPhase.ready &&
         state.phase != EnrichmentPhase.review) {
       return;
     }
     final cancellation = _cancellation = EnrichmentCancellation();
+    final registry = ref.read(enrichmentJobRegistryProvider);
+    final claimed = _claimed = registry.claim([
+      for (final item in state.items)
+        if (item.status == ItemStatus.queued) item.entry.id,
+    ]);
     state = state.copyWith(
       phase: EnrichmentPhase.running,
       stopError: () => null,
       saveError: () => null,
+      items: [
+        for (final item in state.items)
+          item.status == ItemStatus.queued && !claimed.contains(item.entry.id)
+              ? item.copyWith(
+                  status: ItemStatus.failed,
+                  error: () => const EnrichmentException(EnrichmentError.busy),
+                )
+              : item,
+      ],
     );
+    try {
+      await _run(cancellation);
+    } finally {
+      registry.release(claimed);
+      if (identical(_claimed, claimed)) _claimed = null;
+    }
+  }
+
+  Future<void> _run(EnrichmentCancellation cancellation) async {
     final service = ref.read(enrichmentServiceProvider);
     final prefs =
         await _quietly(_local.readPreferences) ?? const AiPreferences();
-    if (target.entryId == null) {
+    if (target.isResumable) {
       // Remembered until saved, so an interrupted run can be resumed.
       await _quietly(
-        () => _local.writeJob(target.deckId, [
+        () => _local.writeJob(target.deckId!, [
           for (final item in state.items)
             if (item.status != ItemStatus.skipped) item.entry.id,
         ]),
       );
     }
 
+    var maxWords = prefs.wordsPerRequest;
+    // Words already re-sent in a smaller batch during this run.
+    final split = <String>{};
     while (ref.mounted && !cancellation.isCancelled) {
-      final chunk = [
+      final queued = [
         for (var i = 0; i < state.items.length; i++)
           if (state.items[i].status == ItemStatus.queued) i,
-      ].take(prefs.wordsPerRequest).toList();
-      if (chunk.isEmpty) break;
+      ];
+      if (queued.isEmpty) break;
+      final requests = {
+        for (final i in queued)
+          i: requestFor(state.items[i].entry, scope: target.scope),
+      };
+      final chunk = queued
+          .take(
+            nextBatchLength([
+              for (final i in queued) requestSize(requests[i]!),
+            ], maxWords: maxWords),
+          )
+          .toList();
       for (final i in chunk) {
         _update(i, state.items[i].copyWith(status: ItemStatus.running));
       }
       try {
         final outcomes = await service.enrichBatch([
-          for (final i in chunk) requestFor(state.items[i].entry),
+          for (final i in chunk) requests[i]!,
         ], cancellation: cancellation);
         if (!ref.mounted) return;
         for (final (n, i) in chunk.indexed) {
@@ -256,6 +416,17 @@ class EnrichmentController extends Notifier<EnrichmentState> {
             _update(i, state.items[i].copyWith(status: ItemStatus.queued));
           }
           break;
+        }
+        final ids = [for (final i in chunk) state.items[i].entry.id];
+        if (e.error == EnrichmentError.malformedResponse &&
+            chunk.length > 1 &&
+            !ids.any(split.contains)) {
+          split.addAll(ids);
+          maxWords = chunk.length ~/ 2;
+          for (final i in chunk) {
+            _update(i, state.items[i].copyWith(status: ItemStatus.queued));
+          }
+          continue;
         }
         for (final i in chunk) {
           _update(
@@ -305,6 +476,7 @@ class EnrichmentController extends Notifier<EnrichmentState> {
             error: () => null,
             meanings: plan.defaultMeanings,
             fields: plan.defaultFields,
+            edits: const {},
           ),
         );
         if (proposal.costUsd case final cost?) {
@@ -342,6 +514,31 @@ class EnrichmentController extends Notifier<EnrichmentState> {
     _update(item, current.copyWith(meanings: selection));
   }
 
+  /// Replaces suggested meaning [meaning] of item [item] with the user's
+  /// correction and selects it. Returns false, changing nothing, for blank
+  /// or too long text.
+  bool editMeaning(int item, int meaning, String text) {
+    final current = state.items[item];
+    final suggested = current.plan?.newMeanings.elementAtOrNull(meaning);
+    final cleaned = TextNormalizer.collapseWhitespace(text);
+    if (suggested == null ||
+        cleaned.isEmpty ||
+        cleaned.runes.length > AppConfig.maxMeaningLength) {
+      return false;
+    }
+    final edits = {...current.edits};
+    if (cleaned == suggested.text) {
+      edits.remove(meaning);
+    } else {
+      edits[meaning] = cleaned;
+    }
+    _update(
+      item,
+      current.copyWith(edits: edits, meanings: {...current.meanings, meaning}),
+    );
+    return true;
+  }
+
   void toggleField(int item, EnrichmentField field) {
     final current = state.items[item];
     final selection = {...current.fields};
@@ -353,7 +550,11 @@ class EnrichmentController extends Notifier<EnrichmentState> {
   Future<void> save() async {
     final updates = [
       for (final item in state.items)
-        ?item.plan?.toUpdate(meanings: item.meanings, fields: item.fields),
+        ?item.plan?.toUpdate(
+          meanings: item.meanings,
+          fields: item.fields,
+          edits: item.edits,
+        ),
     ];
     if (updates.isEmpty) return;
     state = state.copyWith(
@@ -362,13 +563,13 @@ class EnrichmentController extends Notifier<EnrichmentState> {
     );
     try {
       await ref.read(vocabularyRepositoryProvider).applyEnrichments(updates);
-      if (target.entryId == null &&
+      if (target.isResumable &&
           !state.items.any(
             (i) =>
                 i.status == ItemStatus.failed || i.status == ItemStatus.queued,
           )) {
         // Every word of the run is finished.
-        await _quietly(() => _local.clearJob(target.deckId));
+        await _quietly(() => _local.clearJob(target.deckId!));
       }
       if (!ref.mounted) return;
       state = state.copyWith(

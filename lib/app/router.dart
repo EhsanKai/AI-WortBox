@@ -68,6 +68,9 @@ abstract final class AppRoutes {
 
   static String deckEnrich(String deckId) => '${deck(deckId)}/enrich';
 
+  /// AI meanings for words selected in a list; the entry ids go in `extra`.
+  static const enrichSelection = '$words/enrich';
+
   static String entryEnrich(String deckId, String entryId) =>
       '${entry(deckId, entryId)}/enrich';
 
@@ -128,6 +131,16 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                   builder: (_, _) => const VocabularySearchScreen(),
                 ),
                 GoRoute(path: 'tags', builder: (_, _) => const TagsScreen()),
+                GoRoute(
+                  path: 'enrich',
+                  builder: (_, state) => EnrichmentScreen.selection(
+                    entryIds: switch (state.extra) {
+                      final List<Object?> ids =>
+                        ids.whereType<String>().toList(),
+                      _ => const [],
+                    },
+                  ),
+                ),
                 GoRoute(
                   path: 'decks/:deckId',
                   builder: (_, state) =>

@@ -192,6 +192,9 @@ void main() {
       );
       await pumpApp(tester, db, initialLocation: '/words/decks/${deck.id}');
       expect(text('der Baum'), findsOneWidget);
+      // The filter chips scroll sideways.
+      await tester.ensureVisible(find.byKey(const Key('browser.tag')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('browser.tag')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(Key('browser.tag.${b1.id}')));

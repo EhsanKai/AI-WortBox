@@ -206,6 +206,7 @@ String errorMessage(AppLocalizations l10n, Object error) => switch (error) {
     EnrichmentError.server => l10n.aiErrorServer,
     EnrichmentError.malformedResponse => l10n.aiErrorMalformed,
     EnrichmentError.cancelled => l10n.aiErrorCancelled,
+    EnrichmentError.busy => l10n.aiErrorBusy,
     EnrichmentError.dailyQuotaExhausted => l10n.aiErrorDailyQuota,
     EnrichmentError.paidModelBlocked => l10n.aiErrorPaidBlocked,
   },

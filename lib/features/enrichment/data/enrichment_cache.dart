@@ -62,6 +62,9 @@ class EnrichmentCache {
       exact(r.sourceContext ?? ''),
       [for (final m in r.existingMeanings) TextNormalizer.meaningKey(m)]
         ..sort(),
+      // A meanings-only result must never answer a full request. Full keys
+      // are unchanged, so existing cache entries stay valid.
+      if (r.scope != EnrichmentScope.full) r.scope.name,
     ]);
     return '$prefix${sha256.convert(utf8.encode(material))}';
   }

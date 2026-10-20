@@ -46,6 +46,7 @@ class VocabularyQuery {
     this.deckId,
     this.tagId,
     this.difficultOnly = false,
+    this.missingMeaningOnly = false,
   });
 
   /// Free text (German or Persian). Blank means no text filter.
@@ -60,19 +61,28 @@ class VocabularyQuery {
   /// Only entries marked as difficult.
   final bool difficultOnly;
 
+  /// Only entries without a meaning: no meaning row, or only meanings that
+  /// are blank (whitespace). Examples, notes and grammar do not count.
+  final bool missingMeaningOnly;
+
   /// Whether anything besides the deck restricts the list.
   bool get isFiltered =>
-      text.trim().isNotEmpty || tagId != null || difficultOnly;
+      text.trim().isNotEmpty ||
+      tagId != null ||
+      difficultOnly ||
+      missingMeaningOnly;
 
   VocabularyQuery copyWith({
     String? text,
     String? Function()? tagId,
     bool? difficultOnly,
+    bool? missingMeaningOnly,
   }) => VocabularyQuery(
     text: text ?? this.text,
     deckId: deckId,
     tagId: tagId != null ? tagId() : this.tagId,
     difficultOnly: difficultOnly ?? this.difficultOnly,
+    missingMeaningOnly: missingMeaningOnly ?? this.missingMeaningOnly,
   );
 
   @override
@@ -81,8 +91,10 @@ class VocabularyQuery {
       other.text == text &&
       other.deckId == deckId &&
       other.tagId == tagId &&
-      other.difficultOnly == difficultOnly;
+      other.difficultOnly == difficultOnly &&
+      other.missingMeaningOnly == missingMeaningOnly;
 
   @override
-  int get hashCode => Object.hash(text, deckId, tagId, difficultOnly);
+  int get hashCode =>
+      Object.hash(text, deckId, tagId, difficultOnly, missingMeaningOnly);
 }

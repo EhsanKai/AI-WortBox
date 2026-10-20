@@ -11,6 +11,15 @@ default, Persian → German or both).
 > The name "AI WortBox" has not been checked for trademark or app-store
 > availability.
 
+## Install
+
+- **[Installation guide](docs/installation.md)**: build it onto your own
+  iPhone with Xcode, distribute it through TestFlight, set up the optional
+  OpenRouter key, and troubleshoot.
+- TestFlight status: **not yet available.** A release archive (1.0.0,
+  build 2) builds, but uploading needs a paid Apple Developer Program
+  account; see [the remaining steps](docs/installation.md#b-install-through-testflight).
+
 ## Status
 
 | Phase | Scope | Status |
@@ -84,6 +93,20 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
 - Only tested with mocked HTTP so far: **no live OpenRouter call and no
   real-device test has been made yet.**
 
+### Missing meanings: batch AI meanings (D53)
+
+- **Missing meaning** filter in the word lists (blank or whitespace-only
+  meanings count as missing; examples or notes do not count as a meaning).
+  Combines with search, tags and difficult words.
+- Select several words (long-press, select all, clear) → **AI meanings for
+  selected**: only the selected words without a meaning are sent, several
+  per request (5 by default, 1–10 in Settings → AI), and only Persian
+  meanings are requested. Words that already have a meaning are left out
+  and never changed.
+- Answers are matched by id, validated, and reviewed before saving: each
+  suggestion can be edited, accepted or rejected. A failed word fails
+  alone; retry sends only failed words. Saving never touches review state.
+
 ### Phase 5 — implemented, awaiting commit
 
 - **Search and filters:** search all words (My Words → search) or one deck by
@@ -123,9 +146,12 @@ yet.
 
 ## Platform build status
 
-iOS and Android builds are **not yet verified**. The development machine used
-so far has no Android SDK and no full Xcode installation, so
-`flutter build apk` and `flutter build ios` could not run. Verification so far
+iOS: `flutter build ios --release` and a release archive
+(`flutter build ipa`) build with Xcode 26; the app has been installed on an
+iPhone with development signing. App Store/TestFlight export needs a paid
+Apple Developer account (see [installation](docs/installation.md)).
+Android builds are **not yet verified** (no Android SDK on the development
+machine), so `flutter build apk` could not run. Verification so far
 is limited to formatting, static analysis and host-side automated tests
 (including widget tests of the full UI flows). The native file picker
 (`file_picker`) in particular has not been exercised on a device.
@@ -213,6 +239,7 @@ See [docs/testing.md](docs/testing.md) for what is covered.
 
 ## Documentation
 
+- [Installation and TestFlight](docs/installation.md)
 - [Implementation plan and roadmap](docs/implementation-plan.md)
 - [Phase working instructions](docs/claude-phase-instructions.md)
 - [Architecture](docs/architecture.md)

@@ -5,6 +5,17 @@ import 'package:flutter/foundation.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/language/language.dart';
 
+/// What a request asks the model for.
+enum EnrichmentScope {
+  /// Meanings and the optional details (word class, grammar, base form,
+  /// example sentence).
+  full,
+
+  /// Only Persian meanings (completing words that have none). Any other
+  /// field the model returns is discarded.
+  meanings,
+}
+
 /// What is sent for one entry: only the word, its sentence context and the
 /// meanings it already has (so they are not suggested again). No other user
 /// data leaves the device.
@@ -16,6 +27,7 @@ class EnrichmentRequest {
     required this.definitionLanguage,
     this.sourceContext,
     this.existingMeanings = const [],
+    this.scope = EnrichmentScope.full,
   });
 
   /// The German word or expression, exactly as stored.
@@ -27,6 +39,9 @@ class EnrichmentRequest {
   final List<String> existingMeanings;
   final Language sourceLanguage;
   final Language definitionLanguage;
+
+  /// Requests sent together in one batch share the same scope.
+  final EnrichmentScope scope;
 }
 
 @immutable

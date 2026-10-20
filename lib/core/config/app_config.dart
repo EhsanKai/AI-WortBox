@@ -105,6 +105,11 @@ abstract final class AppConfig {
   static const int aiDefaultWordsPerRequest = 5;
   static const int aiMaxWordsPerRequest = 10;
 
+  /// Most characters of words, sentences and existing meanings in one
+  /// request. A batch that would exceed it is split, so a few long
+  /// sentences never make one request (and its answer) too large.
+  static const int aiMaxBatchInputChars = 4000;
+
   /// Requests to OpenRouter running at the same time.
   static const int aiMaxConcurrentRequests = 1;
 

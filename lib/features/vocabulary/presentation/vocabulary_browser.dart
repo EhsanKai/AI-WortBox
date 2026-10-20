@@ -18,15 +18,17 @@ import '../domain/vocabulary_search.dart';
 import 'entry_tile.dart';
 import 'vocabulary_providers.dart';
 
-/// Search field, tag and "difficult" filters, and the matching words.
+/// Search field, tag, "difficult" and "missing meaning" filters, and the
+/// matching words.
 ///
 /// With [deckId] it browses one deck (and shows the full deck list while no
 /// filter is active); without, it searches every deck and shows each word's
 /// deck. Matching runs in the database (see `VocabularySearch`).
 ///
 /// Long-pressing a word starts selection mode: taps then select or
-/// deselect words, and the toolbar selects all, clears the selection or
-/// deletes the selected words after confirmation.
+/// deselect words, and the toolbar selects all, clears the selection,
+/// requests AI meanings for the selected words that have none, or deletes
+/// the selected words after confirmation.
 class VocabularyBrowser extends ConsumerStatefulWidget {
   const VocabularyBrowser({
     super.key,
@@ -129,6 +131,19 @@ class _VocabularyBrowserState extends ConsumerState<VocabularyBrowser> {
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
+  /// Opens AI suggestions for the selected words. Only those without a
+  /// meaning are sent (see `EnrichmentTarget.selection`); the screen says
+  /// how many were left out.
+  Future<void> _enrichSelected(List<VocabularyEntry> listed) async {
+    final ids = [
+      for (final e in listed)
+        if (_selected?.contains(e.id) ?? false) e.id,
+    ];
+    if (ids.isEmpty) return;
+    await context.push(AppRoutes.enrichSelection, extra: ids);
+    if (mounted) _exitSelection();
+  }
+
   Widget _selectionBar(List<VocabularyEntry> listed) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
@@ -178,6 +193,14 @@ class _VocabularyBrowserState extends ConsumerState<VocabularyBrowser> {
               onPressed: count == 0
                   ? null
                   : () => setState(() => _selected = {}),
+            ),
+            IconButton(
+              key: const Key('browser.enrichSelected'),
+              tooltip: l10n.selectionEnrich,
+              icon: const Icon(Icons.auto_awesome_outlined),
+              onPressed: count == 0 || _deleting
+                  ? null
+                  : () => _enrichSelected(listed),
             ),
             IconButton(
               key: const Key('browser.deleteSelected'),
@@ -317,6 +340,16 @@ class _VocabularyBrowserState extends ConsumerState<VocabularyBrowser> {
             ),
             child: Row(
               children: [
+                // First, so it is reachable without scrolling the chips.
+                if (_query.isFiltered) ...[
+                  ActionChip(
+                    key: const Key('browser.clearAll'),
+                    avatar: const Icon(Icons.filter_alt_off_outlined, size: 18),
+                    label: Text(l10n.filterClear),
+                    onPressed: _clear,
+                  ),
+                  const SizedBox(width: AppSpace.sm),
+                ],
                 FilterChip(
                   key: const Key('browser.difficult'),
                   avatar: const Icon(Icons.flag_outlined, size: 18),
@@ -324,6 +357,15 @@ class _VocabularyBrowserState extends ConsumerState<VocabularyBrowser> {
                   selected: _query.difficultOnly,
                   onSelected: (value) =>
                       _update(_query.copyWith(difficultOnly: value)),
+                ),
+                const SizedBox(width: AppSpace.sm),
+                FilterChip(
+                  key: const Key('browser.missingMeaning'),
+                  avatar: const Icon(Icons.translate_outlined, size: 18),
+                  label: Text(l10n.filterMissingMeaning),
+                  selected: _query.missingMeaningOnly,
+                  onSelected: (value) =>
+                      _update(_query.copyWith(missingMeaningOnly: value)),
                 ),
                 if (tags.isNotEmpty) ...[
                   const SizedBox(width: AppSpace.sm),
@@ -337,15 +379,6 @@ class _VocabularyBrowserState extends ConsumerState<VocabularyBrowser> {
                     ),
                     selected: selectedTag != null,
                     onSelected: (_) => _pickTag(tags),
-                  ),
-                ],
-                if (_query.isFiltered) ...[
-                  const SizedBox(width: AppSpace.sm),
-                  ActionChip(
-                    key: const Key('browser.clearAll'),
-                    avatar: const Icon(Icons.filter_alt_off_outlined, size: 18),
-                    label: Text(l10n.filterClear),
-                    onPressed: _clear,
                   ),
                 ],
               ],

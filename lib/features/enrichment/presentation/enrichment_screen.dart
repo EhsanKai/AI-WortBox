@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' as intl;
 
 import '../../../app/router.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/design/app_colors.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/design/typography.dart';
@@ -21,18 +22,33 @@ import 'ai_settings_controller.dart';
 import 'enrichment_controller.dart';
 import 'free_usage_controller.dart';
 
-/// Request AI suggestions for one entry or a deck's entries without
-/// meanings, review them, and save the chosen parts.
+/// Request AI suggestions for one entry, a deck's entries without
+/// meanings, or the words selected in a list (meanings only), review them,
+/// and save the chosen parts.
 class EnrichmentScreen extends ConsumerWidget {
-  const EnrichmentScreen({super.key, required this.deckId, this.entryId});
+  const EnrichmentScreen({super.key, required String this.deckId, this.entryId})
+    : entryIds = const [];
 
-  final String deckId;
+  /// Meanings for the selected words that have none (see
+  /// `EnrichmentTarget.selection`).
+  const EnrichmentScreen.selection({super.key, required this.entryIds})
+    : deckId = null,
+      entryId = null;
+
+  final String? deckId;
   final String? entryId;
+  final List<String> entryIds;
+
+  EnrichmentTarget get _target => switch ((deckId, entryId)) {
+    (final deck?, final entry?) => EnrichmentTarget.entry(deck, entry),
+    (final deck?, null) => EnrichmentTarget.deck(deck),
+    _ => EnrichmentTarget.selection(entryIds),
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final target = (deckId: deckId, entryId: entryId);
+    final target = _target;
     final state = ref.watch(enrichmentControllerProvider(target));
     final controller = ref.read(enrichmentControllerProvider(target).notifier);
     final running = state.phase == EnrichmentPhase.running;
@@ -62,7 +78,9 @@ class EnrichmentScreen extends ConsumerWidget {
           EnrichmentPhase.empty => EmptyStateView(
             icon: Icons.check_circle_outline,
             title: l10n.enrichEmptyTitle,
-            message: l10n.enrichEmptyBody,
+            message: target.isSelection
+                ? l10n.enrichSelectionEmptyBody
+                : l10n.enrichEmptyBody,
           ),
           EnrichmentPhase.done => OutcomeView(
             key: const Key('enrich.done'),
@@ -85,21 +103,29 @@ class EnrichmentScreen extends ConsumerWidget {
                   l10n.enrichCost(_money(l10n).format(cost)),
                 ),
             ],
-            primary: FilledButton(
-              key: const Key('enrich.viewDeck'),
-              onPressed: () => context.go(
-                entryId == null
-                    ? AppRoutes.deck(deckId)
-                    : AppRoutes.entry(deckId, entryId!),
+            primary: switch (deckId) {
+              final deckId? => FilledButton(
+                key: const Key('enrich.viewDeck'),
+                onPressed: () => context.go(
+                  entryId == null
+                      ? AppRoutes.deck(deckId)
+                      : AppRoutes.entry(deckId, entryId!),
+                ),
+                child: Text(l10n.csvViewDeck),
               ),
-              child: Text(l10n.csvViewDeck),
-            ),
+              null => FilledButton(
+                key: const Key('enrich.backToWords'),
+                onPressed: () => context.pop(),
+                child: Text(l10n.enrichBackToWords),
+              ),
+            },
           ),
           _ when state.items.isEmpty => const LoadingView(),
           _ => _SessionView(
             state: state,
             controller: controller,
             single: entryId != null,
+            selection: target.isSelection,
             running: running,
           ),
         },
@@ -119,12 +145,14 @@ class _SessionView extends ConsumerWidget {
     required this.state,
     required this.controller,
     required this.single,
+    required this.selection,
     required this.running,
   });
 
   final EnrichmentState state;
   final EnrichmentController controller;
   final bool single;
+  final bool selection;
   final bool running;
 
   @override
@@ -166,8 +194,29 @@ class _SessionView extends ConsumerWidget {
                   icon: Icons.public,
                   message: single
                       ? l10n.enrichReadySingle
+                      : selection
+                      ? l10n.enrichReadySelection(total)
                       : l10n.enrichReadyBatch(total),
                 ),
+                if (state.excludedCount > 0) ...[
+                  const SizedBox(height: AppSpace.sm),
+                  InfoBanner(
+                    key: const Key('enrich.excluded'),
+                    icon: Icons.lock_outline,
+                    message: l10n.enrichSelectionExcluded(state.excludedCount),
+                  ),
+                ],
+                if (state.overflowCount > 0) ...[
+                  const SizedBox(height: AppSpace.sm),
+                  InfoBanner(
+                    key: const Key('enrich.overflow'),
+                    tone: StatusTone.warning,
+                    message: l10n.enrichSelectionOverflow(
+                      AppConfig.aiMaxBatchSize,
+                      state.overflowCount,
+                    ),
+                  ),
+                ],
                 if (model != null) ...[
                   const SizedBox(height: AppSpace.sm),
                   Text(
@@ -190,6 +239,14 @@ class _SessionView extends ConsumerWidget {
                     l10n.enrichProgress(state.doneCount, total),
                     style: theme.textTheme.labelLarge,
                   ),
+                ),
+                Text(
+                  l10n.enrichProgressDetail(
+                    state.succeededCount,
+                    state.failedCount,
+                  ),
+                  key: const Key('enrich.progressDetail'),
+                  style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: AppSpace.sm),
                 LinearProgressIndicator(
@@ -293,6 +350,15 @@ class _SessionView extends ConsumerWidget {
 }
 
 class _ItemCard extends StatelessWidget {
+  Future<void> _editMeaning(BuildContext context, int meaning) async {
+    final text = await showDialog<String>(
+      context: context,
+      builder: (context) =>
+          _EditMeaningDialog(initial: item.meaningText(meaning)),
+    );
+    if (text != null) controller.editMeaning(index, meaning, text);
+  }
+
   const _ItemCard({
     super.key,
     required this.index,
@@ -406,10 +472,29 @@ class _ItemCard extends StatelessWidget {
                       onChanged: editable
                           ? (_) => controller.toggleMeaning(index, m)
                           : null,
-                      title: AutoDirectionText(meaning.text),
-                      subtitle: meaning.explanation == null
-                          ? null
-                          : AutoDirectionText(meaning.explanation!),
+                      title: AutoDirectionText(item.meaningText(m)),
+                      subtitle: switch ((
+                        item.edits.containsKey(m),
+                        meaning.explanation,
+                      )) {
+                        (true, _) => Text(
+                          l10n.enrichEdited,
+                          key: Key('enrich.item.$id.meaning.$m.edited'),
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        (false, final explanation?) => AutoDirectionText(
+                          explanation,
+                        ),
+                        _ => null,
+                      },
+                      secondary: editable
+                          ? IconButton(
+                              key: Key('enrich.item.$id.meaning.$m.edit'),
+                              tooltip: l10n.enrichEditMeaning,
+                              icon: const Icon(Icons.edit_outlined),
+                              onPressed: () => _editMeaning(context, m),
+                            )
+                          : null,
                     ),
                 ],
                 if (plan.fields.isNotEmpty) ...[
@@ -453,6 +538,60 @@ class _ItemCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Corrects one suggested meaning before it is saved.
+class _EditMeaningDialog extends StatefulWidget {
+  const _EditMeaningDialog({required this.initial});
+
+  final String initial;
+
+  @override
+  State<_EditMeaningDialog> createState() => _EditMeaningDialogState();
+}
+
+class _EditMeaningDialogState extends State<_EditMeaningDialog> {
+  late final _text = TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  bool get _valid {
+    final text = _text.text.trim();
+    return text.isNotEmpty && text.runes.length <= AppConfig.maxMeaningLength;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l10n.enrichEditMeaning),
+      content: TextField(
+        key: const Key('enrich.editField'),
+        controller: _text,
+        autofocus: true,
+        // Persian meaning: right to left.
+        textDirection: TextDirection.rtl,
+        maxLength: AppConfig.maxMeaningLength,
+        onChanged: (_) => setState(() {}),
+      ),
+      actions: [
+        TextButton(
+          key: const Key('enrich.editCancel'),
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.actionCancel),
+        ),
+        FilledButton(
+          key: const Key('enrich.editSave'),
+          onPressed: _valid ? () => Navigator.pop(context, _text.text) : null,
+          child: Text(l10n.actionSave),
+        ),
+      ],
     );
   }
 }

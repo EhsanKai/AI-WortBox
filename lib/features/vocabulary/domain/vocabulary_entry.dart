@@ -168,6 +168,10 @@ class VocabularyEntry {
 
   bool get hasMeanings => meanings.isNotEmpty;
 
+  /// No meaning with visible text. Optional fields (example, notes,
+  /// grammar) do not count. Same rule as `VocabularyQuery.missingMeaningOnly`.
+  bool get lacksMeaning => !meanings.any((m) => m.text.trim().isNotEmpty);
+
   bool get isMultiWordExpression => original.trim().contains(RegExp(r'\s'));
 
   @override

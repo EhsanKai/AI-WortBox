@@ -157,6 +157,10 @@ enum EnrichmentError {
   /// The user cancelled.
   cancelled,
 
+  /// Another enrichment run is already requesting this word; nothing was
+  /// sent for it in this run.
+  busy,
+
   /// The account's free-model requests for the current day are used up
   /// (OpenRouter resets them daily). Requests are paused until [retryAt].
   dailyQuotaExhausted,

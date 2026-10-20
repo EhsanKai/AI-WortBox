@@ -217,4 +217,128 @@ void main() {
     );
     expect(request.existingMeanings, ['زحمت']);
   });
+
+  group('selection (missing meanings)', () {
+    test('only entries without a meaning are candidates, whatever their '
+        'status; blank meanings count as missing', () {
+      final blank = VocabularyEntry(
+        id: 'blank',
+        deckId: 'deck',
+        original: 'Tisch',
+        normalized: 'tisch',
+        sourceLanguage: Language.german,
+        definitionLanguage: Language.persian,
+        sourceType: VocabularySourceType.manual,
+        enrichmentStatus: EnrichmentStatus.ready,
+        createdAt: at,
+        updatedAt: at,
+        meanings: const [VocabularyMeaning('  ')],
+      );
+      final candidates = selectionCandidates([
+        entry('1', 'ging'),
+        entry('2', 'Bank', meanings: ['بانک']),
+        entry('3', 'Mühe', status: EnrichmentStatus.failed, example: 'x'),
+        entry('4', 'Haus', status: EnrichmentStatus.pending),
+        blank,
+      ]);
+      expect(candidates.map((e) => e.id), ['1', '3', '4', 'blank']);
+      expect(entry('5', 'Baum', meanings: ['درخت']).lacksMeaning, isFalse);
+    });
+
+    test('a meanings-only request carries the word, its sentence and no '
+        'blank meanings', () {
+      final request = requestFor(
+        entry('1', 'ging', context: 'Sie ging.'),
+        scope: EnrichmentScope.meanings,
+      );
+      expect(request.scope, EnrichmentScope.meanings);
+      expect(request.original, 'ging');
+      expect(request.sourceContext, 'Sie ging.');
+      expect(request.existingMeanings, isEmpty);
+      expect(requestFor(entry('1', 'ging')).scope, EnrichmentScope.full);
+    });
+  });
+
+  group('batch size', () {
+    test('at most the configured number of words per request', () {
+      final sizes = List.filled(10, 30);
+      expect(nextBatchLength(sizes, maxWords: 5), 5);
+      expect(nextBatchLength(sizes, maxWords: 10), 10);
+      expect(nextBatchLength(sizes.take(3).toList(), maxWords: 5), 3);
+      expect(nextBatchLength(const [], maxWords: 5), 0);
+    });
+
+    test('long input is split by characters; one very long word still goes '
+        'alone', () {
+      expect(nextBatchLength([1500, 1500, 1500, 10], maxWords: 5), 2);
+      expect(nextBatchLength([9000, 10, 10], maxWords: 5), 1);
+      expect(nextBatchLength([100, 100, 100], maxWords: 5, maxChars: 250), 2);
+      expect(
+        requestSize(
+          requestFor(
+            entry('1', 'ging', context: 'Sie ging.', meanings: ['رفت']),
+          ),
+        ),
+        'ging'.length + 'Sie ging.'.length + 'رفت'.length,
+      );
+    });
+
+    test('representative selection: 10 words need 2 requests at the default '
+        'size instead of 10 single requests', () {
+      var remaining = List.filled(10, 60);
+      var requests = 0;
+      while (remaining.isNotEmpty) {
+        final n = nextBatchLength(
+          remaining,
+          maxWords: AppConfig.aiDefaultWordsPerRequest,
+        );
+        remaining = remaining.sublist(n);
+        requests++;
+      }
+      expect(AppConfig.aiDefaultWordsPerRequest, 5);
+      expect(requests, 2);
+    });
+  });
+
+  group('edited meanings', () {
+    final plan = EnrichmentPlan.build(
+      entry('1', 'ging'),
+      EnrichmentProposal(
+        meanings: const [
+          ProposedMeaning('رفتن', explanation: 'حرکت کردن'),
+          ProposedMeaning('گذشتن'),
+          ProposedMeaning('پیش رفتن'),
+        ],
+        provider: 'openrouter',
+        model: 'openrouter/free',
+        generatedAt: at,
+      ),
+    );
+
+    test('the corrected text is saved, keeping the explanation; unedited '
+        'meanings are saved as suggested', () {
+      final update = plan.toUpdate(
+        meanings: {0, 1},
+        fields: const {},
+        edits: {0: '  رفت   ', 2: 'نادیده'},
+      )!;
+      expect(update.addMeanings, const [
+        VocabularyMeaning('رفت', explanation: 'حرکت کردن'),
+        VocabularyMeaning('گذشتن'),
+      ]);
+    });
+
+    test('a blank edit or one that repeats another meaning is left out', () {
+      final update = plan.toUpdate(
+        meanings: {0, 1, 2},
+        fields: const {},
+        edits: {0: '   ', 2: 'گذشتن'},
+      )!;
+      expect(update.addMeanings.map((m) => m.text), ['گذشتن']);
+      expect(
+        plan.toUpdate(meanings: {0}, fields: const {}, edits: {0: ' '}),
+        isNull,
+      );
+    });
+  });
 }

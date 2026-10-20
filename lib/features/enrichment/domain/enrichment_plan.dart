@@ -131,10 +131,32 @@ class EnrichmentPlan {
   };
 
   /// The write for the user's choices, or null when nothing was chosen.
+  ///
+  /// [edits] replaces the text of suggested meanings (by index into
+  /// [newMeanings]) with the user's corrections. Whitespace is collapsed;
+  /// a meaning that is blank, or repeats an existing or earlier chosen
+  /// meaning, is left out.
   EnrichmentUpdate? toUpdate({
     required Set<int> meanings,
     required Set<EnrichmentField> fields,
+    Map<int, String> edits = const {},
   }) {
+    final known = {
+      for (final m in entry.meanings) TextNormalizer.meaningKey(m.text),
+    };
+    final chosenMeanings = <VocabularyMeaning>[];
+    for (final (i, m) in newMeanings.indexed) {
+      if (!meanings.contains(i)) continue;
+      final text = TextNormalizer.collapseWhitespace(edits[i] ?? m.text);
+      if (text.isEmpty || !known.add(TextNormalizer.meaningKey(text))) {
+        continue;
+      }
+      chosenMeanings.add(
+        text == m.text
+            ? m
+            : VocabularyMeaning(text, explanation: m.explanation),
+      );
+    }
     String? chosen(EnrichmentField field) =>
         fields.contains(field) ? _field(field)?.proposed : null;
     final example = fields.contains(EnrichmentField.example)
@@ -143,10 +165,7 @@ class EnrichmentPlan {
     final update = EnrichmentUpdate(
       entryId: entry.id,
       expectedUpdatedAt: entry.updatedAt,
-      addMeanings: [
-        for (final (i, m) in newMeanings.indexed)
-          if (meanings.contains(i)) m,
-      ],
+      addMeanings: chosenMeanings,
       lemma: chosen(EnrichmentField.lemma),
       partOfSpeech: chosen(EnrichmentField.partOfSpeech),
       grammarInfo: chosen(EnrichmentField.grammarInfo),
@@ -177,11 +196,54 @@ List<VocabularyEntry> batchCandidates(List<VocabularyEntry> entries) => [
       e,
 ].take(AppConfig.aiMaxBatchSize).toList();
 
+/// Selected entries that may be sent for meanings: those without a
+/// meaning (see `VocabularyEntry.lacksMeaning`), whatever their enrichment
+/// status. Entries with a meaning are never sent from a selection, so
+/// their meanings cannot be changed.
+List<VocabularyEntry> selectionCandidates(List<VocabularyEntry> selected) => [
+  for (final e in selected)
+    if (e.lacksMeaning) e,
+];
+
 /// The request for [entry]: its word, context and current meanings only.
-EnrichmentRequest requestFor(VocabularyEntry entry) => EnrichmentRequest(
+EnrichmentRequest requestFor(
+  VocabularyEntry entry, {
+  EnrichmentScope scope = EnrichmentScope.full,
+}) => EnrichmentRequest(
   original: entry.original,
   sourceContext: entry.sourceContext,
-  existingMeanings: [for (final m in entry.meanings) m.text],
+  existingMeanings: [
+    for (final m in entry.meanings)
+      if (m.text.trim().isNotEmpty) m.text,
+  ],
   sourceLanguage: entry.sourceLanguage,
   definitionLanguage: entry.definitionLanguage,
+  scope: scope,
 );
+
+/// Characters of [request] that count towards
+/// [AppConfig.aiMaxBatchInputChars].
+int requestSize(EnrichmentRequest request) =>
+    request.original.length +
+    (request.sourceContext?.length ?? 0) +
+    request.existingMeanings.fold(0, (sum, m) => sum + m.length);
+
+/// The first requests of [sizes] (each request's [requestSize], in queue
+/// order) that go into the next batch: at most [maxWords], and no more than
+/// [maxChars] together. Always at least one, so an unusually long word is
+/// still sent (alone). Returns how many to take.
+int nextBatchLength(
+  List<int> sizes, {
+  required int maxWords,
+  int maxChars = AppConfig.aiMaxBatchInputChars,
+}) {
+  var total = 0;
+  var count = 0;
+  for (final size in sizes) {
+    if (count == maxWords) break;
+    if (count > 0 && total + size > maxChars) break;
+    total += size;
+    count++;
+  }
+  return count;
+}

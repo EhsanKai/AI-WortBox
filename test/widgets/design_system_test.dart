@@ -419,7 +419,13 @@ void main() {
       expect(find.text('خیابان، جاده، کوچه (در بعضی شهرها)'), findsOneWidget);
       // A word without meaning shows a status badge instead.
       expect(find.text('Übermüdung'), findsOneWidget);
-      expect(find.text('بدون معنی'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('browser.results')),
+          matching: find.text('بدون معنی'),
+        ),
+        findsOneWidget,
+      );
       await unmountApp(tester);
     });
 

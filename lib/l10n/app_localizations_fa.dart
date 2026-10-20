@@ -2351,4 +2351,83 @@ class AppLocalizationsFa extends AppLocalizations {
 
   @override
   String get practiceRepeat => 'تکرار در همین جلسه (مرحلهٔ یادگیری)';
+
+  @override
+  String get filterMissingMeaning => 'بدون معنی';
+
+  @override
+  String get selectionEnrich => 'معنی با هوش مصنوعی برای انتخاب‌شده‌ها';
+
+  @override
+  String enrichReadySelection(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$countString لغت انتخاب‌شدهٔ بدون معنی به OpenRouter فرستاده می‌شود؛ فقط خود لغت و جمله‌اش.',
+    );
+    return '$_temp0 فقط معنی فارسی خواسته می‌شود و پیش از ذخیره، همهٔ پیشنهادها را بررسی می‌کنید.';
+  }
+
+  @override
+  String enrichSelectionExcluded(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$countString لغت انتخاب‌شده معنی دارند؛ فرستاده نمی‌شوند و معنی‌شان تغییر نمی‌کند.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String enrichSelectionOverflow(int max, int count) {
+    final intl.NumberFormat maxNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String maxString = maxNumberFormat.format(max);
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'در هر بار حداکثر $maxString لغت فرستاده می‌شود؛ $countString لغت دیگر را می‌توانید دفعهٔ بعد کامل کنید.';
+  }
+
+  @override
+  String get enrichSelectionEmptyBody =>
+      'هیچ‌کدام از لغت‌های انتخاب‌شده بدون معنی نیست. معنی‌های موجود اینجا تغییر نمی‌کنند.';
+
+  @override
+  String enrichProgressDetail(int ok, int failed) {
+    final intl.NumberFormat okNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String okString = okNumberFormat.format(ok);
+    final intl.NumberFormat failedNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failedString = failedNumberFormat.format(failed);
+
+    return '$okString پاسخ گرفت · $failedString ناموفق';
+  }
+
+  @override
+  String get enrichEditMeaning => 'ویرایش معنی';
+
+  @override
+  String get enrichEdited => 'ویرایش‌شده توسط شما';
+
+  @override
+  String get enrichBackToWords => 'بازگشت به لغت‌ها';
+
+  @override
+  String get aiErrorBusy =>
+      'این لغت در اجرای دیگری در حال درخواست است. پس از پایان آن دوباره امتحان کنید.';
 }

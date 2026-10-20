@@ -31,6 +31,12 @@ class DriftVocabularyRepository implements VocabularyRepository {
   $VocabularyEntriesTable get _entries => _db.vocabularyEntries;
   $VocabularyMeaningsTable get _meanings => _db.vocabularyMeanings;
 
+  /// The characters Dart's `String.trim` removes, for SQLite's `trim()`.
+  static const _blankChars =
+      '\t\n\u000B\f\r \u0085\u00A0\u1680\u2000\u2001\u2002\u2003'
+      '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F'
+      '\u205F\u3000\uFEFF';
+
   // ---------------------------------------------------------------------------
   // Queries
 
@@ -101,6 +107,18 @@ class DriftVocabularyRepository implements VocabularyRepository {
       where &= _entries.deckId.equals(deckId);
     }
     if (query.difficultOnly) where &= _entries.markedDifficultAt.isNotNull();
+    if (query.missingMeaningOnly) {
+      // A meaning counts only if it has visible text (see
+      // `VocabularyEntry.lacksMeaning`).
+      final visible = FunctionCallExpression<String>('trim', [
+        _meanings.meaning,
+        const Constant(_blankChars),
+      ]).isNotValue('');
+      where &= notExistsQuery(
+        _db.select(_meanings)
+          ..where((m) => m.entryId.equalsExp(_entries.id) & visible),
+      );
+    }
     if (query.tagId case final tagId?) {
       final tagged = _db.selectOnly(_db.entryTags)
         ..addColumns([_db.entryTags.entryId])

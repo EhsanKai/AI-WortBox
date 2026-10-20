@@ -8,6 +8,7 @@ import 'package:ai_wortbox/core/time/clock.dart';
 import 'package:ai_wortbox/data/database/app_database.dart';
 import 'package:ai_wortbox/features/csv_import/data/csv_file_source.dart';
 import 'package:ai_wortbox/features/enrichment/data/ai_settings_store.dart';
+import 'package:ai_wortbox/features/enrichment/presentation/enrichment_controller.dart';
 import 'package:ai_wortbox/features/scan/data/image_cropper.dart';
 import 'package:ai_wortbox/features/scan/data/scan_image_source.dart';
 import 'package:ai_wortbox/features/scan/data/text_recognition_engine.dart';
@@ -59,6 +60,7 @@ Future<void> pumpApp(
   FakeReminderScheduler? reminders,
   FakeExportSink? exportSink,
   Clock? clock,
+  EnrichmentJobRegistry? enrichmentJobs,
   Size size = const Size(390, 844),
   double textScale = 1,
   Brightness brightness = Brightness.light,
@@ -110,6 +112,8 @@ Future<void> pumpApp(
           aiSettings ?? InMemoryAiSettingsStore(),
         ),
         httpClientProvider.overrideWithValue(httpClient ?? noNetworkClient),
+        if (enrichmentJobs != null)
+          enrichmentJobRegistryProvider.overrideWithValue(enrichmentJobs),
         // Request spacing and backoff do not wait in tests.
         aiSleepProvider.overrideWithValue((_) async {}),
         urlLauncherProvider.overrideWithValue((uri) async {

@@ -730,3 +730,48 @@ Status: accepted (product owner request). Not a prediction or AI model.
   state are unaffected. It respects the review direction setting.
 - Entry point: "Needs practice" on Today. This is separate from the manual
   "difficult" mark.
+
+## D53 — Missing-meaning filter and batch AI meanings for selected words (2026-10-20)
+
+Status: accepted (product owner request). Extends D41 batching; no new
+provider, backend or paid default.
+
+- Missing meaning = no meaning row whose text is non-blank after trimming
+  (Dart `String.trim` whitespace, mirrored in SQL). Examples, notes and
+  grammar do not count. `VocabularyQuery.missingMeaningOnly` (SQL
+  `NOT EXISTS`) and `VocabularyEntry.lacksMeaning` apply the same rule.
+- Selection mode gains "AI meanings for selected"
+  (`EnrichmentTarget.selection`, route `/words/enrich`, ids in `extra`).
+  Only selected entries that lack a meaning are sent; the others are counted
+  and shown as left out, so existing meanings can never be overwritten
+  (overwrite is not offered). At most `aiMaxBatchSize` (50) per run; the
+  rest is reported. Selection runs are not stored as resumable jobs.
+- Scope `EnrichmentScope.meanings`: its own system prompt and strict schema
+  (`id`, `word`, `meanings`, `isAmbiguous`), `max_tokens` 200 + 250 per word,
+  always the batch format (even for one word). Other fields in an answer are
+  discarded. Cache keys include the scope, so meanings-only and full results
+  never answer each other; existing full keys are unchanged.
+- Batch size: the existing "words per request" setting (default 5, 1–10).
+  Five keeps one malformed answer from failing many words and stays well
+  inside free models' output limits; a batch is also cut at 4000 input
+  characters (`aiMaxBatchInputChars`), one long word still goes alone.
+- Validation: answers are matched by id and echoed word; unknown ids are
+  ignored; a word answered twice (duplicate id) is now rejected for that
+  word (was: first answer wins); missing, empty or invalid meanings fail that
+  word only. An answer unusable as a whole (invalid or cut-off JSON) is sent
+  once more as two halves (the model did answer, so nothing is ambiguous);
+  timeouts and network errors are still never re-sent automatically.
+- `EnrichmentJobRegistry` (in memory) holds the ids a running session is
+  requesting; another session marks such words `EnrichmentError.busy`
+  instead of sending them. Ids are released when the run ends, is cancelled
+  or the screen closes.
+- Review: each suggested meaning can be edited (blank or over-long text is
+  refused; edits that repeat a meaning are dropped), accepted or rejected.
+  Saving uses `applyEnrichments` unchanged (adds meanings only, optimistic
+  `updatedAt` check, never touches `flashcards` or `review_events`).
+- Request count: 10 eligible words need 2 requests at the default size (1
+  at size 10) instead of 10. This cuts round trips and free-tier request
+  usage; token cost on paid models depends on the text sent and returned,
+  so no fixed saving is claimed.
+- The "Clear filters" chip now comes first in the chip row so it stays
+  visible on narrow screens.

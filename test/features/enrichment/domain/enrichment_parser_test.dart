@@ -315,24 +315,15 @@ void main() {
       );
     });
 
-    test('valid items are parsed per id; extra, unknown and duplicate items '
-        'are ignored', () {
+    test('valid items are parsed per id, in any order; unknown and non-object '
+        'items are ignored', () {
       final results = EnrichmentParser.parseBatch(
         jsonEncode({
           'items': [
             item('2', 'Mühe', muehe),
-            item('1', 'ging'),
-            item(
-              '1',
-              'ging',
-              enrichmentContent(
-                meanings: [
-                  {'text': 'دوم', 'explanation': null},
-                ],
-              ),
-            ),
             item('9', 'Haus'),
             'garbage',
+            item('1', 'ging'),
           ],
         }),
         words,
@@ -343,6 +334,89 @@ void main() {
         (results['2']! as ParsedEnrichment).grammarInfo,
         'die Mühe, -, -n',
       );
+    });
+
+    test('a word answered twice (duplicate id) is rejected; the others are '
+        'kept', () {
+      final results = EnrichmentParser.parseBatch(
+        jsonEncode({
+          'items': [
+            item('1', 'ging'),
+            item(
+              '1',
+              'ging',
+              enrichmentContent(
+                meanings: [
+                  {'text': 'دوم', 'explanation': null},
+                ],
+              ),
+            ),
+            item('2', 'Mühe', muehe),
+          ],
+        }),
+        words,
+      );
+      expect(
+        results['1'],
+        isA<EnrichmentException>().having(
+          (e) => e.error,
+          'error',
+          EnrichmentError.malformedResponse,
+        ),
+      );
+      expect(results['2'], isA<ParsedEnrichment>());
+    });
+
+    test('meanings only: other fields in the answer are discarded; the '
+        'meanings schema asks for nothing else', () {
+      final results = EnrichmentParser.parseBatch(
+        jsonEncode({
+          'items': [item('2', 'Mühe', muehe), item('1', 'ging')],
+        }),
+        words,
+        meaningsOnly: true,
+      );
+      final muehe2 = results['2']! as ParsedEnrichment;
+      expect(muehe2.meanings.single.text, 'زحمت');
+      expect(muehe2.grammarInfo, isNull);
+      expect(muehe2.partOfSpeech, isNull);
+      expect(muehe2.lemma, isNull);
+      expect(muehe2.exampleSentence, isNull);
+      expect((results['1']! as ParsedEnrichment).lemma, isNull);
+
+      final itemSchema =
+          ((meaningsBatchResponseSchema['properties']! as Map)['items']!
+                  as Map)['items']!
+              as Map;
+      expect(itemSchema['additionalProperties'], isFalse);
+      expect(
+        itemSchema['required'],
+        unorderedEquals(['id', 'word', 'meanings', 'isAmbiguous']),
+      );
+    });
+
+    test('an empty or blank meaning is not a meaning', () {
+      final results = EnrichmentParser.parseBatch(
+        jsonEncode({
+          'items': [
+            item(
+              '1',
+              'ging',
+              enrichmentContent(
+                meanings: [
+                  {'text': '   ', 'explanation': null},
+                  {'text': '', 'explanation': null},
+                ],
+              ),
+            ),
+            item('2', 'Mühe', muehe),
+          ],
+        }),
+        words,
+        meaningsOnly: true,
+      );
+      expect(results['1'], isA<EnrichmentException>());
+      expect(results['2'], isA<ParsedEnrichment>());
     });
 
     test('a missing, mismatched or invalid item fails alone', () {
