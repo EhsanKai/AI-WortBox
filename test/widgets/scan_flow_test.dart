@@ -60,7 +60,9 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('scan.gallery')));
     await tester.pumpAndSettle();
-    expect(images.discarded, hasLength(1));
+    await readWholePageAsText(tester);
+    // The photo is kept while the scan is open.
+    expect(images.discarded, isEmpty);
 
     // German text is laid out left to right inside the RTL app.
     final textList = find.byKey(const Key('scan.text'));
@@ -166,6 +168,7 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('scan.gallery')));
     await tester.pumpAndSettle();
+    await readWholePageAsText(tester);
     expect(find.text('متنی پیدا نشد'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('scan.typeInstead')));
@@ -204,6 +207,7 @@ void main() {
     // First scan saves "Stadt".
     await tester.tap(find.byKey(const Key('scan.gallery')));
     await tester.pumpAndSettle();
+    await readWholePageAsText(tester);
     await tester.tap(wordAt('Stadt'));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('scan.review')));
@@ -215,6 +219,7 @@ void main() {
     // Second scan of the same word.
     await tester.tap(find.byKey(const Key('scan.gallery')));
     await tester.pumpAndSettle();
+    await readWholePageAsText(tester);
     await tester.tap(wordAt('Stadt'));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('scan.review')));

@@ -2189,45 +2189,204 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get scanViewImage => 'Select on photo';
-
-  @override
-  String get scanViewText => 'Show text';
-
-  @override
-  String get scanImageHint =>
-      'Tap a word to select it. For several words in a row, touch and hold the first, then drag to the last. Pinch to zoom.';
-
-  @override
   String get scanPageImageLabel => 'Page photo';
 
   @override
-  String get scanRegionMode => 'Select area';
-
-  @override
-  String get scanRegionHint =>
-      'Draw a box around text that was not read correctly to read it again.';
-
-  @override
-  String get scanRegionTitle => 'Text in the selected area';
-
-  @override
-  String get scanRegionHelper =>
-      'Correct it if needed; only this text is added.';
-
-  @override
-  String get scanRegionAdd => 'Add';
-
-  @override
-  String get scanRegionEmpty =>
-      'No text was found in this area. Draw a larger box.';
-
-  @override
-  String get scanRegionFailed => 'This area could not be read. Try again.';
-
-  @override
-  String get scanSplitWords => 'Split into single words';
-
-  @override
   String get scanRemoveSelection => 'Remove from selection';
+
+  @override
+  String get scanModeHighlight => 'Highlight: draw over words';
+
+  @override
+  String get scanModeMove => 'Move and zoom';
+
+  @override
+  String get scanHighlightHint =>
+      'Highlight mode: draw over a word or phrase with one finger, or tap a word. Pinch with two fingers to zoom.';
+
+  @override
+  String get scanMoveHint =>
+      'Move mode: drag with one finger to move the page, pinch to zoom. Nothing is drawn.';
+
+  @override
+  String get scanUndoStroke => 'Undo last highlight';
+
+  @override
+  String get scanClearHighlights => 'Clear all highlights';
+
+  @override
+  String get scanMoreActions => 'More options';
+
+  @override
+  String get scanReadWholePage => 'Read the whole page as text';
+
+  @override
+  String scanHighlightCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString highlights',
+      one: '1 highlight',
+      zero: 'Nothing highlighted yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanReadHighlights => 'Read highlighted text';
+
+  @override
+  String scanHighlightLabel(String number) {
+    return 'Highlight $number';
+  }
+
+  @override
+  String get scanHighlightsEmpty =>
+      'No text was recognized in the highlighted parts. Zoom in and draw over the whole word again.';
+
+  @override
+  String get scanHighlightsFailed => 'The text could not be read. Try again.';
+
+  @override
+  String get scanPhotoUnavailable =>
+      'The photo could not be shown, so the whole page was read as text.';
+
+  @override
+  String scanFailedHighlights(String numbers) {
+    return 'No text was recognized in highlight $numbers. You can go back to the photo and draw it again.';
+  }
+
+  @override
+  String get scanBackToPhoto => 'Back to the photo';
+
+  @override
+  String get scanAddWord => 'Add a word';
+
+  @override
+  String get scanSplitItem => 'Split into single words';
+
+  @override
+  String get scanCombineNext => 'Combine with the next item';
+
+  @override
+  String scanSummaryTitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString items will be added:',
+      one: '1 item will be added:',
+      zero: 'Nothing to add',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get practiceEditWord => 'Edit word';
+
+  @override
+  String get practiceAnswerDetails => 'Answer and details';
+
+  @override
+  String get scanModeRectangle => 'Rectangle: select an area';
+
+  @override
+  String get scanRectangleHint =>
+      'Rectangle mode: drag one finger to draw a box around the text; everything inside it is read. Use two fingers to zoom.';
+
+  @override
+  String scanRegionLabel(String number) {
+    return 'Area $number';
+  }
+
+  @override
+  String get scanRegionsEmpty =>
+      'No text was recognized in the selected areas. Draw the rectangle around the text again, or zoom in.';
+
+  @override
+  String get coachTitle => 'Needs practice';
+
+  @override
+  String coachTileDescription(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString words need more practice',
+      one: '1 word needs more practice',
+      zero: 'Words you keep forgetting will gather here',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String coachIntro(int days, int sessions, int window, int streak) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+    final intl.NumberFormat sessionsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sessionsString = sessionsNumberFormat.format(sessions);
+    final intl.NumberFormat windowNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String windowString = windowNumberFormat.format(window);
+    final intl.NumberFormat streakNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String streakString = streakNumberFormat.format(streak);
+
+    return 'This list comes from a simple rule over your review history: words you answered “not remembered” in at least $sessionsString separate sessions during the last $daysString days (within the word\'s last $windowString answers). A word leaves the list after $streakString correct answers in a row.';
+  }
+
+  @override
+  String coachFailures(int failures, int attempts) {
+    final intl.NumberFormat failuresNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failuresString = failuresNumberFormat.format(failures);
+    final intl.NumberFormat attemptsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String attemptsString = attemptsNumberFormat.format(attempts);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      failures,
+      locale: localeName,
+      other: 'Not remembered $failuresString times',
+      one: 'Not remembered once',
+    );
+    return '$_temp0 (in the last $attemptsString answers)';
+  }
+
+  @override
+  String get coachStart => 'Start focused practice';
+
+  @override
+  String get coachPracticeNote =>
+      'This is extra practice: FSRS scheduling and due dates do not change. Your answers are only kept in your history and statistics.';
+
+  @override
+  String get coachEmptyTitle => 'No word needs extra practice yet';
+
+  @override
+  String get coachEmptyBody =>
+      'Keep doing your normal reviews. Words you fail to remember in several review sessions will appear here.';
+
+  @override
+  String get coachGoToReview => 'Go to review';
+
+  @override
+  String get practiceEmptyCoach =>
+      'No word with a Persian meaning is on the “needs practice” list.';
+
+  @override
+  String get practiceRepeat => 'Again in this session (learning step)';
 }

@@ -3074,83 +3074,239 @@ abstract class AppLocalizations {
   /// **'{count, plural, other{{count} لغت حذف شد}}'**
   String bulkDeleted(int count);
 
-  /// No description provided for @scanViewImage.
-  ///
-  /// In fa, this message translates to:
-  /// **'انتخاب روی عکس'**
-  String get scanViewImage;
-
-  /// No description provided for @scanViewText.
-  ///
-  /// In fa, this message translates to:
-  /// **'نمایش متن'**
-  String get scanViewText;
-
-  /// No description provided for @scanImageHint.
-  ///
-  /// In fa, this message translates to:
-  /// **'روی لغت بزنید تا انتخاب شود. برای چند لغت پشت سر هم، روی اولی نگه دارید و تا آخری بکشید. با دو انگشت بزرگ‌نمایی کنید.'**
-  String get scanImageHint;
-
   /// No description provided for @scanPageImageLabel.
   ///
   /// In fa, this message translates to:
   /// **'عکس صفحه'**
   String get scanPageImageLabel;
 
-  /// No description provided for @scanRegionMode.
-  ///
-  /// In fa, this message translates to:
-  /// **'انتخاب ناحیه'**
-  String get scanRegionMode;
-
-  /// No description provided for @scanRegionHint.
-  ///
-  /// In fa, this message translates to:
-  /// **'دور متنی که درست خوانده نشده یک کادر بکشید تا دوباره خوانده شود.'**
-  String get scanRegionHint;
-
-  /// No description provided for @scanRegionTitle.
-  ///
-  /// In fa, this message translates to:
-  /// **'متن ناحیهٔ انتخاب‌شده'**
-  String get scanRegionTitle;
-
-  /// No description provided for @scanRegionHelper.
-  ///
-  /// In fa, this message translates to:
-  /// **'در صورت نیاز اصلاح کنید؛ فقط همین متن اضافه می‌شود.'**
-  String get scanRegionHelper;
-
-  /// No description provided for @scanRegionAdd.
-  ///
-  /// In fa, this message translates to:
-  /// **'افزودن'**
-  String get scanRegionAdd;
-
-  /// No description provided for @scanRegionEmpty.
-  ///
-  /// In fa, this message translates to:
-  /// **'در این ناحیه متنی پیدا نشد. کادر بزرگ‌تری بکشید.'**
-  String get scanRegionEmpty;
-
-  /// No description provided for @scanRegionFailed.
-  ///
-  /// In fa, this message translates to:
-  /// **'خواندن این ناحیه ممکن نشد. دوباره تلاش کنید.'**
-  String get scanRegionFailed;
-
-  /// No description provided for @scanSplitWords.
-  ///
-  /// In fa, this message translates to:
-  /// **'جدا کردن به لغت‌های تکی'**
-  String get scanSplitWords;
-
   /// No description provided for @scanRemoveSelection.
   ///
   /// In fa, this message translates to:
   /// **'حذف از انتخاب'**
   String get scanRemoveSelection;
+
+  /// No description provided for @scanModeHighlight.
+  ///
+  /// In fa, this message translates to:
+  /// **'ماژیک: کشیدن روی لغت‌ها'**
+  String get scanModeHighlight;
+
+  /// No description provided for @scanModeMove.
+  ///
+  /// In fa, this message translates to:
+  /// **'جابه‌جایی و بزرگ‌نمایی'**
+  String get scanModeMove;
+
+  /// No description provided for @scanHighlightHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'حالت ماژیک: با یک انگشت روی لغت یا عبارت دلخواه بکشید، یا روی یک لغت بزنید. با دو انگشت بزرگ‌نمایی کنید.'**
+  String get scanHighlightHint;
+
+  /// No description provided for @scanMoveHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'حالت جابه‌جایی: با یک انگشت صفحه را جابه‌جا و با دو انگشت بزرگ‌نمایی کنید. چیزی کشیده نمی‌شود.'**
+  String get scanMoveHint;
+
+  /// No description provided for @scanUndoStroke.
+  ///
+  /// In fa, this message translates to:
+  /// **'برگرداندن آخرین انتخاب'**
+  String get scanUndoStroke;
+
+  /// No description provided for @scanClearHighlights.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاک کردن همهٔ انتخاب‌ها'**
+  String get scanClearHighlights;
+
+  /// No description provided for @scanMoreActions.
+  ///
+  /// In fa, this message translates to:
+  /// **'گزینه‌های بیشتر'**
+  String get scanMoreActions;
+
+  /// No description provided for @scanReadWholePage.
+  ///
+  /// In fa, this message translates to:
+  /// **'خواندن کل صفحه به‌صورت متن'**
+  String get scanReadWholePage;
+
+  /// No description provided for @scanHighlightCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, =0{هنوز چیزی انتخاب نشده} other{{count} انتخاب روی عکس}}'**
+  String scanHighlightCount(int count);
+
+  /// No description provided for @scanReadHighlights.
+  ///
+  /// In fa, this message translates to:
+  /// **'خواندن متن انتخاب‌شده'**
+  String get scanReadHighlights;
+
+  /// No description provided for @scanHighlightLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب {number}'**
+  String scanHighlightLabel(String number);
+
+  /// No description provided for @scanHighlightsEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'در بخش‌های انتخاب‌شده متنی تشخیص داده نشد. بزرگ‌نمایی کنید و دوباره روی کل لغت بکشید.'**
+  String get scanHighlightsEmpty;
+
+  /// No description provided for @scanHighlightsFailed.
+  ///
+  /// In fa, this message translates to:
+  /// **'خواندن متن انجام نشد. دوباره تلاش کنید.'**
+  String get scanHighlightsFailed;
+
+  /// No description provided for @scanPhotoUnavailable.
+  ///
+  /// In fa, this message translates to:
+  /// **'نمایش عکس ممکن نشد؛ کل صفحه به‌صورت متن خوانده شد.'**
+  String get scanPhotoUnavailable;
+
+  /// No description provided for @scanFailedHighlights.
+  ///
+  /// In fa, this message translates to:
+  /// **'در انتخاب {numbers} متنی تشخیص داده نشد. می‌توانید به عکس برگردید و دوباره بکشید.'**
+  String scanFailedHighlights(String numbers);
+
+  /// No description provided for @scanBackToPhoto.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگشت به عکس'**
+  String get scanBackToPhoto;
+
+  /// No description provided for @scanAddWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن لغت'**
+  String get scanAddWord;
+
+  /// No description provided for @scanSplitItem.
+  ///
+  /// In fa, this message translates to:
+  /// **'جدا کردن به لغت‌های تکی'**
+  String get scanSplitItem;
+
+  /// No description provided for @scanCombineNext.
+  ///
+  /// In fa, this message translates to:
+  /// **'ادغام با مورد بعدی'**
+  String get scanCombineNext;
+
+  /// No description provided for @scanSummaryTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, =0{چیزی برای افزودن نیست} other{{count} مورد اضافه می‌شود:}}'**
+  String scanSummaryTitle(int count);
+
+  /// No description provided for @practiceEditWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'ویرایش لغت'**
+  String get practiceEditWord;
+
+  /// No description provided for @practiceAnswerDetails.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ و جزئیات'**
+  String get practiceAnswerDetails;
+
+  /// No description provided for @scanModeRectangle.
+  ///
+  /// In fa, this message translates to:
+  /// **'کادر: انتخاب یک ناحیه'**
+  String get scanModeRectangle;
+
+  /// No description provided for @scanRectangleHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'حالت کادر: با یک انگشت دور متن دلخواه یک کادر بکشید؛ همهٔ متن داخل کادر خوانده می‌شود. با دو انگشت بزرگ‌نمایی کنید.'**
+  String get scanRectangleHint;
+
+  /// No description provided for @scanRegionLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'کادر {number}'**
+  String scanRegionLabel(String number);
+
+  /// No description provided for @scanRegionsEmpty.
+  ///
+  /// In fa, this message translates to:
+  /// **'در کادرهای انتخاب‌شده متنی تشخیص داده نشد. کادر را دوباره دور متن بکشید یا بزرگ‌نمایی کنید.'**
+  String get scanRegionsEmpty;
+
+  /// No description provided for @coachTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'نیاز به تمرین'**
+  String get coachTitle;
+
+  /// No description provided for @coachTileDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count, plural, =0{لغت‌هایی که بارها به یاد نمی‌آورید اینجا جمع می‌شوند} other{{count} لغت به تمرین بیشتر نیاز دارد}}'**
+  String coachTileDescription(int count);
+
+  /// No description provided for @coachIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'این فهرست با یک قاعدهٔ ساده از سابقهٔ مرور شما ساخته می‌شود: لغتی که در {days} روز گذشته و در دست‌کم {sessions} جلسهٔ جداگانه «به یاد نیاوردم» زده‌اید (در {window} پاسخ آخر آن لغت). لغتی که {streak} بار پشت سر هم به یاد بیاورید از فهرست خارج می‌شود.'**
+  String coachIntro(int days, int sessions, int window, int streak);
+
+  /// No description provided for @coachFailures.
+  ///
+  /// In fa, this message translates to:
+  /// **'{failures, plural, other{{failures} بار به یاد نیاوردید}} (از {attempts} پاسخ اخیر)'**
+  String coachFailures(int failures, int attempts);
+
+  /// No description provided for @coachStart.
+  ///
+  /// In fa, this message translates to:
+  /// **'شروع تمرین متمرکز'**
+  String get coachStart;
+
+  /// No description provided for @coachPracticeNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'این تمرین اضافه است: زمان‌بندی مرور (FSRS) و موعد کارت‌ها تغییر نمی‌کند. نتیجهٔ شما فقط در سابقه و آمار ثبت می‌شود.'**
+  String get coachPracticeNote;
+
+  /// No description provided for @coachEmptyTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'فعلاً لغتی به تمرین ویژه نیاز ندارد'**
+  String get coachEmptyTitle;
+
+  /// No description provided for @coachEmptyBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'به مرور معمول ادامه دهید. وقتی لغتی را در چند جلسهٔ مرور به یاد نیاورید، اینجا نمایش داده می‌شود.'**
+  String get coachEmptyBody;
+
+  /// No description provided for @coachGoToReview.
+  ///
+  /// In fa, this message translates to:
+  /// **'رفتن به مرور'**
+  String get coachGoToReview;
+
+  /// No description provided for @practiceEmptyCoach.
+  ///
+  /// In fa, this message translates to:
+  /// **'در فهرست «نیاز به تمرین» لغتی با معنی فارسی نیست.'**
+  String get practiceEmptyCoach;
+
+  /// No description provided for @practiceRepeat.
+  ///
+  /// In fa, this message translates to:
+  /// **'تکرار در همین جلسه (مرحلهٔ یادگیری)'**
+  String get practiceRepeat;
 }
 
 class _AppLocalizationsDelegate

@@ -610,3 +610,123 @@ Status: accepted.
   `VocabularyRepository.deleteEntries` deletes in one transaction with the
   same rules as a single delete (meanings, tag assignments and card state
   cascade; review events keep their history with `entry_id = NULL`).
+
+## D48 — Manual freehand highlighting on the page photo (2026-10-19)
+
+Status: accepted (product owner request; supersedes D46's selection model).
+
+- Why D46 failed: photos were first read as a whole page, and selection was
+  only possible where ML Kit had placed word boxes. Wrong or missing boxes
+  made words unselectable or sent the user back to the reformatted text.
+- Now a photo opens directly in a highlight screen showing the original
+  image (own aspect ratio, letterboxed, never modified). No OCR runs until
+  the user taps "Read highlighted text".
+- Highlight mode: one finger draws a translucent stroke (a tap marks the
+  word under the finger); two fingers zoom/pan. Move mode: one finger pans,
+  nothing is drawn. Undo last, remove one (numbered chips), clear all.
+- Strokes are stored in photo pixels: screen point → viewer transform
+  inverted (`toScene`) → `ImageFit.toImage`. The brush is 20 logical px on
+  screen, i.e. 20 / (fit scale × zoom) photo pixels. Device pixel ratio
+  does not enter: all mapping is in logical pixels.
+- Reading: per stroke, a region = brushed area + padding (≥ 2 % of the
+  photo's shorter side vertically, twice that sideways, more for wide
+  brushes), clipped to the photo, cropped in memory to a temporary PNG
+  (enlarged up to 2× when small), recognized with the existing
+  `TextRecognitionEngine`. Only words whose box the finger path ran through
+  (its line, reaching the word) are kept, so neighbouring lines inside the
+  padding are dropped; without word boxes the small region's text is used.
+  An empty region is read once more with double padding, then marked
+  failed and reported — the whole page is never read as a fallback.
+- Results open in the existing review screen (edit, remove, deck,
+  duplicates) plus add a word, split into words, combine with the next, and
+  a summary of what will be saved. Only valid, confirmed items are saved.
+- Reading the whole page as text remains an explicit menu option, and is
+  used automatically only when the photo cannot be decoded for display
+  (with a notice).
+
+## D49 — Editing from the review card; the full answer (2026-10-19)
+
+Status: accepted (product owner request).
+
+- Cause of the missing German example: the revealed answer showed only the
+  side opposite the prompt. German → Persian showed the Persian side, which
+  had only `exampleTranslation`; `exampleSentence` belonged to the German
+  side, which was rendered without details as the prompt. The database
+  mapping was correct.
+- After the reveal, both directions show everything stored: meanings (with
+  explanations) or the word, part of speech and grammar, base form, the
+  German example (with pronunciation) and its translation, notes, source
+  sentence and tags. Empty fields are left out. Nothing is shown before the
+  reveal. The card reads the stored entry (`entryProvider`), like the word
+  page, so the review UI does not rebuild its own copy.
+- "Edit word" (only after the reveal) opens the existing editor on top of
+  the session; saving or going back returns to the same card in the same
+  phase. Opening, saving or cancelling records no answer; content edits
+  never touch `flashcards` or `review_events`.
+- The revealed card can also mark or unmark the word as difficult
+  (`setDifficult`) and edit its tags (the existing tags sheet). Neither
+  records an answer or touches `flashcards`.
+- Counter: an FSRS learning-step card due within 20 minutes is appended to
+  the session again (intended), but the title used the queue length, so
+  "12/61" became "13/62". The title now counts different cards (word +
+  direction), so the total stays fixed. A repeated card shows "again in
+  this session (learning step)". The progress bar counts cards answered at
+  least once.
+
+## D50 — Drawing ignores multi-touch (2026-10-19)
+
+Status: accepted (bug fix for D48).
+
+- Cause: strokes were driven by the scale recognizer. When a finger is
+  added or lifted it ends the gesture and starts a new one. A second finger
+  therefore committed the partial stroke, and lifting one finger of a pinch
+  started a stroke from `_downAt`. `_downAt` held the position of the last
+  finger that touched down (the other finger), so a long line was drawn
+  between the fingers.
+- Now drawing follows raw pointer events by pointer id. Only the finger
+  that started a draft extends it. The draft is kept only when that finger
+  lifts with no other finger having touched meanwhile. Any second finger
+  discards the draft, and nothing is drawn until all fingers are up.
+  Cancelled pointers discard the draft. The scale recognizer only zooms and
+  pans, and only with two or more fingers. Move mode is unchanged.
+
+## D51 — Rectangle selection on the page photo (2026-10-19)
+
+Status: accepted (product owner request).
+
+- A third mode, next to highlight and move: one finger drags a rectangle.
+  Drags smaller than 12 logical px on screen are ignored. Two fingers zoom.
+  Rectangles are stored in photo pixels (screen → inverse viewer transform
+  → `ImageFit.toImage`) and clipped to the photo. They are drawn as an
+  overlay. They are numbered with the highlights, and undo, remove and clear
+  apply to both.
+- Reading: each rectangle is cropped exactly (no padding) into a temporary
+  PNG and recognized with the existing on-device engine. That PNG is
+  deleted afterwards, and the photo file is never changed. Every recognized
+  line with words becomes one review item, in the recognizer's reading
+  order. A word hyphenated across lines is joined. The context is the
+  sentence within the rectangle. No word boxes are needed.
+- An empty rectangle is marked failed and reported ("draw the rectangle
+  again"). The whole page is never read as a fallback. Nothing is
+  translated or enriched; only confirmed items are saved.
+
+## D52 — Memory Coach, first version: a fixed rule (2026-10-19)
+
+Status: accepted (product owner request). Not a prediction or AI model.
+
+- Rule (`MemoryCoachRule.standard`): for each word, take its answers from
+  the last 30 days, newest first, at most 8 (both directions). The word
+  needs practice when its "not remembered" answers in that window come from
+  at least 2 different review sessions, and its latest 3 answers are not
+  all "remembered".
+- So words without history, and a new word forgotten twice in its first
+  session, never qualify; three correct answers in a row remove a word.
+- Data: existing `review_events` only (scheduled and free-practice answers
+  alike, since the table does not separate them). There is no new table or
+  migration.
+- Opening the list or a word reads only. Focused practice is free practice:
+  answers are stored as review events (history and statistics, and they let
+  a word recover) and never change `flashcards`, so FSRS due dates and
+  state are unaffected. It respects the review direction setting.
+- Entry point: "Needs practice" on Today. This is separate from the manual
+  "difficult" mark.

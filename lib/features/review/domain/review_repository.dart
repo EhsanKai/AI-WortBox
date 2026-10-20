@@ -19,4 +19,11 @@ abstract interface class ReviewRepository {
 
   /// Number of distinct sessions with at least one review.
   Stream<int> watchSessionCount();
+
+  /// Reviews of existing words recorded at or after [since] (UTC), in any
+  /// order, updated when reviews are recorded or words deleted. Reads only.
+  Stream<List<ReviewEvent>> watchEventsSince(DateTime since);
+
+  /// A one-time snapshot of [watchEventsSince].
+  Future<List<ReviewEvent>> eventsSince(DateTime since);
 }

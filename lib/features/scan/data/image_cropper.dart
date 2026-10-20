@@ -6,13 +6,34 @@ import 'package:flutter/painting.dart' show Offset, Rect, Size;
 import '../../../core/error/app_exception.dart';
 import 'scan_image_source.dart';
 
-/// Cuts a region out of a page image so it can be recognized on its own.
-/// Abstracted so tests can use a fake.
+/// A temporary image cut out of a page photo.
+class CroppedImage {
+  const CroppedImage({
+    required this.image,
+    required this.region,
+    required this.scale,
+  });
+
+  final PickedImage image;
+
+  /// The part of the photo it shows, in photo pixels.
+  final Rect region;
+
+  /// Crop pixels per photo pixel (crops are enlarged when small).
+  final double scale;
+}
+
+/// Reads page photos and cuts regions out of them, on the device. The
+/// photo file itself is never changed. Abstracted so tests can use a fake.
 abstract interface class ImageCropper {
+  /// Pixel size of the upright photo as it is displayed. Throws
+  /// [ScanException] when it cannot be decoded.
+  Future<Size> imageSize(PickedImage image);
+
   /// A temporary PNG of [region] (pixels of the upright image) of [image],
   /// enlarged when small so print stays legible for OCR. The caller
   /// discards it. Throws [ScanException].
-  Future<PickedImage> crop(PickedImage image, Rect region);
+  Future<CroppedImage> crop(PickedImage image, Rect region);
 }
 
 /// Pixel size of the upright (orientation-corrected) image at [path], as
@@ -44,7 +65,16 @@ class DartUiImageCropper implements ImageCropper {
   static const _minLongSide = 1200.0;
 
   @override
-  Future<PickedImage> crop(PickedImage image, Rect region) async {
+  Future<Size> imageSize(PickedImage image) async {
+    try {
+      return await readImageSize(image.path);
+    } on Object catch (e) {
+      throw ScanException(ScanError.unreadableImage, e);
+    }
+  }
+
+  @override
+  Future<CroppedImage> crop(PickedImage image, Rect region) async {
     final ui.Image source;
     try {
       source = await _decode(image.path);
@@ -59,9 +89,9 @@ class DartUiImageCropper implements ImageCropper {
         throw const ScanException(ScanError.unreadableImage);
       }
       final longSide = area.width > area.height ? area.width : area.height;
-      final factor = longSide >= _minLongSide
+      final double factor = longSide >= _minLongSide
           ? 1.0
-          : (_minLongSide / longSide).clamp(1.0, 2.0);
+          : (_minLongSide / longSide).clamp(1.0, 2.0).toDouble();
       final width = (area.width * factor).round();
       final height = (area.height * factor).round();
 
@@ -84,10 +114,14 @@ class DartUiImageCropper implements ImageCropper {
         '${DateTime.now().microsecondsSinceEpoch}.png',
       );
       await file.writeAsBytes(png.buffer.asUint8List(), flush: true);
-      return PickedImage(
-        path: file.path,
-        name: 'region.png',
-        sizeBytes: await file.length(),
+      return CroppedImage(
+        image: PickedImage(
+          path: file.path,
+          name: 'region.png',
+          sizeBytes: await file.length(),
+        ),
+        region: area,
+        scale: factor,
       );
     } on ScanException {
       rethrow;

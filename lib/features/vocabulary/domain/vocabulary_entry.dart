@@ -168,7 +168,7 @@ class VocabularyEntry {
 
   bool get hasMeanings => meanings.isNotEmpty;
 
-  bool get isMultiWordExpression => original.trim().contains(' ');
+  bool get isMultiWordExpression => original.trim().contains(RegExp(r'\s'));
 
   @override
   bool operator ==(Object other) =>

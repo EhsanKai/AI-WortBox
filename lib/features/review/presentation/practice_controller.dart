@@ -7,6 +7,7 @@ import '../../vocabulary/domain/vocabulary_entry.dart';
 import '../../vocabulary/domain/vocabulary_search.dart';
 import '../domain/flashcard.dart';
 import '../domain/review_event.dart';
+import 'memory_coach_providers.dart';
 import 'review_providers.dart';
 
 /// Which words a review session uses and whether it is scheduled.
@@ -16,6 +17,7 @@ class PracticeConfig {
     this.deckId,
     this.difficultOnly = false,
     this.scheduled = true,
+    this.coach = false,
   });
 
   /// One deck, or every deck when null.
@@ -25,19 +27,25 @@ class PracticeConfig {
   /// Scheduled review (FSRS, due cards only) rather than free practice.
   final bool scheduled;
 
-  /// Difficult-word practice is always free practice: the manual mark is
-  /// kept separate from FSRS scheduling.
-  bool get isScheduled => scheduled && !difficultOnly;
+  /// Focused practice of the Memory Coach's words (see
+  /// `findStrugglingWords`), in every deck.
+  final bool coach;
+
+  /// Difficult-word and Memory Coach practice are always free practice: the
+  /// manual mark and the coach's suggestions are kept separate from FSRS
+  /// scheduling.
+  bool get isScheduled => scheduled && !difficultOnly && !coach;
 
   @override
   bool operator ==(Object other) =>
       other is PracticeConfig &&
       other.deckId == deckId &&
       other.difficultOnly == difficultOnly &&
-      other.scheduled == scheduled;
+      other.scheduled == scheduled &&
+      other.coach == coach;
 
   @override
-  int get hashCode => Object.hash(deckId, difficultOnly, scheduled);
+  int get hashCode => Object.hash(deckId, difficultOnly, scheduled, coach);
 }
 
 /// A word asked in one direction.
@@ -50,6 +58,10 @@ class StudyCard {
 
   /// German shown, Persian recalled.
   bool get asksMeaning => direction == CardDirection.forward;
+
+  /// Identifies the card (word and direction); the same card can appear
+  /// twice in a session when FSRS brings it back for a learning step.
+  (String, CardDirection) get key => (entry.id, direction);
 }
 
 enum PracticePhase {
@@ -96,6 +108,25 @@ class PracticeState {
 
   StudyCard? get current => index < cards.length ? cards[index] : null;
 
+  /// Different cards in the session. A card repeated for a learning step
+  /// (appended to [cards] after its answer) is counted once, so the total
+  /// shown does not grow while reviewing.
+  int get total => {for (final c in cards) c.key}.length;
+
+  /// Different cards shown so far, including the current one (1-based).
+  int get position =>
+      {for (final c in cards.take(index + 1)) c.key}.length.clamp(0, total);
+
+  /// Different cards answered at least once, for the progress bar.
+  int get answeredCards => {for (final c in cards.take(index)) c.key}.length;
+
+  /// The current card was already answered in this session and is shown
+  /// again for an FSRS learning step.
+  bool get isRepeat {
+    final card = current;
+    return card != null && cards.take(index).any((c) => c.key == card.key);
+  }
+
   int get answered => remembered + forgotten;
 
   PracticeState copyWith({
@@ -123,8 +154,9 @@ class PracticeState {
 /// Scheduled sessions review the cards FSRS says are due and advance their
 /// scheduling state with every answer (`StudyRepository.recordAnswer`); a
 /// card that is due again within minutes (a learning step) returns at the
-/// end of the session. Free practice (all words, or difficult words only)
-/// records review events but never changes scheduling state.
+/// end of the session. Free practice (all words, difficult words only, or
+/// the Memory Coach's words) records review events but never changes
+/// scheduling state.
 ///
 /// Only an explicit "remembered"/"not remembered" after the reveal is
 /// recorded, once per tap.
@@ -143,7 +175,11 @@ class PracticeController extends Notifier<PracticeState> {
   Future<void> _load() async {
     List<StudyCard> cards;
     try {
-      cards = config.isScheduled ? await _dueCards() : await _freeCards();
+      cards = config.isScheduled
+          ? await _dueCards()
+          : config.coach
+          ? await _coachCards()
+          : await _freeCards();
     } on Object catch (e) {
       if (!ref.mounted) return;
       state = PracticeState(phase: PracticePhase.failed, error: e);
@@ -191,6 +227,29 @@ class PracticeController extends Notifier<PracticeState> {
       for (final (i, entry)
           in words.take(AppConfig.practiceSessionSize).indexed)
         StudyCard(entry, direction.directionAt(i)),
+    ];
+  }
+
+  /// The coach's words with a meaning, most struggled-with first.
+  Future<List<StudyCard>> _coachCards() async {
+    final direction = await ref.read(reviewDirectionProvider.future);
+    final rule = ref.read(memoryCoachRuleProvider);
+    final now = ref.read(clockProvider).nowUtc();
+    final suggestions = await resolveSuggestions(
+      await ref
+          .read(reviewRepositoryProvider)
+          .eventsSince(now.subtract(rule.lookback)),
+      now: now,
+      rule: rule,
+      vocabulary: ref.read(vocabularyRepositoryProvider),
+    );
+    return [
+      for (final (i, s)
+          in suggestions
+              .where((s) => s.entry.hasMeanings)
+              .take(AppConfig.practiceSessionSize)
+              .indexed)
+        StudyCard(s.entry, direction.directionAt(i)),
     ];
   }
 

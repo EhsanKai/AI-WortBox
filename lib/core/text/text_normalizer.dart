@@ -34,6 +34,18 @@ abstract final class TextNormalizer {
   static String collapseWhitespace(String input) =>
       input.trim().replaceAll(_whitespace, ' ');
 
+  static final _lineBreak = RegExp(r'\r\n|\r|\n');
+
+  /// Like [collapseWhitespace] within each line, but keeps the line breaks
+  /// the user entered (as `\n`): e.g. "Der Nachbar\nDie Nachbarin". Blank
+  /// lines are dropped, so single-line text comes out exactly as from
+  /// [collapseWhitespace].
+  static String collapseWhitespaceKeepingLines(String input) => input
+      .split(_lineBreak)
+      .map(collapseWhitespace)
+      .where((line) => line.isNotEmpty)
+      .join('\n');
+
   /// Composes German umlauts and unifies Arabic/Persian look-alike letters.
   static String composeCharacters(String input) {
     var result = input;

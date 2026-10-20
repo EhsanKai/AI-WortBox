@@ -1,4 +1,4 @@
-import 'dart:ui' show Rect, Size;
+import 'dart:ui' show Offset, Rect, Size;
 
 import 'package:ai_wortbox/core/error/app_exception.dart';
 import 'package:ai_wortbox/features/scan/data/image_cropper.dart';
@@ -90,18 +90,24 @@ Rect fakeBoxOf(String text, String word, {int occurrence = 0}) => [
         if (e.text == word) e.box,
 ][occurrence];
 
-/// Returns OCR [lines] as one block per paragraph (split on blank lines).
+/// Recognizes [text] like a page: one block per paragraph (split on blank
+/// lines), one line per `\n`.
 ///
 /// With [layout], words come with boxes on a [fakePageSize] photo (see
-/// [fakePageLayout]). A crop made by [FakeImageCropper] is recognized as
-/// [regionText].
+/// [fakePageLayout]).
+///
+/// A crop made by [FakeImageCropper] is "read" like the real engine would:
+/// only the words of the page whose boxes lie inside the crop, with boxes in
+/// crop pixels. [regionText] replaces that result (as text without word
+/// positions); [regionError] makes reading a crop fail.
 class FakeTextRecognitionEngine implements TextRecognitionEngine {
   FakeTextRecognitionEngine(
     this.text, {
     this.error,
     this.isAvailable = true,
     this.layout = false,
-    this.regionText = '',
+    this.regionText,
+    this.regionError,
   });
 
   String text;
@@ -109,21 +115,36 @@ class FakeTextRecognitionEngine implements TextRecognitionEngine {
   @override
   bool isAvailable;
   bool layout;
-  String regionText;
+  String? regionText;
+  ScanException? regionError;
   int calls = 0;
   bool disposed = false;
+
+  /// Every image recognized, in order.
+  final recognized = <PickedImage>[];
+
+  /// Crops recognized, as photo regions.
+  Iterable<Rect> get readRegions =>
+      recognized.map((i) => FakeImageCropper.regionOf(i)).whereType<Rect>();
+
+  /// Whether the whole page photo was ever recognized.
+  bool get readWholePage => recognized.any((i) => i.path == fakePhoto.path);
 
   @override
   Future<ScanText> recognize(PickedImage image) async {
     calls++;
-    if (error != null) throw error!;
-    if (image.name == fakeRegion.name) {
-      return ScanText.fromOcrLayout(
-        fakePageLayout(regionText),
-        rawText: regionText,
-        imageSize: fakePageSize,
-      );
+    recognized.add(image);
+    final region = FakeImageCropper.regionOf(image);
+    if (region != null) {
+      if (regionError != null) throw regionError!;
+      if (regionText case final t?) {
+        return ScanText.fromRecognizedBlocks([
+          for (final line in t.split('\n')) [(line, null)],
+        ], rawText: t);
+      }
+      return _readCrop(region, FakeImageCropper.scaleOf(image));
     }
+    if (error != null) throw error!;
     if (layout) {
       return ScanText.fromOcrLayout(
         fakePageLayout(text),
@@ -138,25 +159,86 @@ class FakeTextRecognitionEngine implements TextRecognitionEngine {
     return ScanText.fromRecognizedBlocks(blocks, rawText: text);
   }
 
+  ScanText _readCrop(Rect region, double scale) {
+    Rect toCrop(Rect r) => Rect.fromLTRB(
+      (r.left - region.left) * scale,
+      (r.top - region.top) * scale,
+      (r.right - region.left) * scale,
+      (r.bottom - region.top) * scale,
+    );
+    final blocks = <List<OcrLine>>[];
+    for (final block in fakePageLayout(text)) {
+      final lines = <OcrLine>[];
+      for (final line in block) {
+        final inside = [
+          for (final e in line.elements)
+            if (region.contains(e.box.center))
+              OcrElement(e.text, toCrop(e.box), confidence: e.confidence),
+        ];
+        if (inside.isEmpty) continue;
+        lines.add(
+          OcrLine(inside.map((e) => e.text).join(' '), elements: inside),
+        );
+      }
+      if (lines.isNotEmpty) blocks.add(lines);
+    }
+    return ScanText.fromOcrLayout(
+      blocks,
+      rawText: blocks.expand((b) => b).map((l) => l.text).join('\n'),
+      imageSize: region.size * scale,
+    );
+  }
+
   @override
   Future<void> dispose() async => disposed = true;
 }
 
-const fakeRegion = PickedImage(
-  path: '/tmp/fake/region.png',
-  name: 'region.png',
-  sizeBytes: 512,
-);
-
-/// Records requested crops and returns [fakeRegion] (or throws [error]).
+/// Cuts nothing: returns a fake crop that remembers its region (read back
+/// by [FakeTextRecognitionEngine]). Records every requested region.
 class FakeImageCropper implements ImageCropper {
-  final crops = <(PickedImage, Rect)>[];
+  FakeImageCropper({this.size = fakePageSize, this.scale = 2});
+
+  Size size;
+  double scale;
+  ScanException? sizeError;
   ScanException? error;
+  final crops = <(PickedImage, Rect)>[];
+
+  static const _prefix = 'fake-region:';
+
+  static Rect? regionOf(PickedImage image) {
+    if (!image.path.startsWith(_prefix)) return null;
+    final v = image.path.substring(_prefix.length).split(',');
+    return Rect.fromLTRB(
+      double.parse(v[0]),
+      double.parse(v[1]),
+      double.parse(v[2]),
+      double.parse(v[3]),
+    );
+  }
+
+  static double scaleOf(PickedImage image) =>
+      double.parse(image.name.split('@').last);
 
   @override
-  Future<PickedImage> crop(PickedImage image, Rect region) async {
+  Future<Size> imageSize(PickedImage image) async {
+    if (sizeError != null) throw sizeError!;
+    return size;
+  }
+
+  @override
+  Future<CroppedImage> crop(PickedImage image, Rect region) async {
     if (error != null) throw error!;
     crops.add((image, region));
-    return fakeRegion;
+    final area = region.intersect(Offset.zero & size);
+    return CroppedImage(
+      image: PickedImage(
+        path: '$_prefix${area.left},${area.top},${area.right},${area.bottom}',
+        name: 'region@$scale',
+        sizeBytes: 512,
+      ),
+      region: area,
+      scale: scale,
+    );
   }
 }

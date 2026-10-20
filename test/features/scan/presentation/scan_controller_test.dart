@@ -26,6 +26,7 @@ void main() {
   late Deck deck;
   late FakeScanImageSource images;
   late FakeTextRecognitionEngine engine;
+  late FakeImageCropper cropper;
   late ProviderContainer container;
 
   setUp(() async {
@@ -37,6 +38,7 @@ void main() {
     ).createDeck(const DeckDraft(name: 'Buch'));
     images = FakeScanImageSource();
     engine = FakeTextRecognitionEngine(page);
+    cropper = FakeImageCropper();
     container = ProviderContainer(
       overrides: [
         appDatabaseProvider.overrideWithValue(db),
@@ -44,6 +46,7 @@ void main() {
         idGeneratorProvider.overrideWithValue(SequentialIdGenerator()),
         scanImageSourceProvider.overrideWithValue(images),
         textRecognitionEngineProvider.overrideWithValue(engine),
+        imageCropperProvider.overrideWithValue(cropper),
       ],
       retry: (_, _) => null,
     );
@@ -88,12 +91,36 @@ void main() {
     ];
   }
 
-  test('recognizes a picked image and always discards the photo', () async {
-    await controller().pickImage(ImageOrigin.camera);
-    expect(images.requested, [ImageOrigin.camera]);
-    expect(engine.calls, 1);
-    expect(images.discarded, [fakePhoto]);
+  test(
+    'a picked photo opens unchanged for highlighting; nothing is '
+    'recognized until asked; the photo is deleted when the scan ends',
+    () async {
+      await controller().pickImage(ImageOrigin.camera);
+      expect(images.requested, [ImageOrigin.camera]);
+      expect(state().step, ScanStep.highlight);
+      expect(state().image, fakePhoto);
+      expect(state().imageSize, fakePageSize);
+      expect(engine.calls, 0);
+      expect(images.discarded, isEmpty);
+
+      // Reading the whole page only on explicit request.
+      await controller().readWholePage();
+      expect(engine.calls, 1);
+      expect(state().step, ScanStep.select);
+      expect(state().document!.text, page);
+      controller().backFromText();
+      expect(state().step, ScanStep.highlight);
+
+      controller().backToCapture();
+      expect(images.discarded, [fakePhoto]);
+    },
+  );
+
+  test('a photo that cannot be shown is read as text, with a notice', () async {
+    cropper.sizeError = const ScanException(ScanError.unreadableImage);
+    await controller().pickImage(ImageOrigin.gallery);
     expect(state().step, ScanStep.select);
+    expect(state().notice, SelectionNotice.photoUnavailable);
     expect(state().document!.text, page);
   });
 
@@ -132,22 +159,25 @@ void main() {
     expect(engine.calls, 0);
   });
 
-  test('OCR failure and unavailability lead to an error state', () async {
+  test('OCR failure and unavailability keep the photo with a notice', () async {
     engine.error = const ScanException(ScanError.ocrFailed);
     await controller().pickImage(ImageOrigin.gallery);
-    expect((state().error! as ScanException).error, ScanError.ocrFailed);
-    expect(images.discarded, hasLength(1));
+    await controller().readWholePage();
+    expect(state().step, ScanStep.highlight);
+    expect(state().notice, SelectionNotice.highlightsFailed);
+    expect(state().isBusy, isFalse);
 
     engine
       ..error = null
       ..isAvailable = false;
-    await controller().pickImage(ImageOrigin.gallery);
-    expect((state().error! as ScanException).error, ScanError.ocrUnavailable);
+    await controller().readWholePage();
+    expect(state().notice, SelectionNotice.highlightsFailed);
   });
 
   test('an empty OCR result opens an empty selection step', () async {
     engine.text = '   ';
     await controller().pickImage(ImageOrigin.gallery);
+    await controller().readWholePage();
     expect(state().step, ScanStep.select);
     expect(state().document!.hasWords, isFalse);
   });
@@ -155,9 +185,10 @@ void main() {
   test('recovers a photo lost while Android killed the activity', () async {
     images.lost = fakePhoto;
     await controller().recoverLostImage();
-    expect(state().step, ScanStep.select);
+    expect(state().step, ScanStep.highlight);
     await controller().recoverLostImage(); // Only once per session.
-    expect(engine.calls, 1);
+    expect(state().image, fakePhoto);
+    expect(engine.calls, 0);
   });
 
   test('typed fallback goes straight to selection', () {
@@ -176,7 +207,10 @@ void main() {
   });
 
   group('selection and review', () {
-    setUp(() => controller().pickImage(ImageOrigin.gallery));
+    setUp(() async {
+      await controller().pickImage(ImageOrigin.gallery);
+      await controller().readWholePage();
+    });
 
     test('words and expressions become review items with context', () async {
       await pumpEventQueue();

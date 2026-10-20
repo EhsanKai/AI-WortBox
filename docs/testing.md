@@ -374,17 +374,23 @@ Needs Android and iPhone devices; none of this has been run yet.
 | `test/features/review/presentation/practice_controller_test.dart` | Default direction, scheduled vs free, reveal required, double taps, re-queued learning steps, both directions over two days, difficult-only stays unscheduled, direction persisted |
 | `test/features/speech/flutter_tts_speech_service_test.dart` | iOS playback session (once, before speaking, not on Android, retried after failure), rapid taps, restart, stop, refused language |
 | `test/features/vocabulary/data/bulk_delete_test.dart` | Only selected words deleted; meanings, tags, card state cascade; history kept; unknown ids; 1200 ids |
-| `test/features/scan/domain/page_layout_test.dart` | Word boxes ↔ characters (umlauts, ß, punctuation, hyphenation), hit tests with slop, misaligned boxes disable the photo view, image ↔ screen mapping incl. zoom/pan |
-| `test/features/scan/presentation/scan_visual_selection_test.dart` | Photo kept only while scanning, three words from different paragraphs saved and nothing else, deselect/split/remove, disjoint selections, area crop → correction → item |
+| `test/features/scan/domain/page_layout_test.dart` | OCR word boxes ↔ characters (umlauts, ß, punctuation), misaligned boxes are dropped, image ↔ screen mapping incl. letterboxing and zoom/pan |
+| `test/features/scan/domain/highlight_test.dart` (D48) | Crop padding for thin and wide strokes, larger second attempt, clipping, words selected by the finger path (not neighbouring lines), crop → photo mapping, punctuation trimming, fallbacks, stroke screen ↔ photo round trip under zoom |
+| `test/features/scan/presentation/scan_highlight_test.dart` (D48) | No OCR on opening; strokes added/undone/removed/cleared; only highlighted regions read (never the whole page) in drawing order; phrase in one stroke; empty region retried then reported without whole-page fallback; OCR error retried; edits kept, only new strokes read; edit/remove/add/split/combine; only valid confirmed items saved to the chosen deck; duplicates skipped; crop clipped |
+| `test/widgets/scan_highlight_flow_test.dart` (D48) | Photo shown with its aspect ratio and nothing read; finger drawing, tap, undo, chip removal, clear; three highlights saved after correction to a chosen deck and present after restart; two-finger zoom while highlighting then a small word; move mode never draws; failed highlight banner and back to photo; split/add/combine; 320 px at 2× |
+| `test/features/review/domain/memory_coach_test.dart` (D52) | No/insufficient history, one failed session not enough, two sessions qualify with evidence, recovery after three correct answers, 30-day / 8-answer window, configurable rule, deleted words and deterministic order |
+| `test/widgets/review_card_edit_test.dart` (D49) | Mark/unmark difficult and add/remove tags from the revealed card without recording an answer or touching FSRS; counter total fixed when a learning-step card repeats (also in `practice_controller_test.dart`); Answer hidden before the reveal; all stored fields (German and Persian example, notes, grammar, base form, source, tags) after it in both directions; edit from the card saves, updates the card and pronunciation, keeps FSRS row and history, records nothing, persists after restart; cancel changes nothing; missing fields omitted; 320 px at 2× |
+| `test/widgets/memory_coach_flow_test.dart` (D52) | Empty state with insufficient history; only qualifying words listed with evidence; opening or inspecting writes nothing; focused practice asks only those words in the chosen direction and leaves `flashcards` unchanged |
+| `test/widgets/scan_highlight_flow_test.dart` — multi-touch and rectangles (D50, D51) | Pinch with either finger lifted first while the other keeps moving draws nothing (highlight and rectangle mode); a second finger discards a stroke in progress; a cancelled pointer leaves no stroke; rectangle around two lines → one item per line; tap draws no rectangle; rectangle under zoom maps to the framed words; empty rectangle reported, removed, redrawn, whole page never read |
 | `test/widgets/review_flow_test.dart` | Deck hides meanings (text and semantics), Start review shows one prompt, reveal, FSRS row written, direction from Settings survives restart, due count, nothing due → free practice, long-press selection, select all/clear, cancel/confirm delete, back leaves selection |
-| `test/widgets/scan_visual_flow_test.dart` | Taps at real screen positions, pinch zoom keeps boxes aligned, hold-and-drag vs plain drag, area drawn on screen → correct photo region, view switching, 320 px at 2× text |
 
-Automated tests cannot show: ML Kit's real word boxes and their alignment
-with the decoded photo on a device, gesture feel, whether a German voice is
+Automated tests cannot show: how ML Kit reads real crops of a photo, whether
+crops line up with what was highlighted on a device, gesture feel, whether a German voice is
 installed, how speech sounds, and the silent switch. See the manual checks
 in the final report of this change and below.
 
-Manual checks on a device (D42–D47):
+Manual checks on a device (D42–D52; see also the checklist in the final
+report of the D49–D52 change):
 
 1. Review German → Persian from Today: German shown, meaning hidden until
    "Show answer"; answer; the card returns after its learning step.
@@ -395,6 +401,7 @@ Manual checks on a device (D42–D47):
 4. Open a deck: meanings hidden; eye icon shows them; long-press → select
    several → delete → confirm; cancel deletes nothing.
 5. Pronunciation with the silent switch on, with music playing, offline.
-6. Scan a page: tap three words in different paragraphs, zoom and tap
-   more, touch-hold-drag an expression, draw an area around a misread word,
-   correct it, continue, choose the deck, save; only those words are added.
+6. Scan a page (D48): the photo looks exactly as taken; highlight a word, a
+   phrase and a word in another paragraph; zoom in and highlight a small
+   word; undo; read; correct a word; choose the deck; save; only those words
+   are added.

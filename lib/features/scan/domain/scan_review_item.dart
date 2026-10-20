@@ -15,6 +15,7 @@ class ScanReviewItem {
     this.lemma = '',
     this.meaning = '',
     this.hint,
+    this.stroke,
   });
 
   /// Stable within the session (used as a widget key).
@@ -35,6 +36,9 @@ class ScanReviewItem {
   /// Offline base-form suggestion; never applied automatically.
   final LemmaHint? hint;
 
+  /// Id of the photo highlight this item was read from, if any.
+  final int? stroke;
+
   ScanReviewItem copyWith({
     String? original,
     String? context,
@@ -49,6 +53,7 @@ class ScanReviewItem {
     hint: original == null || original == this.original
         ? hint
         : LemmaHints.suggest(original),
+    stroke: stroke,
   );
 
   /// The vocabulary draft saved for this item.

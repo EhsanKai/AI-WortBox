@@ -57,7 +57,9 @@ class VocabularyDraft {
 
   /// A copy with whitespace cleaned up, blank optional fields set to null, and
   /// blank or repeated meanings removed (first occurrence wins). The spelling
-  /// of [original] is otherwise preserved exactly.
+  /// of [original] is otherwise preserved exactly, including line breaks the
+  /// user entered (e.g. "Der Nachbar\nDie Nachbarin"); only spaces within a
+  /// line and blank lines are cleaned up.
   VocabularyDraft cleaned() {
     final seen = <String>{};
     final cleanedMeanings = <VocabularyMeaning>[];
@@ -70,7 +72,7 @@ class VocabularyDraft {
     }
     return VocabularyDraft(
       deckId: deckId,
-      original: TextNormalizer.collapseWhitespace(original),
+      original: TextNormalizer.collapseWhitespaceKeepingLines(original),
       meanings: List.unmodifiable(cleanedMeanings),
       lemma: _optional(lemma),
       partOfSpeech: _optional(partOfSpeech),

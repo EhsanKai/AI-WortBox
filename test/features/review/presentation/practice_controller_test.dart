@@ -99,6 +99,30 @@ void main() {
     await controllerOf(config).answer(outcome);
   }
 
+  test('a card repeated for an FSRS learning step does not raise the total; '
+      'it is marked as a repeat', () async {
+    await add('Haus', ['خانه']);
+    await add('Baum', ['درخت']);
+    const config = PracticeConfig();
+    var state = await start(config);
+    expect((state.position, state.total, state.isRepeat), (1, 2, false));
+
+    await answer(config, ReviewOutcome.forgotten);
+    state = stateOf(config);
+    // The forgotten card comes back at the end (legitimate FSRS step)…
+    expect(state.cards, hasLength(3));
+    // …but the counter still counts two cards.
+    expect((state.position, state.total, state.isRepeat), (2, 2, false));
+    expect(state.answeredCards, 1);
+
+    await answer(config, ReviewOutcome.remembered);
+    state = stateOf(config);
+    expect(state.phase, PracticePhase.question);
+    expect((state.position, state.total, state.isRepeat), (2, 2, true));
+    expect(state.answeredCards, 2);
+    expect(state.current!.entry.original, 'Haus');
+  });
+
   test('German → Persian is the default direction', () async {
     expect(
       await container.read(reviewDirectionProvider.future),

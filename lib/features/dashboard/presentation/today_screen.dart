@@ -14,6 +14,7 @@ import '../../decks/domain/deck.dart';
 import '../../decks/presentation/deck_providers.dart';
 import '../../decks/presentation/deck_tile.dart';
 import '../../decks/presentation/decks_screen.dart';
+import '../../review/presentation/memory_coach_providers.dart';
 import '../../review/presentation/practice_screen.dart'
     show reviewDirectionLabel;
 import '../../review/presentation/review_providers.dart';
@@ -139,6 +140,16 @@ class _Dashboard extends ConsumerWidget {
               _ => l10n.practiceTileDescription,
             },
             onTap: () => context.go(AppRoutes.practice),
+          ),
+          const SizedBox(height: AppSpace.sm),
+          ActionTile(
+            key: const Key('today.coach'),
+            icon: Icons.psychology_alt_outlined,
+            title: l10n.coachTitle,
+            description: l10n.coachTileDescription(
+              ref.watch(coachSuggestionsProvider).value?.length ?? 0,
+            ),
+            onTap: () => context.go(AppRoutes.memoryCoach),
           ),
           const SizedBox(height: AppSpace.xl),
           SectionHeader(l10n.dashboardYourDecks),

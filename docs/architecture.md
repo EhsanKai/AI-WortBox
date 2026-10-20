@@ -195,14 +195,23 @@ ScanReviewItem.toDraft          ─▶ VocabularyRepository.importEntries
   `importEntries`, i.e. one transaction, the same duplicate rules and the
   same three `DuplicateStrategy` options as CSV import (default: skip).
   Items already in the deck are marked and not saved again.
-- **Privacy**: the picked photo is a temporary copy, kept only while the
-  scan is open when words can be selected on it, otherwise deleted right
-  after recognition (also on errors); area crops are deleted after reading.
-  Images are never uploaded or stored (D46).
-- **Photo selection (D46)**: `ScanText.words` (character range, box,
-  confidence) and `imageSize`; `ScanDocument.tokenAt/boxesOf`; `ImageFit`
-  (contain-fit mapping); `ScanImageSelectView` (InteractiveViewer, tap,
-  long-press drag, area mode via `ImageCropper`).
+- **Privacy**: the picked photo is a temporary copy, never modified, kept
+  only while the scan is open (deleted on a new scan, typing, going back,
+  saving or leaving); highlight crops are deleted right after reading.
+  Images are never uploaded or stored (D48).
+- **Highlighting (D48)**: `ScanHighlightView` (InteractiveViewer + a draw
+  surface in highlight mode; `ImageFit` maps photo ↔ viewer, the viewer's
+  transform handles zoom/pan) records `HighlightStroke`s in photo pixels.
+  `ScanController.readHighlights` crops `ocrRegionFor(stroke)` with
+  `ImageCropper`, recognizes the crop with `TextRecognitionEngine` and keeps
+  the words the finger path covered (`highlightedText`); results become
+  review items without a text range.
+- **Rectangles and multi-touch (D50, D51)**: a third mode records
+  `RegionSelection`s (photo pixels, clipped by `regionRectFor`); they share
+  ids and numbering with strokes. `readHighlights` crops exactly the
+  rectangle and turns every recognized line into an item (`regionText`).
+  Drawing follows raw pointers (`Listener` with pointer ids); the scale
+  recognizer only zooms with two or more fingers.
 - **State**: `ScanController` (Riverpod, one per screen instance) drives the
   steps capture → (typing) → select → review → done inside one route; the
   back button returns to the previous step.
@@ -311,6 +320,16 @@ CsvImportController ─ AnkiPackageReader (ZIP signature) or CsvParser ─▶ Cs
   transactional import are shared with CSV. `withMemoryDatabase` opens Anki
   collections in an in-memory SQLite VFS. Imported Anki words are stored with
   `source_type = csv` (shown as "file import").
+- **Review card (D49):** the session card watches `entryProvider` (the
+  same stored entry as the word page) and shows every stored field after
+  the reveal; "Edit word" pushes `VocabularyFormScreen` on the session's
+  navigator, so the session, card and phase survive and nothing is
+  recorded. `updateEntry` never writes `flashcards`.
+- **Memory Coach (D52):** `findStrugglingWords` (pure) applies
+  `MemoryCoachRule` to `ReviewRepository.watchEventsSince`;
+  `coachSuggestionsProvider` loads the entries; `MemoryCoachScreen` lists
+  them and starts `PracticeConfig(coach: true)`, which is free practice
+  (`ReviewRepository.record`, never `flashcards`).
 - Tests replace every native service (`speechServiceProvider`,
   `reminderSchedulerProvider`, `exportFileSinkProvider`) and the practice
   order (`randomProvider`).

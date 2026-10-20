@@ -1,5 +1,6 @@
 import 'package:ai_wortbox/core/config/app_config.dart';
 import 'package:ai_wortbox/core/error/app_exception.dart';
+import 'package:ai_wortbox/core/language/language.dart';
 import 'package:ai_wortbox/features/vocabulary/domain/vocabulary_draft.dart';
 import 'package:ai_wortbox/features/vocabulary/domain/vocabulary_entry.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +14,41 @@ void main() {
       ).cleaned();
       expect(draft.original, 'sich Mühe geben');
       expect(draft.normalized, 'sich mühe geben');
+    });
+
+    test('keeps line breaks the user entered; cleans each line and drops '
+        'blank lines', () {
+      String clean(String original) =>
+          VocabularyDraft(deckId: 'd', original: original).cleaned().original;
+      expect(clean('Der Nachbar\nDie Nachbarin'), 'Der Nachbar\nDie Nachbarin');
+      expect(
+        clean('  Der   Nachbar \r\n\n  Die Nachbarin\r'),
+        'Der Nachbar\nDie Nachbarin',
+      );
+      // A single line is unchanged by the line handling.
+      expect(clean(' das   Haus '), 'das Haus');
+      expect(clean('das Haus').contains('\n'), isFalse);
+      // Duplicate detection still compares the words, not the layout.
+      final draft = const VocabularyDraft(
+        deckId: 'd',
+        original: 'Der Nachbar\nDie Nachbarin',
+      ).cleaned();
+      expect(draft.normalized, 'der nachbar die nachbarin');
+      expect(
+        VocabularyEntry(
+          id: 'e',
+          deckId: 'd',
+          original: draft.original,
+          normalized: draft.normalized,
+          sourceLanguage: Language.german,
+          definitionLanguage: Language.persian,
+          sourceType: VocabularySourceType.manual,
+          enrichmentStatus: EnrichmentStatus.missing,
+          createdAt: DateTime.utc(2026),
+          updatedAt: DateTime.utc(2026),
+        ).isMultiWordExpression,
+        isTrue,
+      );
     });
 
     test('drops blank and repeated meanings, keeping order', () {

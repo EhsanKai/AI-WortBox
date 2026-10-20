@@ -57,6 +57,11 @@ abstract final class AppTypography {
   /// The German word on its detail screen.
   static final headword = _german(30, 1.25, FontWeight.w600);
 
+  /// [headword] for an entry written on several lines (e.g. "Der Nachbar" /
+  /// "Die Nachbarin"): a step smaller and a little more line spacing, so
+  /// each line usually fits on one row of a phone screen.
+  static final headwordMultiline = _german(24, 1.35, FontWeight.w600);
+
   /// The German word in lists, cards and dialogs.
   static final wordTitle = _german(19, 1.3, FontWeight.w600);
 

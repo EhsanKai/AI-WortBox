@@ -43,9 +43,6 @@ void main() {
       rawText: 'raw',
       imageSize: size,
     );
-    final document = ScanDocument(text);
-
-    String wordAt(Offset p) => document.tokenAt(p)!.display;
 
     test('each element is mapped to its characters in the normalized text', () {
       expect(text.hasLayout, isTrue);
@@ -64,33 +61,6 @@ void main() {
         ],
       );
       expect(text.words.first.confidence, 0.8);
-    });
-
-    test('a box selects its word: umlauts, ß, punctuation and leading '
-        'quotes are handled', () {
-      expect(wordAt(const Offset(50, 30)), 'Größe');
-      expect(wordAt(const Offset(250, 30)), 'Maß');
-      expect(wordAt(const Offset(350, 30)), 'bitte');
-      expect(wordAt(const Offset(20, 70)), 'Mühe');
-    });
-
-    test('both halves of a hyphenated word select the joined word, and its '
-        'selection covers both boxes', () {
-      final first = document.tokenAt(const Offset(240, 70))!;
-      final second = document.tokenAt(const Offset(20, 120))!;
-      expect(first.start, second.start);
-      expect(first.display, 'Verständnis');
-      expect(document.boxesOf(document.rangeOfWord(first)), [
-        box(230, 60),
-        box(10, 110),
-      ]);
-    });
-
-    test('a touch near a box (within the slop) still hits it; far away '
-        'hits nothing', () {
-      expect(document.tokenAt(const Offset(117, 30)), isNull);
-      expect(document.tokenAt(const Offset(117, 30), slop: 6)!.display, 'und');
-      expect(document.tokenAt(const Offset(900, 700), slop: 6), isNull);
     });
 
     test('boxes outside the photo (e.g. rotated) disable the photo view', () {

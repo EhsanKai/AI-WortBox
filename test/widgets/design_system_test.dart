@@ -215,6 +215,7 @@ void main() {
         brightness: brightness,
       );
       await scrollAndTap(tester, find.byKey(const Key('scan.gallery')));
+      await readWholePageAsText(tester);
     }
 
     Finder word(String w) => find.byKey(Key('scan.word.${page.indexOf(w)}'));

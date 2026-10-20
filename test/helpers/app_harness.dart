@@ -18,6 +18,7 @@ import 'package:http/http.dart' as http;
 
 import 'ai_fakes.dart';
 import 'phase5_fakes.dart';
+import 'scan_fakes.dart';
 
 /// A valid 1×1 transparent PNG.
 final onePixelPng = Uint8List.fromList(const [
@@ -96,8 +97,10 @@ Future<void> pumpApp(
           scanImageSourceProvider.overrideWithValue(imageSource),
         if (recognitionEngine != null)
           textRecognitionEngineProvider.overrideWithValue(recognitionEngine),
-        if (imageCropper != null)
-          imageCropperProvider.overrideWithValue(imageCropper),
+        // Photos are never decoded or cropped for real in tests.
+        imageCropperProvider.overrideWithValue(
+          imageCropper ?? FakeImageCropper(),
+        ),
         // Page photos are never read from disk in tests.
         scanPageImageProvider.overrideWithValue(
           (_) => MemoryImage(onePixelPng),
@@ -158,5 +161,14 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) async {
     }
   }
   await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+}
+
+/// On the photo screen, reads the whole page as text (the explicit menu
+/// action; photos are otherwise only read where the user highlights).
+Future<void> readWholePageAsText(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('scan.more')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('scan.wholePage')));
   await tester.pumpAndSettle();
 }

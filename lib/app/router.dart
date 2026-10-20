@@ -9,6 +9,7 @@ import '../features/decks/presentation/decks_screen.dart';
 import '../features/enrichment/presentation/ai_settings_screen.dart';
 import '../features/enrichment/presentation/enrichment_screen.dart';
 import '../features/reminders/presentation/reminder_screen.dart';
+import '../features/review/presentation/memory_coach_screen.dart';
 import '../features/review/presentation/practice_controller.dart';
 import '../features/review/presentation/practice_screen.dart';
 import '../features/scan/presentation/scan_screen.dart';
@@ -37,18 +38,23 @@ abstract final class AppRoutes {
   static const tags = '$words/tags';
   static const practice = '$today/practice';
 
-  /// A scheduled (FSRS) review session, or free practice with [free] or
-  /// [difficultOnly].
+  /// The Memory Coach: words that need practice.
+  static const memoryCoach = '$today/coach';
+
+  /// A scheduled (FSRS) review session, or free practice with [free],
+  /// [difficultOnly] or [coach] (the Memory Coach's words).
   static String practiceSession({
     String? deckId,
     bool difficultOnly = false,
     bool free = false,
+    bool coach = false,
   }) => Uri(
     path: '$practice/session',
     queryParameters: {
       'deckId': ?deckId,
       if (difficultOnly) 'difficult': '1',
       if (free) 'free': '1',
+      if (coach) 'coach': '1',
     },
   ).toString();
 
@@ -97,10 +103,15 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                           difficultOnly:
                               state.uri.queryParameters['difficult'] == '1',
                           scheduled: state.uri.queryParameters['free'] != '1',
+                          coach: state.uri.queryParameters['coach'] == '1',
                         ),
                       ),
                     ),
                   ],
+                ),
+                GoRoute(
+                  path: 'coach',
+                  builder: (_, _) => const MemoryCoachScreen(),
                 ),
               ],
             ),

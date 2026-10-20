@@ -104,4 +104,33 @@ void main() {
     expect(await reviews.watchDailyActivity().first, isEmpty);
     expect(await reviews.watchSessionCount().first, 0);
   });
+
+  test('events since a time: read back as recorded, older ones and those of '
+      'deleted words left out; the stream follows new answers', () async {
+    final old = await record('s0', ReviewOutcome.forgotten);
+    clock.advance(const Duration(days: 2));
+    final since = clock.nowUtc();
+    final recent = await record('s1', ReviewOutcome.forgotten);
+    expect(await reviews.eventsSince(since), [recent]);
+    expect(await reviews.eventsSince(old.reviewedAt), hasLength(2));
+
+    final emitted = <int>[];
+    final sub = reviews
+        .watchEventsSince(since)
+        .listen((e) => emitted.add(e.length));
+    await pumpEventQueue();
+    await record('s2', ReviewOutcome.remembered);
+    await pumpEventQueue();
+    expect(emitted.last, 2);
+
+    await DriftVocabularyRepository(
+      db,
+      clock: clock,
+      ids: SequentialIdGenerator('x'),
+    ).deleteEntry(entryId);
+    await pumpEventQueue();
+    expect(emitted.last, 0);
+    expect(await reviews.eventsSince(old.reviewedAt), isEmpty);
+    await sub.cancel();
+  });
 }

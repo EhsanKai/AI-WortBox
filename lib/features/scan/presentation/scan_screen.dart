@@ -14,10 +14,12 @@ import '../../../core/widgets/state_views.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/scan_image_source.dart';
 import 'scan_controller.dart';
+import 'scan_highlight_view.dart';
 import 'scan_review_view.dart';
 import 'scan_select_view.dart';
 
-/// Photo/gallery/typed text → select words → review → save.
+/// Photo/gallery → highlight words on the photo → read only those →
+/// review → save; or typed text → select words → review → save.
 ///
 /// All steps live in one route so the session state is kept together; the
 /// back button moves to the previous step.
@@ -57,8 +59,10 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         if (didPop) return;
         switch (state.step) {
           case ScanStep.typing:
-          case ScanStep.select:
+          case ScanStep.highlight:
             controller.backToCapture();
+          case ScanStep.select:
+            controller.backFromText();
           case ScanStep.review:
             controller.backToSelect();
           case ScanStep.capture:
@@ -73,30 +77,14 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             _ => l10n.scanTitle,
           }),
           actions: [
-            if (state.step == ScanStep.select && state.canShowImage)
-              IconButton(
-                key: const Key('scan.toggleView'),
-                tooltip: state.view == ScanView.image
-                    ? l10n.scanViewText
-                    : l10n.scanViewImage,
-                icon: Icon(
-                  state.view == ScanView.image
-                      ? Icons.notes
-                      : Icons.image_outlined,
-                ),
-                onPressed: () => controller.setView(
-                  state.view == ScanView.image ? ScanView.text : ScanView.image,
-                ),
-              ),
             if (state.step == ScanStep.select &&
                 (state.document?.hasWords ?? false)) ...[
-              if (state.view == ScanView.text || !state.canShowImage)
-                IconButton(
-                  key: const Key('scan.editText'),
-                  tooltip: l10n.scanEditText,
-                  icon: const Icon(Icons.edit_note),
-                  onPressed: () => _editText(context, state),
-                ),
+              IconButton(
+                key: const Key('scan.editText'),
+                tooltip: l10n.scanEditText,
+                icon: const Icon(Icons.edit_note),
+                onPressed: () => _editText(context, state),
+              ),
               IconButton(
                 key: const Key('scan.clearSelection'),
                 tooltip: l10n.scanClearSelection,
@@ -114,6 +102,9 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             controller: controller,
           ),
           ScanStep.typing => _TypingView(controller: controller),
+          ScanStep.highlight => ScanHighlightView(
+            initialDeckId: widget.initialDeckId,
+          ),
           ScanStep.select => ScanSelectView(
             initialDeckId: widget.initialDeckId,
           ),

@@ -330,7 +330,12 @@ class _VocabularyFormState extends ConsumerState<_VocabularyForm> {
             autofocus: !_isEditing,
             textDirection: TextDirection.ltr,
             style: AppTypography.wordTitle,
-            textInputAction: TextInputAction.next,
+            // Several lines are allowed, e.g. "Der Nachbar" and
+            // "Die Nachbarin" as one entry; Return starts a new line.
+            keyboardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
+            minLines: 1,
+            maxLines: 4,
             maxLength: AppConfig.maxOriginalLength,
             decoration: InputDecoration(
               labelText: l10n.formWordLabel,

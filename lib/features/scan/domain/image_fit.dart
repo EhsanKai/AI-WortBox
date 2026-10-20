@@ -1,6 +1,7 @@
 import 'dart:ui' show Offset, Rect, Size;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart' show Matrix4, MatrixUtils;
 
 /// How an image of [imageSize] pixels is shown centred and scaled to fit
 /// (like `BoxFit.contain`) in a [viewport] of logical pixels, and the
@@ -46,6 +47,13 @@ class ImageFit {
       Rect.fromPoints(toView(imageRect.topLeft), toView(imageRect.bottomRight));
 
   Offset toImage(Offset viewPoint) => (viewPoint - offset) / scale;
+
+  /// [viewportPoint] (on screen, relative to the viewer) in image pixels:
+  /// the viewer's zoom/pan [transform] is undone first, then the fit. Not
+  /// clipped: points in the letterbox lie outside the image.
+  Offset toImageThrough(Matrix4 transform, Offset viewportPoint) => toImage(
+    MatrixUtils.transformPoint(Matrix4.inverted(transform), viewportPoint),
+  );
 
   @override
   bool operator ==(Object other) =>

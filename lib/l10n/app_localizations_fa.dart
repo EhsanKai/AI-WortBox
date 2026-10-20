@@ -2155,45 +2155,200 @@ class AppLocalizationsFa extends AppLocalizations {
   }
 
   @override
-  String get scanViewImage => 'انتخاب روی عکس';
-
-  @override
-  String get scanViewText => 'نمایش متن';
-
-  @override
-  String get scanImageHint =>
-      'روی لغت بزنید تا انتخاب شود. برای چند لغت پشت سر هم، روی اولی نگه دارید و تا آخری بکشید. با دو انگشت بزرگ‌نمایی کنید.';
-
-  @override
   String get scanPageImageLabel => 'عکس صفحه';
 
   @override
-  String get scanRegionMode => 'انتخاب ناحیه';
-
-  @override
-  String get scanRegionHint =>
-      'دور متنی که درست خوانده نشده یک کادر بکشید تا دوباره خوانده شود.';
-
-  @override
-  String get scanRegionTitle => 'متن ناحیهٔ انتخاب‌شده';
-
-  @override
-  String get scanRegionHelper =>
-      'در صورت نیاز اصلاح کنید؛ فقط همین متن اضافه می‌شود.';
-
-  @override
-  String get scanRegionAdd => 'افزودن';
-
-  @override
-  String get scanRegionEmpty =>
-      'در این ناحیه متنی پیدا نشد. کادر بزرگ‌تری بکشید.';
-
-  @override
-  String get scanRegionFailed => 'خواندن این ناحیه ممکن نشد. دوباره تلاش کنید.';
-
-  @override
-  String get scanSplitWords => 'جدا کردن به لغت‌های تکی';
-
-  @override
   String get scanRemoveSelection => 'حذف از انتخاب';
+
+  @override
+  String get scanModeHighlight => 'ماژیک: کشیدن روی لغت‌ها';
+
+  @override
+  String get scanModeMove => 'جابه‌جایی و بزرگ‌نمایی';
+
+  @override
+  String get scanHighlightHint =>
+      'حالت ماژیک: با یک انگشت روی لغت یا عبارت دلخواه بکشید، یا روی یک لغت بزنید. با دو انگشت بزرگ‌نمایی کنید.';
+
+  @override
+  String get scanMoveHint =>
+      'حالت جابه‌جایی: با یک انگشت صفحه را جابه‌جا و با دو انگشت بزرگ‌نمایی کنید. چیزی کشیده نمی‌شود.';
+
+  @override
+  String get scanUndoStroke => 'برگرداندن آخرین انتخاب';
+
+  @override
+  String get scanClearHighlights => 'پاک کردن همهٔ انتخاب‌ها';
+
+  @override
+  String get scanMoreActions => 'گزینه‌های بیشتر';
+
+  @override
+  String get scanReadWholePage => 'خواندن کل صفحه به‌صورت متن';
+
+  @override
+  String scanHighlightCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString انتخاب روی عکس',
+      zero: 'هنوز چیزی انتخاب نشده',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanReadHighlights => 'خواندن متن انتخاب‌شده';
+
+  @override
+  String scanHighlightLabel(String number) {
+    return 'انتخاب $number';
+  }
+
+  @override
+  String get scanHighlightsEmpty =>
+      'در بخش‌های انتخاب‌شده متنی تشخیص داده نشد. بزرگ‌نمایی کنید و دوباره روی کل لغت بکشید.';
+
+  @override
+  String get scanHighlightsFailed => 'خواندن متن انجام نشد. دوباره تلاش کنید.';
+
+  @override
+  String get scanPhotoUnavailable =>
+      'نمایش عکس ممکن نشد؛ کل صفحه به‌صورت متن خوانده شد.';
+
+  @override
+  String scanFailedHighlights(String numbers) {
+    return 'در انتخاب $numbers متنی تشخیص داده نشد. می‌توانید به عکس برگردید و دوباره بکشید.';
+  }
+
+  @override
+  String get scanBackToPhoto => 'بازگشت به عکس';
+
+  @override
+  String get scanAddWord => 'افزودن لغت';
+
+  @override
+  String get scanSplitItem => 'جدا کردن به لغت‌های تکی';
+
+  @override
+  String get scanCombineNext => 'ادغام با مورد بعدی';
+
+  @override
+  String scanSummaryTitle(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString مورد اضافه می‌شود:',
+      zero: 'چیزی برای افزودن نیست',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get practiceEditWord => 'ویرایش لغت';
+
+  @override
+  String get practiceAnswerDetails => 'پاسخ و جزئیات';
+
+  @override
+  String get scanModeRectangle => 'کادر: انتخاب یک ناحیه';
+
+  @override
+  String get scanRectangleHint =>
+      'حالت کادر: با یک انگشت دور متن دلخواه یک کادر بکشید؛ همهٔ متن داخل کادر خوانده می‌شود. با دو انگشت بزرگ‌نمایی کنید.';
+
+  @override
+  String scanRegionLabel(String number) {
+    return 'کادر $number';
+  }
+
+  @override
+  String get scanRegionsEmpty =>
+      'در کادرهای انتخاب‌شده متنی تشخیص داده نشد. کادر را دوباره دور متن بکشید یا بزرگ‌نمایی کنید.';
+
+  @override
+  String get coachTitle => 'نیاز به تمرین';
+
+  @override
+  String coachTileDescription(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString لغت به تمرین بیشتر نیاز دارد',
+      zero: 'لغت‌هایی که بارها به یاد نمی‌آورید اینجا جمع می‌شوند',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String coachIntro(int days, int sessions, int window, int streak) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+    final intl.NumberFormat sessionsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String sessionsString = sessionsNumberFormat.format(sessions);
+    final intl.NumberFormat windowNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String windowString = windowNumberFormat.format(window);
+    final intl.NumberFormat streakNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String streakString = streakNumberFormat.format(streak);
+
+    return 'این فهرست با یک قاعدهٔ ساده از سابقهٔ مرور شما ساخته می‌شود: لغتی که در $daysString روز گذشته و در دست‌کم $sessionsString جلسهٔ جداگانه «به یاد نیاوردم» زده‌اید (در $windowString پاسخ آخر آن لغت). لغتی که $streakString بار پشت سر هم به یاد بیاورید از فهرست خارج می‌شود.';
+  }
+
+  @override
+  String coachFailures(int failures, int attempts) {
+    final intl.NumberFormat failuresNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String failuresString = failuresNumberFormat.format(failures);
+    final intl.NumberFormat attemptsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String attemptsString = attemptsNumberFormat.format(attempts);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      failures,
+      locale: localeName,
+      other: '$failuresString بار به یاد نیاوردید',
+    );
+    return '$_temp0 (از $attemptsString پاسخ اخیر)';
+  }
+
+  @override
+  String get coachStart => 'شروع تمرین متمرکز';
+
+  @override
+  String get coachPracticeNote =>
+      'این تمرین اضافه است: زمان‌بندی مرور (FSRS) و موعد کارت‌ها تغییر نمی‌کند. نتیجهٔ شما فقط در سابقه و آمار ثبت می‌شود.';
+
+  @override
+  String get coachEmptyTitle => 'فعلاً لغتی به تمرین ویژه نیاز ندارد';
+
+  @override
+  String get coachEmptyBody =>
+      'به مرور معمول ادامه دهید. وقتی لغتی را در چند جلسهٔ مرور به یاد نیاورید، اینجا نمایش داده می‌شود.';
+
+  @override
+  String get coachGoToReview => 'رفتن به مرور';
+
+  @override
+  String get practiceEmptyCoach =>
+      'در فهرست «نیاز به تمرین» لغتی با معنی فارسی نیست.';
+
+  @override
+  String get practiceRepeat => 'تکرار در همین جلسه (مرحلهٔ یادگیری)';
 }

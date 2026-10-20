@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 
 import '../../../core/config/app_config.dart';
 import '../../../core/design/app_colors.dart';
@@ -63,6 +64,21 @@ class ScanReviewView extends ConsumerWidget {
             )
             .length ??
         0;
+    final toSave = [
+      for (final (index, (_, item)) in state.items.indexed)
+        if (decisions?[index + 1]
+            case CreateDecision() ||
+                MergeIntoEntryDecision() ||
+                MergeIntoRowDecision())
+          item.original.trim(),
+    ];
+    final numbers = NumberFormat.decimalPattern(l10n.localeName);
+    final failed = [
+      for (final id in state.photoSelectionIds)
+        if (state.failedStrokes.contains(id))
+          numbers.format(state.selectionNumber(id)),
+    ];
+    final fromPhoto = state.document == null;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -75,6 +91,20 @@ class ScanReviewView extends ConsumerWidget {
         Text(l10n.scanReviewIntro, style: theme.textTheme.bodyLarge),
         const SizedBox(height: AppSpace.md),
         InfoBanner(tone: StatusTone.warning, message: l10n.scanOcrWarning),
+        if (failed.isNotEmpty) ...[
+          const SizedBox(height: AppSpace.md),
+          InfoBanner(
+            key: const Key('scan.failedHighlights'),
+            tone: StatusTone.danger,
+            icon: Icons.error_outline,
+            message: l10n.scanFailedHighlights(failed.join('، ')),
+            action: TextButton(
+              key: const Key('scan.redraw'),
+              onPressed: controller.backToSelect,
+              child: Text(l10n.scanBackToPhoto),
+            ),
+          ),
+        ],
         const SizedBox(height: AppSpace.lg),
         if (deckList.isNotEmpty)
           DropdownButtonFormField<String>(
@@ -105,7 +135,22 @@ class ScanReviewView extends ConsumerWidget {
             decision: decisions?[index + 1],
             onChanged: controller.updateItem,
             onRemove: () => controller.removeItem(item.id),
+            onSplit: item.original.trim().contains(RegExp(r'\s'))
+                ? () => controller.splitItem(item.id)
+                : null,
+            onCombineNext: index + 1 < state.items.length
+                ? () => controller.combineWithNext(item.id)
+                : null,
           ),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: TextButton.icon(
+            key: const Key('scan.addItem'),
+            onPressed: controller.addItem,
+            icon: const Icon(Icons.add),
+            label: Text(l10n.scanAddWord),
+          ),
+        ),
         const SizedBox(height: AppSpace.md),
         SectionHeader(l10n.csvSectionDuplicates),
         RadioGroup<DuplicateStrategy>(
@@ -138,6 +183,31 @@ class ScanReviewView extends ConsumerWidget {
           InfoBanner(tone: StatusTone.danger, message: l10n.scanSaveFailed),
         ],
         const SizedBox(height: AppSpace.xl),
+        Card(
+          key: const Key('scan.summary'),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpace.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n.scanSummaryTitle(toSave.length),
+                  style: theme.textTheme.titleSmall,
+                ),
+                if (toSave.isNotEmpty) ...[
+                  const SizedBox(height: AppSpace.xs),
+                  Text(
+                    toSave.join(' · '),
+                    key: const Key('scan.summaryWords'),
+                    textDirection: TextDirection.ltr,
+                    style: AppTypography.germanBody,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpace.md),
         FilledButton(
           key: const Key('scan.save'),
           onPressed: saveCount == 0 || state.isBusy ? null : controller.save,
@@ -149,7 +219,7 @@ class ScanReviewView extends ConsumerWidget {
         TextButton(
           key: const Key('scan.backToText'),
           onPressed: controller.backToSelect,
-          child: Text(l10n.scanBackToText),
+          child: Text(fromPhoto ? l10n.scanBackToPhoto : l10n.scanBackToText),
         ),
       ],
     );
@@ -163,12 +233,20 @@ class _ReviewItemCard extends StatefulWidget {
     required this.decision,
     required this.onChanged,
     required this.onRemove,
+    this.onSplit,
+    this.onCombineNext,
   });
 
   final ScanReviewItem item;
   final ImportDecision? decision;
   final ValueChanged<ScanReviewItem> onChanged;
   final VoidCallback onRemove;
+
+  /// Null when the item is a single word.
+  final VoidCallback? onSplit;
+
+  /// Null for the last item.
+  final VoidCallback? onCombineNext;
 
   @override
   State<_ReviewItemCard> createState() => _ReviewItemCardState();
@@ -245,6 +323,20 @@ class _ReviewItemCardState extends State<_ReviewItemCard> {
                       ),
                     ),
                   ),
+                  if (widget.onSplit != null)
+                    IconButton(
+                      key: Key('scan.item.$id.split'),
+                      tooltip: l10n.scanSplitItem,
+                      icon: const Icon(Icons.call_split),
+                      onPressed: widget.onSplit,
+                    ),
+                  if (widget.onCombineNext != null)
+                    IconButton(
+                      key: Key('scan.item.$id.combine'),
+                      tooltip: l10n.scanCombineNext,
+                      icon: const Icon(Icons.merge),
+                      onPressed: widget.onCombineNext,
+                    ),
                   IconButton(
                     key: Key('scan.item.$id.remove'),
                     tooltip: l10n.scanItemRemove,

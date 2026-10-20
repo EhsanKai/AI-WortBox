@@ -79,6 +79,33 @@ class DriftReviewRepository implements ReviewRepository {
     return query.watchSingle().map((row) => row.read(sessions) ?? 0);
   }
 
+  @override
+  Stream<List<ReviewEvent>> watchEventsSince(DateTime since) =>
+      _eventsSince(since).watch().map((rows) => rows.map(_toDomain).toList());
+
+  @override
+  Future<List<ReviewEvent>> eventsSince(DateTime since) => _guard(
+    'eventsSince',
+    () async => (await _eventsSince(since).get()).map(_toDomain).toList(),
+  );
+
+  SimpleSelectStatement<$ReviewEventsTable, ReviewEventRow> _eventsSince(
+    DateTime since,
+  ) => _db.select(_events)
+    ..where(
+      (e) => e.entryId.isNotNull() & e.reviewedAt.isBiggerOrEqualValue(since),
+    );
+
+  static ReviewEvent _toDomain(ReviewEventRow row) => ReviewEvent(
+    id: row.id,
+    entryId: row.entryId,
+    sessionId: row.sessionId,
+    direction: row.direction,
+    outcome: row.outcome,
+    reviewedAt: row.reviewedAt.toUtc(),
+    localDay: LocalDay.parse(row.localDay),
+  );
+
   Future<T> _guard<T>(String operation, Future<T> Function() body) async {
     try {
       return await body();

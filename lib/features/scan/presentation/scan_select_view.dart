@@ -12,11 +12,9 @@ import '../data/scan_image_source.dart';
 import '../domain/scan_document.dart';
 import '../domain/text_tokenizer.dart';
 import 'scan_controller.dart';
-import 'scan_image_select_view.dart';
 
-/// Shows the page — the photo with selectable words when OCR placed them,
-/// otherwise the recognized German text — and lets the user select words
-/// and contiguous expressions.
+/// Shows typed text (or the whole page, read as text on request) and lets
+/// the user select words and contiguous expressions.
 class ScanSelectView extends ConsumerWidget {
   const ScanSelectView({super.key, required this.initialDeckId});
 
@@ -56,10 +54,6 @@ class ScanSelectView extends ConsumerWidget {
       );
     }
 
-    if (state.view == ScanView.image && state.canShowImage) {
-      return ScanImageSelectView(initialDeckId: initialDeckId);
-    }
-
     final (notice, noticeTone) = switch (state.notice) {
       SelectionNotice.pickExpressionEnd => (
         l10n.scanExpressionPickEnd,
@@ -73,11 +67,13 @@ class ScanSelectView extends ConsumerWidget {
         l10n.scanSelectionsDropped(state.droppedCount),
         StatusTone.warning,
       ),
-      SelectionNotice.regionEmpty => (l10n.scanRegionEmpty, StatusTone.warning),
-      SelectionNotice.regionFailed => (
-        l10n.scanRegionFailed,
+      SelectionNotice.photoUnavailable => (
+        l10n.scanPhotoUnavailable,
         StatusTone.warning,
       ),
+      SelectionNotice.highlightsEmpty ||
+      SelectionNotice.regionsEmpty ||
+      SelectionNotice.highlightsFailed => (null, StatusTone.neutral),
       null => (null, StatusTone.neutral),
     };
 

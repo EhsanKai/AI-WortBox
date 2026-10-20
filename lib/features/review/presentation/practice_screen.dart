@@ -3,20 +3,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show NumberFormat;
 
+import '../../../app/providers.dart';
 import '../../../app/router.dart';
 import '../../../core/design/app_colors.dart' show StatusTone;
 import '../../../core/design/tokens.dart';
 import '../../../core/design/typography.dart';
+import '../../../core/error/app_exception.dart';
 import '../../../core/text/bidi.dart';
 import '../../../core/widgets/auto_direction_text.dart';
 import '../../../core/widgets/info_banner.dart';
 import '../../../core/widgets/outcome_view.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/state_views.dart';
+import '../../../core/widgets/status_badge.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../decks/presentation/deck_providers.dart';
 import '../../speech/presentation/speak_button.dart';
+import '../../tags/presentation/entry_tags_sheet.dart';
+import '../../tags/presentation/tag_providers.dart';
 import '../../vocabulary/domain/vocabulary_entry.dart';
+import '../../vocabulary/presentation/vocabulary_form_screen.dart';
+import '../../vocabulary/presentation/vocabulary_providers.dart';
 import '../domain/review_direction.dart';
 import '../domain/review_event.dart';
 import 'practice_controller.dart';
@@ -209,8 +216,8 @@ class PracticeSessionScreen extends ConsumerWidget {
           state.phase == PracticePhase.question ||
                   state.phase == PracticePhase.answer
               ? l10n.practiceProgress(
-                  numbers.format(state.index + 1),
-                  numbers.format(state.cards.length),
+                  numbers.format(state.position),
+                  numbers.format(state.total),
                 )
               : l10n.practiceTitle,
         ),
@@ -243,7 +250,9 @@ class PracticeSessionScreen extends ConsumerWidget {
         PracticePhase.empty => EmptyStateView(
           icon: Icons.style_outlined,
           title: l10n.practiceEmptyTitle,
-          message: config.difficultOnly
+          message: config.coach
+              ? l10n.practiceEmptyCoach
+              : config.difficultOnly
               ? l10n.practiceEmptyDifficult
               : l10n.practiceEmptyBody,
           action: FilledButton(
@@ -267,6 +276,8 @@ class PracticeSessionScreen extends ConsumerWidget {
             ),
             if (config.isScheduled)
               OutcomeLine(Icons.event_repeat, l10n.practiceScheduledDone),
+            if (config.coach)
+              OutcomeLine(Icons.event_available, l10n.coachPracticeNote),
           ],
           primary: FilledButton(
             key: const Key('practice.finish'),
@@ -289,7 +300,7 @@ class PracticeSessionScreen extends ConsumerWidget {
   }
 }
 
-class _Card extends StatelessWidget {
+class _Card extends ConsumerWidget {
   const _Card({
     required this.card,
     required this.revealed,
@@ -302,11 +313,24 @@ class _Card extends StatelessWidget {
   final PracticeState state;
   final PracticeController controller;
 
+  /// Opens the word's editor on top of the session. Nothing is recorded:
+  /// the session, the card and its phase are unchanged when it closes, and
+  /// the card shows the saved content (it watches the stored entry).
+  Future<void> _edit(BuildContext context, VocabularyEntry entry) =>
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => VocabularyFormScreen(entryId: entry.id),
+        ),
+      );
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final entry = card.entry;
+    // The stored entry, as on the word page, so an edit made from this card
+    // shows at once; the session's copy is used while it loads (or if the
+    // word was deleted meanwhile).
+    final entry = ref.watch(entryProvider(card.entry.id)).value ?? card.entry;
 
     return ListView(
       // A new card must never reuse the previous card's revealed widgets.
@@ -319,8 +343,20 @@ class _Card extends StatelessWidget {
       ),
       children: [
         LinearProgressIndicator(
-          value: state.cards.isEmpty ? 0 : state.index / state.cards.length,
+          value: state.total == 0 ? 0 : state.answeredCards / state.total,
         ),
+        if (state.isRepeat) ...[
+          const SizedBox(height: AppSpace.sm),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: StatusBadge(
+              key: const Key('practice.repeat'),
+              label: l10n.practiceRepeat,
+              tone: StatusTone.accent,
+              icon: Icons.replay,
+            ),
+          ),
+        ],
         const SizedBox(height: AppSpace.lg),
         Text(
           card.asksMeaning ? l10n.practicePromptMeaning : l10n.practicePrompt,
@@ -350,10 +386,35 @@ class _Card extends StatelessWidget {
             key: const Key('practice.answer'),
             color: theme.colorScheme.surfaceContainerHigh,
             child: Padding(
-              padding: const EdgeInsets.all(AppSpace.lg),
-              child: card.asksMeaning
-                  ? _MeaningSide(entry: entry, details: true)
-                  : _GermanSide(entry: entry, details: true),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.lg,
+                AppSpace.sm,
+                AppSpace.lg,
+                AppSpace.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpace.xs),
+                    child: Text(
+                      l10n.practiceAnswerDetails,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  _AnswerActions(
+                    entry: entry,
+                    enabled: !state.isRecording,
+                    onEdit: () => _edit(context, entry),
+                  ),
+                  card.asksMeaning
+                      ? _MeaningSide(entry: entry, explanations: true)
+                      : _GermanSide(entry: entry),
+                  _AnswerDetails(entry: entry),
+                ],
+              ),
             ),
           ),
           if (state.error case final error?) ...[
@@ -398,76 +459,108 @@ class _Card extends StatelessWidget {
   }
 }
 
-/// The German side: the word with pronunciation and, as an answer, its
-/// base form, grammar and example.
-class _GermanSide extends StatelessWidget {
-  const _GermanSide({
+/// Changes to the word that never record an answer or touch FSRS state:
+/// edit its content, mark or unmark it as difficult, choose its tags.
+class _AnswerActions extends ConsumerWidget {
+  const _AnswerActions({
     required this.entry,
-    this.centered = false,
-    this.details = false,
+    required this.enabled,
+    required this.onEdit,
   });
 
   final VocabularyEntry entry;
-  final bool centered;
-  final bool details;
+  final bool enabled;
+  final VoidCallback onEdit;
+
+  Future<void> _toggleDifficult(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref
+          .read(vocabularyRepositoryProvider)
+          .setDifficult(entry.id, difficult: !entry.isDifficult);
+    } on AppException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(errorMessage(l10n, e))));
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final muted = theme.colorScheme.onSurfaceVariant;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    final tags = ref.watch(entryTagsProvider(entry.id)).value ?? const [];
+    return Wrap(
+      spacing: AppSpace.xs,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: AutoDirectionText(
-                entry.original,
-                key: const Key('practice.word'),
-                textAlign: centered ? TextAlign.center : null,
-                style: AppTypography.headword,
-              ),
-            ),
-            SpeakButton(text: entry.original, language: entry.sourceLanguage),
-          ],
+        TextButton.icon(
+          key: const Key('practice.edit'),
+          onPressed: enabled ? onEdit : null,
+          icon: const Icon(Icons.edit_outlined),
+          label: Text(l10n.practiceEditWord),
         ),
-        if (details) ...[
-          if (entry.lemma != null)
-            Text(
-              '${l10n.entryLemma}: ${bidiIsolate(entry.lemma!)}',
-              style: theme.textTheme.bodyMedium?.copyWith(color: muted),
-            ),
-          if (entry.grammarInfo != null)
-            AutoDirectionText(
-              entry.grammarInfo!,
-              style: AppTypography.germanBody.copyWith(color: muted),
-            ),
-          if (entry.exampleSentence != null) ...[
-            const SizedBox(height: AppSpace.sm),
-            AutoDirectionText(
-              entry.exampleSentence!,
-              style: AppTypography.germanBody,
-            ),
-          ],
-        ],
+        TextButton.icon(
+          key: const Key('practice.difficult'),
+          onPressed: enabled ? () => _toggleDifficult(context, ref) : null,
+          icon: Icon(entry.isDifficult ? Icons.flag : Icons.flag_outlined),
+          label: Text(
+            entry.isDifficult
+                ? l10n.entryUnmarkDifficult
+                : l10n.entryMarkDifficult,
+          ),
+        ),
+        TextButton.icon(
+          key: const Key('practice.tags.edit'),
+          onPressed: enabled
+              ? () => showEntryTagsSheet(
+                  context,
+                  entryId: entry.id,
+                  selected: {for (final t in tags) t.id},
+                )
+              : null,
+          icon: const Icon(Icons.label_outline),
+          label: Text(tags.isEmpty ? l10n.tagsAdd : l10n.tagsEdit),
+        ),
       ],
     );
   }
 }
 
-/// The Persian side: the meanings and, as an answer, the example's
-/// translation.
+/// The German side: the word with pronunciation. Line breaks the user
+/// entered are kept; long lines still wrap.
+class _GermanSide extends StatelessWidget {
+  const _GermanSide({required this.entry, this.centered = false});
+
+  final VocabularyEntry entry;
+  final bool centered;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: AutoDirectionText(
+          entry.original,
+          key: const Key('practice.word'),
+          textAlign: centered ? TextAlign.center : null,
+          style: entry.original.contains('\n')
+              ? AppTypography.headwordMultiline
+              : AppTypography.headword,
+        ),
+      ),
+      SpeakButton(text: entry.original, language: entry.sourceLanguage),
+    ],
+  );
+}
+
+/// The Persian side: the meanings, as an answer with their explanations.
 class _MeaningSide extends StatelessWidget {
   const _MeaningSide({
     required this.entry,
     this.centered = false,
-    this.details = false,
+    this.explanations = false,
   });
 
   final VocabularyEntry entry;
   final bool centered;
-  final bool details;
+  final bool explanations;
 
   @override
   Widget build(BuildContext context) {
@@ -478,22 +571,157 @@ class _MeaningSide extends StatelessWidget {
         for (final meaning in entry.meanings)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpace.xs),
-            child: AutoDirectionText(
-              meaning.text,
-              key: const Key('practice.meaning'),
-              textAlign: centered ? TextAlign.center : null,
-              style: theme.textTheme.headlineSmall,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AutoDirectionText(
+                  meaning.text,
+                  key: const Key('practice.meaning'),
+                  textAlign: centered ? TextAlign.center : null,
+                  style: theme.textTheme.headlineSmall,
+                ),
+                if (explanations && meaning.explanation != null)
+                  AutoDirectionText(
+                    meaning.explanation!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
             ),
           ),
-        if (details && entry.exampleTranslation != null) ...[
-          const SizedBox(height: AppSpace.sm),
-          AutoDirectionText(
-            entry.exampleTranslation!,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+      ],
+    );
+  }
+}
+
+/// Everything else stored for the word, shown only after the reveal, in
+/// both directions: grammar, base form, the example and its translation,
+/// notes, the source sentence and tags. Empty fields are left out; nothing
+/// is generated here.
+class _AnswerDetails extends ConsumerWidget {
+  const _AnswerDetails({required this.entry});
+
+  final VocabularyEntry entry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurfaceVariant;
+    final tags = ref.watch(entryTagsProvider(entry.id)).value ?? const [];
+    final grammar = [
+      entry.partOfSpeech,
+      entry.grammarInfo,
+    ].whereType<String>().join(' · ');
+
+    Widget labelled(String label, Widget child, {Key? key}) => Padding(
+      key: key,
+      padding: const EdgeInsets.only(top: AppSpace.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.labelMedium?.copyWith(color: muted),
           ),
+          const SizedBox(height: AppSpace.xxs),
+          child,
         ],
+      ),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (grammar.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpace.xs),
+            child: AutoDirectionText(
+              grammar,
+              key: const Key('practice.grammar'),
+              style: AppTypography.germanBody.copyWith(color: muted),
+            ),
+          ),
+        if (entry.lemma != null)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpace.xs),
+            child: Text(
+              '${l10n.entryLemma}: ${bidiIsolate(entry.lemma!)}',
+              key: const Key('practice.lemma'),
+              style: theme.textTheme.bodyMedium?.copyWith(color: muted),
+            ),
+          ),
+        if (entry.exampleSentence != null || entry.exampleTranslation != null)
+          labelled(
+            l10n.entryExample,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (entry.exampleSentence case final example?)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: AutoDirectionText(
+                          example,
+                          key: const Key('practice.example'),
+                          style: AppTypography.germanBody,
+                        ),
+                      ),
+                      SpeakButton(
+                        text: example,
+                        language: entry.sourceLanguage,
+                        tooltip: l10n.speakExample,
+                      ),
+                    ],
+                  ),
+                if (entry.exampleTranslation case final translation?)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpace.xs),
+                    child: AutoDirectionText(
+                      translation,
+                      key: const Key('practice.exampleTranslation'),
+                      style: theme.textTheme.bodyLarge?.copyWith(color: muted),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        if (entry.notes case final notes?)
+          labelled(
+            l10n.entryNotes,
+            AutoDirectionText(
+              notes,
+              key: const Key('practice.notes'),
+              style: theme.textTheme.bodyLarge,
+            ),
+          ),
+        if (entry.sourceContext case final source?)
+          labelled(
+            l10n.entrySource,
+            AutoDirectionText(
+              source,
+              key: const Key('practice.source'),
+              style: AppTypography.germanBody.copyWith(color: muted),
+            ),
+          ),
+        if (tags.isNotEmpty)
+          labelled(
+            l10n.tagsTitle,
+            Wrap(
+              key: const Key('practice.tags'),
+              spacing: AppSpace.xs,
+              runSpacing: AppSpace.xs,
+              children: [
+                for (final tag in tags)
+                  Chip(
+                    avatar: const Icon(Icons.label_outline, size: 18),
+                    label: Text(bidiIsolate(tag.name)),
+                  ),
+              ],
+            ),
+          ),
       ],
     );
   }

@@ -130,6 +130,35 @@ void main() {
   });
 
   group('updateEntry', () {
+    test(
+      'line breaks in the word survive saving, loading and editing',
+      () async {
+        final created = await repository.createEntry(
+          VocabularyDraft(
+            deckId: deck.id,
+            original: 'Der Nachbar\nDie Nachbarin',
+            meanings: const [VocabularyMeaning('همسایه')],
+          ),
+        );
+        expect(created.original, 'Der Nachbar\nDie Nachbarin');
+        final row = await (db.select(
+          db.vocabularyEntries,
+        )..where((e) => e.id.equals(created.id))).getSingle();
+        expect(row.original, 'Der Nachbar\nDie Nachbarin');
+        final loaded = await repository.getEntry(created.id);
+        final updated = await repository.updateEntry(
+          created.id,
+          VocabularyDraft.fromEntry(loaded!)
+              .copyWith(original: '${loaded.original}\nDie Nachbarn'),
+        );
+        expect(updated.original, 'Der Nachbar\nDie Nachbarin\nDie Nachbarn');
+        expect(
+          (await repository.getEntry(created.id))!.original,
+          updated.original,
+        );
+      },
+    );
+
     test('replaces content and keeps review state untouched', () async {
       final entry = await repository.createEntry(draft('Bank', ['بانک']));
       await addFlashcard(entry.id);

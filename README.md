@@ -54,12 +54,12 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
 
 ### Page scanning (Phase 3)
 
-- Scan a book page: take a photo or choose one from the gallery; German text
-  is recognized **on the device** (Google ML Kit, no internet). The photo is
-  kept only while the scan is open and then deleted.
-- Select words **directly on the photo**: tap words, touch-hold-and-drag
-  for an expression, pinch to zoom; or draw a box around badly recognized
-  text to read it again and correct it. A text view is still available.
+- Scan a book page: take a photo or choose one from the gallery. The photo
+  is shown exactly as taken; **highlight the words you want with your
+  finger** (pinch to zoom, undo, clear). Only the highlighted parts are
+  recognized **on the device** (Google ML Kit, no internet), then shown for
+  correction before saving. The photo is kept only while the scan is open.
+  Reading the whole page as text is an explicit menu option (D48).
 - Select single words or multi-word expressions in the recognized text
   (shown left-to-right inside the Persian UI); correct OCR mistakes; the
   original sentence is kept as context for each word.

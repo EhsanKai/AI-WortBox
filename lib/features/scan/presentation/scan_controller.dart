@@ -1,4 +1,4 @@
-import 'dart:ui' show Rect;
+import 'dart:ui' show Offset, Rect, Size;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,11 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/error/app_exception.dart';
-import '../../../core/text/text_normalizer.dart';
 import '../../vocabulary/domain/duplicate_detection.dart';
 import '../../vocabulary/domain/vocabulary_repository.dart';
 import '../../vocabulary/presentation/vocabulary_providers.dart';
 import '../data/scan_image_source.dart';
+import '../domain/highlight.dart';
 import '../domain/lemma_hints.dart';
 import '../domain/scan_document.dart';
 import '../domain/scan_review_item.dart';
@@ -18,25 +18,28 @@ import '../domain/scan_text.dart';
 import '../domain/text_tokenizer.dart';
 import '../domain/word_selection.dart';
 
-enum ScanStep { capture, typing, select, review, done }
+/// capture → highlight (photo) or typing → select (text) → review → done.
+enum ScanStep { capture, typing, highlight, select, review, done }
 
 enum SelectionMode { word, expression }
 
-/// How the selection step shows the page: the photo with selectable word
-/// boxes, or the recognized text.
-enum ScanView { image, text }
-
-/// Short-lived messages for the selection screen.
+/// Short-lived messages for the selection screens.
 enum SelectionNotice {
   pickExpressionEnd,
   expressionTooLong,
   selectionsDropped,
 
-  /// No text was found in a drawn area.
-  regionEmpty,
+  /// No highlight contained readable text.
+  highlightsEmpty,
 
-  /// Reading a drawn area failed.
-  regionFailed,
+  /// No rectangle contained readable text (only rectangles were read).
+  regionsEmpty,
+
+  /// Reading the highlights failed (OCR error).
+  highlightsFailed,
+
+  /// The photo could not be shown, so the whole page was read as text.
+  photoUnavailable,
 }
 
 @immutable
@@ -57,10 +60,12 @@ class ScanState {
     this.result,
     this.saveError,
     this.image,
-    this.view = ScanView.text,
+    this.imageSize,
+    this.strokes = const [],
+    this.regions = const [],
+    this.readStrokes = const {},
+    this.failedStrokes = const {},
     this.manualItems = const [],
-    this.regionBusy = false,
-    this.regionText,
   });
 
   final ScanStep step;
@@ -71,6 +76,7 @@ class ScanState {
   /// Problem while picking or recognizing (capture step).
   final Object? error;
 
+  /// Text to select from (typed text, or the whole page read on request).
   final ScanDocument? document;
   final WordSelection selection;
   final SelectionMode mode;
@@ -80,34 +86,49 @@ class ScanState {
   final SelectionNotice? notice;
   final int droppedCount;
 
-  /// Items on the review screen: selections in text order with their
-  /// ranges, then items read from drawn areas (no range).
+  /// Items on the review screen. Text selections carry their range;
+  /// items read from highlights or added by hand have none.
   final List<(SelectedRange?, ScanReviewItem)> items;
   final String? deckId;
   final DuplicateStrategy strategy;
   final ImportSummary? result;
   final Object? saveError;
 
-  /// The page photo, kept only while this scan is open and only when words
-  /// can be selected on it. Deleted when the scan ends.
+  /// The page photo, unchanged, kept only while this scan is open.
   final PickedImage? image;
-  final ScanView view;
 
-  /// Words read from areas drawn on the photo and confirmed by the user.
+  /// Its pixel size as displayed (upright).
+  final Size? imageSize;
+
+  /// Highlights drawn on the photo, in drawing order.
+  final List<HighlightStroke> strokes;
+
+  /// Rectangles drawn on the photo, in drawing order. They share the ids
+  /// (and numbering) of [strokes].
+  final List<RegionSelection> regions;
+
+  /// Highlights and rectangles already read by OCR (not read again).
+  final Set<int> readStrokes;
+
+  /// Highlights and rectangles in which no text was recognized.
+  final Set<int> failedStrokes;
+
+  /// Items without a text range: read from highlights or added by hand.
   final List<ScanReviewItem> manualItems;
 
-  /// A drawn area is being read.
-  final bool regionBusy;
-
-  /// Text read from a drawn area, waiting for the user to correct and add
-  /// it (or dismiss it).
-  final String? regionText;
-
-  /// Everything that will go to the review screen.
+  /// Text selections plus items without a range.
   int get selectedCount => selection.length + manualItems.length;
 
-  bool get canShowImage =>
-      image != null && (document?.scanText.hasLayout ?? false);
+  /// Whether anything is highlighted or framed on the photo.
+  bool get hasPhotoSelections => strokes.isNotEmpty || regions.isNotEmpty;
+
+  /// Ids of all highlights and rectangles, in drawing order.
+  List<int> get photoSelectionIds =>
+      [for (final s in strokes) s.id, for (final r in regions) r.id]..sort();
+
+  /// Position (1-based) of highlight or rectangle [id] in drawing order, as
+  /// shown to the user.
+  int selectionNumber(int id) => photoSelectionIds.indexOf(id) + 1;
 
   ScanState copyWith({
     ScanStep? step,
@@ -118,26 +139,30 @@ class ScanState {
     List<(SelectedRange?, ScanReviewItem)>? items,
     String? deckId,
     DuplicateStrategy? strategy,
-    ScanView? view,
+    List<HighlightStroke>? strokes,
+    List<RegionSelection>? regions,
+    Set<int>? readStrokes,
+    Set<int>? failedStrokes,
     List<ScanReviewItem>? manualItems,
-    bool regionBusy = false,
   }) => ScanState(
     step: step ?? this.step,
     isBusy: isBusy ?? this.isBusy,
     document: document ?? this.document,
     selection: selection ?? this.selection,
     mode: mode ?? this.mode,
-    // Transient fields (anchor, notice, errors, region result) are cleared
-    // by default.
+    // Transient fields (anchor, notice, errors) are cleared by default.
     anchor: null,
     items: items ?? this.items,
     deckId: deckId ?? this.deckId,
     strategy: strategy ?? this.strategy,
     result: result,
     image: image,
-    view: view ?? this.view,
+    imageSize: imageSize,
+    strokes: strokes ?? this.strokes,
+    regions: regions ?? this.regions,
+    readStrokes: readStrokes ?? this.readStrokes,
+    failedStrokes: failedStrokes ?? this.failedStrokes,
     manualItems: manualItems ?? this.manualItems,
-    regionBusy: regionBusy,
   );
 }
 
@@ -148,9 +173,10 @@ class ScanController extends Notifier<ScanState> {
   bool _recoveryChecked = false;
   late ScanImageSource _source;
 
-  /// The photo kept for selecting on it; see [ScanState.image].
+  /// The photo kept for highlighting; see [ScanState.image].
   PickedImage? _kept;
   int _lastItemId = 0;
+  int _lastStrokeId = 0;
 
   @override
   ScanState build() {
@@ -173,7 +199,7 @@ class ScanController extends Notifier<ScanState> {
     if (_recoveryChecked) return;
     _recoveryChecked = true;
     final image = await ref.read(scanImageSourceProvider).retrieveLost();
-    if (image != null) await _recognize(image);
+    if (image != null) await _openPhoto(image);
   }
 
   Future<void> pickImage(ImageOrigin origin) async {
@@ -190,41 +216,49 @@ class ScanController extends Notifier<ScanState> {
         state = state.copyWith(isBusy: false);
         return;
       }
-      await _recognize(image);
+      await _openPhoto(image);
     } on AppException catch (e) {
       _fail(e);
     }
   }
 
-  Future<void> _recognize(PickedImage image) async {
+  /// Shows the photo for highlighting. Nothing is recognized yet: OCR runs
+  /// only on the highlighted parts, when the user asks for it.
+  Future<void> _openPhoto(PickedImage image) async {
     state = state.copyWith(isBusy: true);
-    var keep = false;
     try {
       validatePickedImage(image);
-      final engine = ref.read(textRecognitionEngineProvider);
-      if (!engine.isAvailable) {
-        throw const ScanException(ScanError.ocrUnavailable);
-      }
-      final text = await engine.recognize(image);
-      // The photo is kept only to select words on it, until the scan ends.
-      keep = text.hasLayout && ref.mounted;
-      if (keep) {
-        _discardKept();
-        _kept = image;
-      }
-      _open(text, image: keep ? image : null);
     } on AppException catch (e) {
-      _fail(e);
-    } finally {
-      if (!keep) await _source.discard(image);
+      await _source.discard(image);
+      return _fail(e);
     }
+    _kept = image;
+    final Size size;
+    try {
+      size = await ref.read(imageCropperProvider).imageSize(image);
+    } on AppException {
+      // The photo cannot be displayed; reading the whole page is the only
+      // way to use it, and the user is told so.
+      return _readWholePage(image, notice: SelectionNotice.photoUnavailable);
+    }
+    if (!ref.mounted) return;
+    state = ScanState(
+      step: ScanStep.highlight,
+      deckId: state.deckId,
+      strategy: state.strategy,
+      image: image,
+      imageSize: size,
+    );
   }
 
-  void _fail(Object error) => state = ScanState(
-    deckId: state.deckId,
-    strategy: state.strategy,
-    error: error,
-  );
+  void _fail(Object error) {
+    _discardKept();
+    state = ScanState(
+      deckId: state.deckId,
+      strategy: state.strategy,
+      error: error,
+    );
+  }
 
   void startTyping() {
     _discardKept();
@@ -242,13 +276,19 @@ class ScanController extends Notifier<ScanState> {
     _open(text);
   }
 
-  void _open(ScanText text, {PickedImage? image}) => state = ScanState(
+  void _open(ScanText text, {SelectionNotice? notice}) => state = ScanState(
     step: ScanStep.select,
     document: ScanDocument(text),
     deckId: state.deckId,
     strategy: state.strategy,
-    image: image,
-    view: image != null ? ScanView.image : ScanView.text,
+    notice: notice,
+    image: state.image,
+    imageSize: state.imageSize,
+    strokes: state.strokes,
+    regions: state.regions,
+    readStrokes: state.readStrokes,
+    failedStrokes: state.failedStrokes,
+    manualItems: state.manualItems,
   );
 
   void backToCapture() {
@@ -256,136 +296,270 @@ class ScanController extends Notifier<ScanState> {
     state = ScanState(deckId: state.deckId, strategy: state.strategy);
   }
 
-  /// Switches between the photo and the recognized text; selections are
-  /// shared by both.
-  void setView(ScanView view) {
-    if (view == ScanView.image && !state.canShowImage) return;
-    state = state.copyWith(view: view);
+  /// Back from the text view: to the photo when there is one.
+  void backFromText() {
+    if (state.image != null && state.imageSize != null) {
+      state = state.copyWith(step: ScanStep.highlight);
+    } else {
+      backToCapture();
+    }
   }
 
   // ---------------------------------------------------------------------------
-  // Selection
+  // Highlighting on the photo
+
+  /// Adds a highlight drawn through [points] with a brush [width], both in
+  /// photo pixels. Returns its id.
+  int addStroke(List<Offset> points, double width) {
+    if (points.isEmpty || width <= 0) return -1;
+    final stroke = HighlightStroke(
+      id: ++_lastStrokeId,
+      points: List.unmodifiable(points),
+      width: width,
+    );
+    state = state.copyWith(strokes: [...state.strokes, stroke]);
+    return stroke.id;
+  }
+
+  /// Adds a rectangle spanned by [a] and [b] (photo pixels), clipped to
+  /// the photo. Returns its id, or -1 when it is empty after clipping.
+  int addRegion(Offset a, Offset b) {
+    final size = state.imageSize;
+    if (size == null) return -1;
+    final rect = regionRectFor(a, b, size);
+    if (rect == null) return -1;
+    final region = RegionSelection(id: ++_lastStrokeId, rect: rect);
+    state = state.copyWith(regions: [...state.regions, region]);
+    return region.id;
+  }
+
+  /// Removes the last highlight or rectangle drawn.
+  void undoPhotoSelection() {
+    final ids = state.photoSelectionIds;
+    if (ids.isNotEmpty) removePhotoSelection(ids.last);
+  }
+
+  /// Removes highlight or rectangle [id] and anything read from it.
+  void removePhotoSelection(int id) => _dropSelections({id});
+
+  void clearPhotoSelections() => _dropSelections({...state.photoSelectionIds});
+
+  void _dropSelections(Set<int> ids) {
+    final manual = [
+      for (final item in state.manualItems)
+        if (!ids.contains(item.stroke)) item,
+    ];
+    state = state.copyWith(
+      strokes: [
+        for (final s in state.strokes)
+          if (!ids.contains(s.id)) s,
+      ],
+      regions: [
+        for (final r in state.regions)
+          if (!ids.contains(r.id)) r,
+      ],
+      readStrokes: state.readStrokes.difference(ids),
+      failedStrokes: state.failedStrokes.difference(ids),
+      manualItems: manual,
+      items: _itemsWith(manual),
+    );
+  }
+
+  /// Reads the highlighted and framed parts of the photo with on-device
+  /// OCR, one crop per highlight or rectangle, and opens the review with the
+  /// results in drawing order.
+  ///
+  /// A highlight yields the words its path ran through; a rectangle yields
+  /// every readable line inside it (one item per line). Selections already
+  /// read are not read again. A highlight without text is read once more
+  /// with a larger margin; an empty highlight or rectangle is marked failed.
+  /// The rest of the page is never read.
+  Future<void> readHighlights() async {
+    final image = state.image;
+    final size = state.imageSize;
+    if (image == null || size == null || state.isBusy) return;
+    final pending = <Object>[
+      for (final s in state.strokes)
+        if (!state.readStrokes.contains(s.id)) s,
+      for (final r in state.regions)
+        if (!state.readStrokes.contains(r.id)) r,
+    ];
+    int idOf(Object selection) => switch (selection) {
+      HighlightStroke(:final id) || RegionSelection(:final id) => id,
+      _ => throw ArgumentError.value(selection),
+    };
+    pending.sort((a, b) => idOf(a).compareTo(idOf(b)));
+    if (pending.isEmpty) {
+      if (state.manualItems.isNotEmpty) _showReview();
+      return;
+    }
+    final engine = ref.read(textRecognitionEngineProvider);
+    if (!engine.isAvailable) {
+      state = _withTransient(
+        state.copyWith(),
+        notice: SelectionNotice.highlightsFailed,
+      );
+      return;
+    }
+    state = state.copyWith(isBusy: true);
+    final read = {...state.readStrokes};
+    final failed = {...state.failedStrokes};
+    final found = <ScanReviewItem>[];
+    var errors = 0;
+    for (final selection in pending) {
+      final id = idOf(selection);
+      var texts = const <HighlightText>[];
+      var error = false;
+      try {
+        if (selection is HighlightStroke) {
+          var text = await _read(image, size, selection, margin: 1);
+          if (text == null || text.isEmpty) {
+            text = await _read(image, size, selection, margin: 2);
+          }
+          texts = [?text];
+        } else if (selection is RegionSelection) {
+          texts = await _readRegion(image, selection.rect);
+        }
+      } on AppException {
+        error = true;
+        errors++;
+      }
+      if (!ref.mounted) return;
+      texts = [
+        for (final t in texts)
+          if (!t.isEmpty) t,
+      ];
+      if (texts.isEmpty) {
+        // After an OCR error the selection is read again next time; one
+        // that simply contains no text is not.
+        if (!error) read.add(id);
+        failed.add(id);
+        continue;
+      }
+      read.add(id);
+      failed.remove(id);
+      for (final text in texts) {
+        found.add(
+          ScanReviewItem(
+            id: ++_lastItemId,
+            original: text.text,
+            context: text.context,
+            hint: LemmaHints.suggest(text.text),
+            stroke: id,
+          ),
+        );
+      }
+    }
+    final manual = [...state.manualItems, ...found];
+    final next = state.copyWith(
+      isBusy: false,
+      readStrokes: read,
+      failedStrokes: failed,
+      manualItems: manual,
+      items: _itemsWith(manual),
+    );
+    if (manual.isEmpty) {
+      state = _withTransient(
+        next,
+        notice: errors > 0
+            ? SelectionNotice.highlightsFailed
+            : pending.every((s) => s is RegionSelection)
+            ? SelectionNotice.regionsEmpty
+            : SelectionNotice.highlightsEmpty,
+      );
+      return;
+    }
+    state = next;
+    _showReview();
+  }
+
+  /// Reads exactly [rect] (photo pixels, inside the photo): a temporary
+  /// crop of it is recognized and deleted again.
+  Future<List<HighlightText>> _readRegion(PickedImage image, Rect rect) async {
+    if (rect.width < 1 || rect.height < 1) return const [];
+    final crop = await ref.read(imageCropperProvider).crop(image, rect);
+    try {
+      return regionText(
+        await ref.read(textRecognitionEngineProvider).recognize(crop.image),
+      );
+    } finally {
+      await _source.discard(crop.image);
+    }
+  }
+
+  Future<HighlightText?> _read(
+    PickedImage image,
+    Size size,
+    HighlightStroke stroke, {
+    required double margin,
+  }) async {
+    final region = ocrRegionFor(stroke, size, margin: margin);
+    if (region.width < 1 || region.height < 1) return null;
+    final crop = await ref.read(imageCropperProvider).crop(image, region);
+    try {
+      final recognized = await ref
+          .read(textRecognitionEngineProvider)
+          .recognize(crop.image);
+      return highlightedText(
+        stroke,
+        recognized,
+        region: crop.region,
+        scale: crop.scale,
+      );
+    } finally {
+      await _source.discard(crop.image);
+    }
+  }
+
+  /// Reads the whole photo as text, only on the user's explicit request (or
+  /// when the photo cannot be displayed). Highlights are kept.
+  Future<void> readWholePage() async {
+    final image = state.image;
+    if (image == null || state.isBusy) return;
+    await _readWholePage(image);
+  }
+
+  Future<void> _readWholePage(
+    PickedImage image, {
+    SelectionNotice? notice,
+  }) async {
+    state = state.copyWith(isBusy: true);
+    try {
+      final engine = ref.read(textRecognitionEngineProvider);
+      if (!engine.isAvailable) {
+        throw const ScanException(ScanError.ocrUnavailable);
+      }
+      final text = await engine.recognize(image);
+      if (!ref.mounted) return;
+      if (state.image == null) {
+        // Photo not displayable: nothing to go back to.
+        state = ScanState(
+          deckId: state.deckId,
+          strategy: state.strategy,
+          image: image,
+        );
+      }
+      _open(text, notice: notice);
+    } on AppException catch (e) {
+      if (state.step == ScanStep.highlight) {
+        state = _withTransient(
+          state.copyWith(isBusy: false),
+          notice: SelectionNotice.highlightsFailed,
+        );
+      } else {
+        _fail(e);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Selection in text
 
   void setMode(SelectionMode mode) => state = state.copyWith(mode: mode);
 
   void clearSelection() => state = state.copyWith(
     selection: const WordSelection(),
-    items: const [],
-    manualItems: const [],
-  );
-
-  /// Selects or deselects one word (photo view: a tap on a word).
-  void toggleWord(TextToken word) {
-    final document = state.document;
-    if (document == null || !word.isWord) return;
-    state = state.copyWith(
-      selection: state.selection.toggle(document.rangeOfWord(word)),
-    );
-  }
-
-  /// Selects the words from [from] to [to] in reading order as one
-  /// expression (photo view: touch, hold and drag). Refused with a notice
-  /// across paragraphs or beyond the expression length limit.
-  bool selectBetween(TextToken from, TextToken to) {
-    final document = state.document;
-    if (document == null || !from.isWord || !to.isWord) return false;
-    final range = from.start == to.start
-        ? document.rangeOfWord(from)
-        : document.rangeBetween(
-            from,
-            to,
-            maxWords: AppConfig.maxExpressionWords,
-          );
-    if (range == null) {
-      state = _withTransient(
-        state.copyWith(),
-        notice: SelectionNotice.expressionTooLong,
-      );
-      return false;
-    }
-    state = state.copyWith(selection: state.selection.add(range));
-    return true;
-  }
-
-  /// Deselects [range].
-  void removeRange(SelectedRange range) =>
-      state = state.copyWith(selection: state.selection.remove(range));
-
-  /// Replaces an expression with its single words.
-  void splitRange(SelectedRange range) {
-    final document = state.document;
-    if (document == null) return;
-    var selection = state.selection.remove(range);
-    for (final word in document.words) {
-      if (word.start >= range.start && word.end <= range.end) {
-        selection = selection.add(document.rangeOfWord(word));
-      }
-    }
-    state = state.copyWith(selection: selection);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Drawn areas (fallback when words are not recognized well)
-
-  /// Crops [imageRect] (pixels of the photo) and recognizes it again on the
-  /// device. The result is offered in [ScanState.regionText] for
-  /// correction; nothing is selected until the user adds it.
-  Future<void> recognizeRegion(Rect imageRect) async {
-    final image = state.image;
-    if (image == null || state.regionBusy || imageRect.isEmpty) return;
-    state = state.copyWith(regionBusy: true);
-    PickedImage? crop;
-    try {
-      crop = await ref.read(imageCropperProvider).crop(image, imageRect);
-      final text = await ref
-          .read(textRecognitionEngineProvider)
-          .recognize(crop);
-      if (!ref.mounted) return;
-      final document = ScanDocument(text);
-      final found = TextNormalizer.collapseWhitespace(
-        document.tokens.map((t) => t.display).join(),
-      ).trim();
-      state = found.isEmpty
-          ? _withTransient(
-              state.copyWith(),
-              notice: SelectionNotice.regionEmpty,
-            )
-          : _withTransient(state.copyWith(), regionText: found);
-    } on AppException {
-      if (!ref.mounted) return;
-      state = _withTransient(
-        state.copyWith(),
-        notice: SelectionNotice.regionFailed,
-      );
-    } finally {
-      if (crop != null) await _source.discard(crop);
-    }
-  }
-
-  /// Adds the (corrected) text of a drawn area as one item.
-  void addRegionText(String text, {String context = ''}) {
-    final original = TextNormalizer.collapseWhitespace(text).trim();
-    if (original.isEmpty) return dismissRegionText();
-    state = state.copyWith(
-      manualItems: [
-        ...state.manualItems,
-        ScanReviewItem(
-          id: ++_lastItemId,
-          original: original,
-          context: context.trim() == original ? '' : context.trim(),
-          hint: LemmaHints.suggest(original),
-        ),
-      ],
-    );
-  }
-
-  void dismissRegionText() => state = state.copyWith();
-
-  void removeManualItem(int id) => state = state.copyWith(
-    manualItems: [
-      for (final item in state.manualItems)
-        if (item.id != id) item,
-    ],
+    items: _itemsWith(state.manualItems, selection: const WordSelection()),
   );
 
   void tapWord(TextToken word) {
@@ -442,7 +616,7 @@ class ScanController extends Notifier<ScanState> {
       state.copyWith(
         document: ScanDocument(edited),
         selection: selection,
-        items: const [],
+        items: _itemsWith(state.manualItems, selection: const WordSelection()),
       ),
       notice: dropped > 0 ? SelectionNotice.selectionsDropped : null,
       droppedCount: dropped,
@@ -454,9 +628,9 @@ class ScanController extends Notifier<ScanState> {
     TextToken? anchor,
     SelectionNotice? notice,
     int droppedCount = 0,
-    String? regionText,
   }) => ScanState(
     step: s.step,
+    isBusy: s.isBusy,
     document: s.document,
     selection: s.selection,
     mode: s.mode,
@@ -467,16 +641,33 @@ class ScanController extends Notifier<ScanState> {
     deckId: s.deckId,
     strategy: s.strategy,
     image: s.image,
-    view: s.view,
+    imageSize: s.imageSize,
+    strokes: s.strokes,
+    regions: s.regions,
+    readStrokes: s.readStrokes,
+    failedStrokes: s.failedStrokes,
     manualItems: s.manualItems,
-    regionText: regionText,
   );
+
+  /// Review items: current text selections (keeping their edits), then the
+  /// items without a range.
+  List<(SelectedRange?, ScanReviewItem)> _itemsWith(
+    List<ScanReviewItem> manual, {
+    WordSelection? selection,
+  }) {
+    final selected = selection ?? state.selection;
+    return [
+      for (final (range, item) in state.items)
+        if (range != null && selected.ranges.contains(range)) (range, item),
+      for (final item in manual) (null, item),
+    ];
+  }
 
   // ---------------------------------------------------------------------------
   // Review
 
-  /// Opens the review screen with exactly the selected words (and words
-  /// read from drawn areas); nothing else from the page is included.
+  /// Opens the review screen with exactly the selected words (and items
+  /// read from highlights); nothing else from the page is included.
   void goToReview() {
     final document = state.document;
     if (document == null || state.selectedCount == 0) return;
@@ -501,7 +692,16 @@ class ScanController extends Notifier<ScanState> {
     state = state.copyWith(step: ScanStep.review, items: items);
   }
 
-  void backToSelect() => state = state.copyWith(step: ScanStep.select);
+  void _showReview() => state = state.copyWith(
+    step: ScanStep.review,
+    items: _itemsWith(state.manualItems),
+  );
+
+  /// Back from the review: to the text when there is one, otherwise to the
+  /// photo with its highlights.
+  void backToSelect() => state = state.copyWith(
+    step: state.document != null ? ScanStep.select : ScanStep.highlight,
+  );
 
   void updateItem(ScanReviewItem item) => state = state.copyWith(
     items: [
@@ -521,12 +721,92 @@ class ScanController extends Notifier<ScanState> {
     final items = state.items.where((e) => e.$2.id != id).toList();
     final range = entry.$1;
     state = state.copyWith(
-      step: items.isEmpty ? ScanStep.select : ScanStep.review,
+      step: items.isEmpty ? _selectionStep() : ScanStep.review,
       items: items,
       selection: range == null ? null : state.selection.remove(range),
       manualItems: [
         for (final item in state.manualItems)
           if (item.id != id) item,
+      ],
+    );
+  }
+
+  ScanStep _selectionStep() =>
+      state.document != null ? ScanStep.select : ScanStep.highlight;
+
+  /// Adds an empty item for a word the user types in.
+  void addItem() => _replaceItems(state.items.length, 0, [
+    ScanReviewItem(id: ++_lastItemId, original: '', context: ''),
+  ]);
+
+  /// Replaces item [id] with one item per word of it.
+  void splitItem(int id) {
+    final index = state.items.indexWhere((e) => e.$2.id == id);
+    if (index < 0) return;
+    final item = state.items[index].$2;
+    final words = item.original
+        .split(RegExp(r'\s+'))
+        .map(
+          (w) => w.replaceAll(
+            RegExp(r'^[.,;:!?"„“”»«()]+|[.,;:!?"„“”»«()]+$'),
+            '',
+          ),
+        )
+        .where((w) => w.isNotEmpty)
+        .toList();
+    if (words.length < 2) return;
+    _replaceItems(index, 1, [
+      for (final w in words)
+        ScanReviewItem(
+          id: ++_lastItemId,
+          original: w,
+          context: item.context,
+          hint: LemmaHints.suggest(w),
+          stroke: item.stroke,
+        ),
+    ]);
+  }
+
+  /// Joins item [id] with the next one into one expression.
+  void combineWithNext(int id) {
+    final index = state.items.indexWhere((e) => e.$2.id == id);
+    if (index < 0 || index + 1 >= state.items.length) return;
+    final a = state.items[index].$2, b = state.items[index + 1].$2;
+    final original = '${a.original} ${b.original}'.trim();
+    _replaceItems(index, 2, [
+      ScanReviewItem(
+        id: ++_lastItemId,
+        original: original,
+        context: a.context == b.context || b.context.isEmpty
+            ? a.context
+            : '${a.context} ${b.context}'.trim(),
+        meaning: [a.meaning, b.meaning].where((m) => m.isNotEmpty).join('; '),
+        hint: LemmaHints.suggest(original),
+        stroke: a.stroke ?? b.stroke,
+      ),
+    ]);
+  }
+
+  /// Replaces [count] review items at [index] with [replacement]. Replaced
+  /// text selections are deselected; all resulting items keep the review
+  /// order and become items without a range.
+  void _replaceItems(int index, int count, List<ScanReviewItem> replacement) {
+    final removed = state.items.sublist(index, index + count);
+    var selection = state.selection;
+    for (final (range, _) in removed) {
+      if (range != null) selection = selection.remove(range);
+    }
+    final items = [
+      ...state.items.sublist(0, index),
+      for (final item in replacement) (null, item),
+      ...state.items.sublist(index + count),
+    ];
+    state = state.copyWith(
+      items: items,
+      selection: selection,
+      manualItems: [
+        for (final (range, item) in items)
+          if (range == null) item,
       ],
     );
   }
@@ -574,7 +854,11 @@ class ScanController extends Notifier<ScanState> {
         strategy: state.strategy,
         saveError: e,
         image: state.image,
-        view: state.view,
+        imageSize: state.imageSize,
+        strokes: state.strokes,
+        regions: state.regions,
+        readStrokes: state.readStrokes,
+        failedStrokes: state.failedStrokes,
         manualItems: state.manualItems,
       );
     }

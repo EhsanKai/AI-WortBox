@@ -1212,17 +1212,120 @@
       }
     }
   },
-  "scanViewImage": "انتخاب روی عکس",
-  "scanViewText": "نمایش متن",
-  "scanImageHint": "روی لغت بزنید تا انتخاب شود. برای چند لغت پشت سر هم، روی اولی نگه دارید و تا آخری بکشید. با دو انگشت بزرگ‌نمایی کنید.",
   "scanPageImageLabel": "عکس صفحه",
-  "scanRegionMode": "انتخاب ناحیه",
-  "scanRegionHint": "دور متنی که درست خوانده نشده یک کادر بکشید تا دوباره خوانده شود.",
-  "scanRegionTitle": "متن ناحیهٔ انتخاب‌شده",
-  "scanRegionHelper": "در صورت نیاز اصلاح کنید؛ فقط همین متن اضافه می‌شود.",
-  "scanRegionAdd": "افزودن",
-  "scanRegionEmpty": "در این ناحیه متنی پیدا نشد. کادر بزرگ‌تری بکشید.",
-  "scanRegionFailed": "خواندن این ناحیه ممکن نشد. دوباره تلاش کنید.",
-  "scanSplitWords": "جدا کردن به لغت‌های تکی",
-  "scanRemoveSelection": "حذف از انتخاب"
+  "scanRemoveSelection": "حذف از انتخاب",
+  "scanModeHighlight": "ماژیک: کشیدن روی لغت‌ها",
+  "scanModeMove": "جابه‌جایی و بزرگ‌نمایی",
+  "scanHighlightHint": "حالت ماژیک: با یک انگشت روی لغت یا عبارت دلخواه بکشید، یا روی یک لغت بزنید. با دو انگشت بزرگ‌نمایی کنید.",
+  "scanMoveHint": "حالت جابه‌جایی: با یک انگشت صفحه را جابه‌جا و با دو انگشت بزرگ‌نمایی کنید. چیزی کشیده نمی‌شود.",
+  "scanUndoStroke": "برگرداندن آخرین انتخاب",
+  "scanClearHighlights": "پاک کردن همهٔ انتخاب‌ها",
+  "scanMoreActions": "گزینه‌های بیشتر",
+  "scanReadWholePage": "خواندن کل صفحه به‌صورت متن",
+  "scanHighlightCount": "{count, plural, =0{هنوز چیزی انتخاب نشده} other{{count} انتخاب روی عکس}}",
+  "@scanHighlightCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "scanReadHighlights": "خواندن متن انتخاب‌شده",
+  "scanHighlightLabel": "انتخاب {number}",
+  "@scanHighlightLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "scanHighlightsEmpty": "در بخش‌های انتخاب‌شده متنی تشخیص داده نشد. بزرگ‌نمایی کنید و دوباره روی کل لغت بکشید.",
+  "scanHighlightsFailed": "خواندن متن انجام نشد. دوباره تلاش کنید.",
+  "scanPhotoUnavailable": "نمایش عکس ممکن نشد؛ کل صفحه به‌صورت متن خوانده شد.",
+  "scanFailedHighlights": "در انتخاب {numbers} متنی تشخیص داده نشد. می‌توانید به عکس برگردید و دوباره بکشید.",
+  "@scanFailedHighlights": {
+    "placeholders": {
+      "numbers": {
+        "type": "String"
+      }
+    }
+  },
+  "scanBackToPhoto": "بازگشت به عکس",
+  "scanAddWord": "افزودن لغت",
+  "scanSplitItem": "جدا کردن به لغت‌های تکی",
+  "scanCombineNext": "ادغام با مورد بعدی",
+  "scanSummaryTitle": "{count, plural, =0{چیزی برای افزودن نیست} other{{count} مورد اضافه می‌شود:}}",
+  "@scanSummaryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "practiceEditWord": "ویرایش لغت",
+  "practiceAnswerDetails": "پاسخ و جزئیات",
+  "scanModeRectangle": "کادر: انتخاب یک ناحیه",
+  "scanRectangleHint": "حالت کادر: با یک انگشت دور متن دلخواه یک کادر بکشید؛ همهٔ متن داخل کادر خوانده می‌شود. با دو انگشت بزرگ‌نمایی کنید.",
+  "scanRegionLabel": "کادر {number}",
+  "@scanRegionLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "scanRegionsEmpty": "در کادرهای انتخاب‌شده متنی تشخیص داده نشد. کادر را دوباره دور متن بکشید یا بزرگ‌نمایی کنید.",
+  "coachTitle": "نیاز به تمرین",
+  "coachTileDescription": "{count, plural, =0{لغت‌هایی که بارها به یاد نمی‌آورید اینجا جمع می‌شوند} other{{count} لغت به تمرین بیشتر نیاز دارد}}",
+  "@coachTileDescription": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "coachIntro": "این فهرست با یک قاعدهٔ ساده از سابقهٔ مرور شما ساخته می‌شود: لغتی که در {days} روز گذشته و در دست‌کم {sessions} جلسهٔ جداگانه «به یاد نیاوردم» زده‌اید (در {window} پاسخ آخر آن لغت). لغتی که {streak} بار پشت سر هم به یاد بیاورید از فهرست خارج می‌شود.",
+  "@coachIntro": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "sessions": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "window": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "streak": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "coachFailures": "{failures, plural, other{{failures} بار به یاد نیاوردید}} (از {attempts} پاسخ اخیر)",
+  "@coachFailures": {
+    "placeholders": {
+      "failures": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "attempts": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "coachStart": "شروع تمرین متمرکز",
+  "coachPracticeNote": "این تمرین اضافه است: زمان‌بندی مرور (FSRS) و موعد کارت‌ها تغییر نمی‌کند. نتیجهٔ شما فقط در سابقه و آمار ثبت می‌شود.",
+  "coachEmptyTitle": "فعلاً لغتی به تمرین ویژه نیاز ندارد",
+  "coachEmptyBody": "به مرور معمول ادامه دهید. وقتی لغتی را در چند جلسهٔ مرور به یاد نیاورید، اینجا نمایش داده می‌شود.",
+  "coachGoToReview": "رفتن به مرور",
+  "practiceEmptyCoach": "در فهرست «نیاز به تمرین» لغتی با معنی فارسی نیست.",
+  "practiceRepeat": "تکرار در همین جلسه (مرحلهٔ یادگیری)"
 }
