@@ -10,12 +10,14 @@ phase. They complement the product specification and
    **Phase 5** (scope selected by the product owner; see the roadmap) is
    implemented, together with the product owner's follow-up request
    (D42–D47: FSRS review, review direction, hidden answers, photo word
-   selection, iOS speech fix, bulk delete). No later phase exists; other
-   proposals are not approved.
+   selection, iOS speech fix, bulk delete), then D48–D53, then the
+   **Build 3** release scope (D54–D56: full backup/restore, the About
+   screen with release notes, AI sentence practice). No later phase
+   exists; other proposals are not approved.
 2. At the end of each phase: report and **stop**. Do not start the next phase
    without explicit approval.
-3. Items in the proposed-feature register (P1–P13, Anki `.apkg`) are
-   **not approved**. Do not implement them, add dependencies for them or
+3. Items in the proposed-feature register (P1–P13, Anki `.apkg`) that are
+   not marked implemented are **not approved**. Do not implement them, add dependencies for them or
    change the schema for them, even if they look small or adjacent to the
    current phase. If an approved task seems to need one, stop and ask.
 4. Documentation-only requests change documentation only: no source, schema,
@@ -49,6 +51,15 @@ phase. They complement the product specification and
 - Keep everything offline-capable except AI features.
 - Never put API keys in the app, committed configuration or logs; use mocks
   in automated tests.
+
+## Releases
+
+Every build given to the product owner follows `docs/releases.md`: a new,
+unused build number in `pubspec.yaml`, Persian and English release notes in
+`assets/release_notes.json` describing the changes compared with the
+previous build (only what is implemented and verified), and a report of the
+version, build number and notes before the product owner reviews or
+installs it. The app shows the installed build's notes in Settings → About.
 
 ## End-of-phase report
 

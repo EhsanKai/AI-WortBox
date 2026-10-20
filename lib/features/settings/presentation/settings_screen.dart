@@ -9,6 +9,7 @@ import '../../../core/widgets/action_tile.dart';
 import '../../../core/widgets/brand_mark.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../about/presentation/about_providers.dart';
 import '../../enrichment/presentation/ai_settings_controller.dart';
 import '../../reminders/presentation/reminder_controller.dart';
 import '../../review/presentation/practice_screen.dart';
@@ -120,6 +121,15 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => context.push(AppRoutes.tags),
           ),
           sectionGap,
+          SectionHeader(l10n.settingsData),
+          ActionTile(
+            key: const Key('settings.backup'),
+            icon: Icons.settings_backup_restore,
+            title: l10n.backupTitle,
+            description: l10n.backupTileDescription,
+            onTap: () => context.go(AppRoutes.backup),
+          ),
+          sectionGap,
           SectionHeader(l10n.settingsPrivacy),
           Card(
             child: ListTile(
@@ -157,6 +167,17 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: AppSpace.sm),
+          ActionTile(
+            key: const Key('settings.about'),
+            icon: Icons.info_outline,
+            title: l10n.aboutTitle,
+            description: switch (ref.watch(installedVersionProvider).value) {
+              final v? => l10n.aboutTileVersion(v.version, v.buildNumber),
+              null => l10n.aboutTileDescription,
+            },
+            onTap: () => context.go(AppRoutes.about),
           ),
           const SizedBox(height: AppSpace.sm),
           ActionTile(

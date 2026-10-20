@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -187,6 +188,154 @@ void main() {
         expect(await newDb.select(newDb.entryTags).get(), isEmpty);
         expect(await newDb.select(newDb.reviewEvents).get(), isEmpty);
         expect(await newDb.select(newDb.appSettings).get(), isEmpty);
+      },
+    );
+  });
+
+  test('v2 → v3 keeps every v2 row unchanged (decks, words, meanings, FSRS '
+      'cards, tags, review history, settings) and adds an empty '
+      'sentence-practice table', () async {
+    const t = '2026-10-19T08:00:00.000Z';
+    const later = '2026-10-19T09:00:00.000Z';
+    final decks = [
+      const v2.DecksData(
+        id: 'deck-1',
+        name: 'Kafka',
+        sourceLanguage: 'de',
+        definitionLanguage: 'fa',
+        dailyNewCardLimit: 15,
+        createdAt: t,
+        updatedAt: t,
+      ),
+    ];
+    final entries = [
+      const v2.VocabularyEntriesData(
+        id: 'e-1',
+        deckId: 'deck-1',
+        original: 'Ungeziefer',
+        normalized: 'ungeziefer',
+        sourceLanguage: 'de',
+        definitionLanguage: 'fa',
+        sourceType: 'image',
+        enrichmentStatus: 'ready',
+        createdAt: t,
+        updatedAt: t,
+        markedDifficultAt: later,
+        searchKey: 'ungeziefer\nحشره',
+      ),
+    ];
+    final meanings = [
+      const v2.VocabularyMeaningsData(
+        id: 'm-1',
+        entryId: 'e-1',
+        position: 0,
+        meaning: 'حشره',
+      ),
+    ];
+    final cards = [
+      const v2.FlashcardsData(
+        id: 'c-1',
+        entryId: 'e-1',
+        direction: 'forward',
+        state: 'review',
+        step: null,
+        stability: 7.25,
+        difficulty: 4.9,
+        due: '2026-10-25T08:00:00.000Z',
+        lastReviewedAt: later,
+        reviewCount: 6,
+        lapseCount: 2,
+        schedulerVersion: 'fsrs-2.0.1;default;retention=0.9',
+        createdAt: t,
+        updatedAt: later,
+      ),
+    ];
+    final tags = [
+      const v2.TagsData(
+        id: 't-1',
+        name: 'B1',
+        nameKey: 'b1',
+        createdAt: t,
+        updatedAt: t,
+      ),
+    ];
+    final entryTags = [
+      const v2.EntryTagsData(entryId: 'e-1', tagId: 't-1', createdAt: t),
+    ];
+    final events = [
+      const v2.ReviewEventsData(
+        id: 'r-1',
+        entryId: 'e-1',
+        sessionId: 's-1',
+        direction: 'forward',
+        outcome: 'remembered',
+        reviewedAt: later,
+        localDay: '2026-10-19',
+      ),
+      const v2.ReviewEventsData(
+        id: 'r-2',
+        entryId: null,
+        sessionId: 's-1',
+        direction: 'reverse',
+        outcome: 'forgotten',
+        reviewedAt: later,
+        localDay: '2026-10-19',
+      ),
+    ];
+    final settings = [
+      const v2.AppSettingsData(key: 'review.direction', value: 'both'),
+      const v2.AppSettingsData(key: 'ai.freeOnly', value: 'true'),
+    ];
+
+    List<Map<String, Object?>> json(Iterable<Insertable<Object>> rows) => [
+      for (final r in rows)
+        {
+          for (final MapEntry(:key, :value) in r.toColumns(false).entries)
+            key: (value as Variable).value,
+        },
+    ];
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 2,
+      newVersion: 3,
+      createOld: v2.DatabaseAtV2.new,
+      createNew: v3.DatabaseAtV3.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch.insertAll(oldDb.decks, decks);
+        batch.insertAll(oldDb.vocabularyEntries, entries);
+        batch.insertAll(oldDb.vocabularyMeanings, meanings);
+        batch.insertAll(oldDb.flashcards, cards);
+        batch.insertAll(oldDb.tags, tags);
+        batch.insertAll(oldDb.entryTags, entryTags);
+        batch.insertAll(oldDb.reviewEvents, events);
+        batch.insertAll(oldDb.appSettings, settings);
+      },
+      validateItems: (newDb) async {
+        expect(json(await newDb.select(newDb.decks).get()), json(decks));
+        expect(
+          json(await newDb.select(newDb.vocabularyEntries).get()),
+          json(entries),
+        );
+        expect(
+          json(await newDb.select(newDb.vocabularyMeanings).get()),
+          json(meanings),
+        );
+        expect(json(await newDb.select(newDb.flashcards).get()), json(cards));
+        expect(json(await newDb.select(newDb.tags).get()), json(tags));
+        expect(
+          json(await newDb.select(newDb.entryTags).get()),
+          json(entryTags),
+        );
+        expect(
+          json(await newDb.select(newDb.reviewEvents).get()),
+          json(events),
+        );
+        expect(
+          json(await newDb.select(newDb.appSettings).get()),
+          json(settings),
+        );
+        expect(await newDb.select(newDb.sentencePracticeEvents).get(), isEmpty);
       },
     );
   });

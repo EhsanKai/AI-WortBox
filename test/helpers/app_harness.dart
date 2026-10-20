@@ -6,6 +6,9 @@ import 'package:ai_wortbox/app/providers.dart';
 import 'package:ai_wortbox/core/id/id_generator.dart';
 import 'package:ai_wortbox/core/time/clock.dart';
 import 'package:ai_wortbox/data/database/app_database.dart';
+import 'package:ai_wortbox/features/about/data/app_info_source.dart';
+import 'package:ai_wortbox/features/about/domain/release_notes.dart';
+import 'package:ai_wortbox/features/about/presentation/about_providers.dart';
 import 'package:ai_wortbox/features/csv_import/data/csv_file_source.dart';
 import 'package:ai_wortbox/features/enrichment/data/ai_settings_store.dart';
 import 'package:ai_wortbox/features/enrichment/presentation/enrichment_controller.dart';
@@ -14,6 +17,7 @@ import 'package:ai_wortbox/features/scan/data/scan_image_source.dart';
 import 'package:ai_wortbox/features/scan/data/text_recognition_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
@@ -41,6 +45,18 @@ class FakeCsvFileSource implements CsvFileSource {
   Future<PickedCsvFile?> pick() async => file;
 }
 
+/// A fixed installed version instead of the platform's package info.
+class FakeAppInfoSource implements AppInfoSource {
+  FakeAppInfoSource({this.version = '1.0.0', this.buildNumber = '3'});
+
+  final String version;
+  final String buildNumber;
+
+  @override
+  Future<InstalledVersion> installedVersion() async =>
+      InstalledVersion(version: version, buildNumber: buildNumber);
+}
+
 /// Pumps the full app on a phone-sized viewport with an in-memory database.
 ///
 /// [size] is the logical viewport (default 390×844), [textScale] the system
@@ -61,6 +77,9 @@ Future<void> pumpApp(
   FakeExportSink? exportSink,
   Clock? clock,
   EnrichmentJobRegistry? enrichmentJobs,
+  AppInfoSource? appInfo,
+  Locale locale = const Locale('fa'),
+  List<Override> extraOverrides = const [],
   Size size = const Size(390, 844),
   double textScale = 1,
   Brightness brightness = Brightness.light,
@@ -120,9 +139,12 @@ Future<void> pumpApp(
           launchedUrls?.add(uri);
           return true;
         }),
+        // The platform's package info is not available on the host.
+        appInfoSourceProvider.overrideWithValue(appInfo ?? FakeAppInfoSource()),
+        ...extraOverrides,
       ],
       retry: (_, _) => null,
-      child: AiWortBoxApp(initialLocation: initialLocation),
+      child: AiWortBoxApp(initialLocation: initialLocation, locale: locale),
     ),
   );
   await tester.pumpAndSettle();

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import '../../../core/error/app_exception.dart';
 import '../../../core/time/clock.dart';
-import '../domain/ai_model_catalog.dart';
 import '../domain/enrichment.dart';
 import '../domain/enrichment_parser.dart';
 import '../domain/free_model_policy.dart';
@@ -10,6 +9,7 @@ import 'ai_local_store.dart';
 import 'ai_settings_store.dart';
 import 'enrichment_cache.dart';
 import 'free_model_catalog.dart';
+import 'openrouter_chat.dart';
 import 'openrouter_client.dart';
 
 /// Enrichment through OpenRouter with the user's own key ("bring your own
@@ -32,25 +32,30 @@ import 'openrouter_client.dart';
 /// No request is sent without a saved key, and there is no fallback key.
 class OpenRouterEnrichmentService implements VocabularyEnrichmentService {
   OpenRouterEnrichmentService({
-    required this._client,
-    required this._settings,
+    required OpenRouterClient client,
+    required AiSettingsStore settings,
     required this._clock,
     this._localState,
     this._cache,
-    this._catalog,
-  });
+    FreeModelCatalog? catalog,
+  }) : _chat = OpenRouterChat(
+         client: client,
+         settings: settings,
+         localState: _localState,
+         catalog: catalog,
+       );
 
-  final OpenRouterClient _client;
-  final AiSettingsStore _settings;
+  /// Key, free-only policy, fallbacks and answer checks (shared with every
+  /// AI feature).
+  final OpenRouterChat _chat;
   final Clock _clock;
   final AiLocalState? _localState;
   final EnrichmentCache? _cache;
-  final FreeModelCatalog? _catalog;
 
   static const provider = 'openrouter';
 
   /// Price ceiling sent with free-only requests (USD; zero = free only).
-  static const zeroMaxPrice = {'prompt': 0, 'completion': 0, 'request': 0};
+  static const zeroMaxPrice = OpenRouterChat.zeroMaxPrice;
 
   @override
   Future<EnrichmentProposal> enrich(
@@ -75,14 +80,11 @@ class OpenRouterEnrichmentService implements VocabularyEnrichmentService {
     if (requests.any((r) => r.scope != requests.first.scope)) {
       throw ArgumentError('A batch must not mix enrichment scopes.');
     }
-    final apiKey = (await _settings.readApiKey())?.trim();
-    if (apiKey == null || apiKey.isEmpty) {
-      throw const EnrichmentException(EnrichmentError.notConfigured);
-    }
+    final apiKey = await _chat.requireApiKey();
     if (cancellation?.isCancelled ?? false) {
       throw const EnrichmentException(EnrichmentError.cancelled);
     }
-    final prefs = await _preferences();
+    final prefs = await _chat.preferences();
 
     final outcomes = List<EnrichmentOutcome?>.filled(requests.length, null);
     final cached = await _cache?.lookup(requests) ?? const {};
@@ -113,146 +115,38 @@ class OpenRouterEnrichmentService implements VocabularyEnrichmentService {
       for (final (n, i) in misses.indexed)
         (id: '${n + 1}', request: requests[i]),
     ];
-    final (attempts, verifiedIds) = await _plan(prefs);
-    final budget = RetryBudget(_client.maxRetries);
-
-    for (var a = 0; ; a++) {
-      final attempt = attempts[a];
-      try {
-        final json = await _client.chatCompletion(
-          apiKey: apiKey,
-          body: buildBody(attempt, words, freeOnly: prefs.freeOnly),
-          cancellation: cancellation,
-          budget: budget,
-          free: prefs.freeOnly,
+    final answer = await _chat.send(
+      apiKey: apiKey,
+      prefs: prefs,
+      cancellation: cancellation,
+      body: (attempt) => buildBody(attempt, words, freeOnly: prefs.freeOnly),
+      parse: (content) => EnrichmentParser.parseBatch(content, [
+        for (final w in words) (id: w.id, original: w.request.original),
+      ], meaningsOnly: words.first.request.scope == EnrichmentScope.meanings),
+    );
+    final results = answer.value;
+    final usedModel = answer.model;
+    final now = _clock.nowUtc();
+    final fresh =
+        <
+          ({EnrichmentRequest request, ParsedEnrichment parsed, String model})
+        >[];
+    var first = true;
+    for (final (n, w) in words.indexed) {
+      final result = results[w.id]!;
+      if (result is ParsedEnrichment) {
+        fresh.add((request: w.request, parsed: result, model: usedModel));
+        // The request's cost is reported once, on its first result.
+        outcomes[misses[n]] = EnrichmentSucceeded(
+          _proposal(result, usedModel, now, cost: first ? answer.cost : null),
         );
-        final usedModel = json['model'] is String
-            ? json['model']! as String
-            : attempt.model;
-        if (prefs.freeOnly) _enforceZeroCost(json, usedModel, verifiedIds);
-
-        final results = EnrichmentParser.parseBatch(_content(json), [
-          for (final w in words) (id: w.id, original: w.request.original),
-        ], meaningsOnly: words.first.request.scope == EnrichmentScope.meanings);
-        final cost = _cost(json);
-        final now = _clock.nowUtc();
-        final fresh =
-            <
-              ({
-                EnrichmentRequest request,
-                ParsedEnrichment parsed,
-                String model,
-              })
-            >[];
-        var first = true;
-        for (final (n, w) in words.indexed) {
-          final result = results[w.id]!;
-          if (result is ParsedEnrichment) {
-            fresh.add((request: w.request, parsed: result, model: usedModel));
-            // The request's cost is reported once, on its first result.
-            outcomes[misses[n]] = EnrichmentSucceeded(
-              _proposal(result, usedModel, now, cost: first ? cost : null),
-            );
-            first = false;
-          } else {
-            outcomes[misses[n]] = EnrichmentFailed(
-              result as EnrichmentException,
-            );
-          }
-        }
-        await _cache?.store(fresh);
-        await _quietly(() async => _localState?.recordModelUsed(usedModel));
-        return outcomes.cast();
-      } on EnrichmentException catch (e) {
-        final hasNext = a + 1 < attempts.length;
-        if (!prefs.freeOnly || !hasNext || !_canFallBack(e)) rethrow;
-        // Another free model may succeed; it counts against the same
-        // retry budget as same-model retries.
-        if (!budget.tryConsume()) rethrow;
+        first = false;
+      } else {
+        outcomes[misses[n]] = EnrichmentFailed(result as EnrichmentException);
       }
     }
-  }
-
-  Future<AiPreferences> _preferences() async {
-    try {
-      return await _localState?.readPreferences() ?? const AiPreferences();
-    } on StorageException {
-      // Unreadable preferences: the safe default is free-only.
-      return const AiPreferences();
-    }
-  }
-
-  Future<(List<ModelAttempt>, Set<String>)> _plan(AiPreferences prefs) async {
-    final paidModel = AiModelCatalog.resolve(
-      prefs.freeOnly ? null : await _settings.readModel(),
-    );
-    var ranked = const <OpenRouterModelInfo>[];
-    if (prefs.freeOnly && prefs.mode == FreeRoutingMode.qualityFree) {
-      try {
-        ranked = (await _catalog?.load())?.ranked ?? const [];
-      } on EnrichmentException {
-        // Not verifiable now: only the free router is used.
-        ranked = const [];
-      }
-    }
-    return (
-      planAttempts(
-        freeOnly: prefs.freeOnly,
-        mode: prefs.mode,
-        paidModel: paidModel,
-        rankedFree: ranked,
-      ),
-      {for (final m in ranked) m.id},
-    );
-  }
-
-  /// Failures where a different free model may succeed. Never: invalid
-  /// key, credits, forbidden, account rate limits, the daily quota,
-  /// network, timeouts (it may still be running) or cancellation.
-  static bool _canFallBack(EnrichmentException e) => switch (e.error) {
-    EnrichmentError.modelUnavailable ||
-    EnrichmentError.badRequest ||
-    EnrichmentError.server ||
-    EnrichmentError.malformedResponse => true,
-    EnrichmentError.rateLimited => e.upstream,
-    _ => false,
-  };
-
-  /// Free-only safety net after the fact. The request has been answered;
-  /// if it was not free, nothing more is sent.
-  static void _enforceZeroCost(
-    Map<String, Object?> json,
-    String model,
-    Set<String> verifiedIds,
-  ) {
-    final cost = _cost(json);
-    if (cost != null && cost > 0) {
-      throw const EnrichmentException(EnrichmentError.paidModelBlocked);
-    }
-    if (!FreeModelPolicy.isFreeModelId(model, verifiedIds: verifiedIds) &&
-        cost != 0) {
-      throw const EnrichmentException(EnrichmentError.paidModelBlocked);
-    }
-  }
-
-  static String _content(Map<String, Object?> json) {
-    final choices = json['choices'];
-    final first = choices is List && choices.isNotEmpty ? choices.first : null;
-    final message = first is Map ? first['message'] : null;
-    final content = message is Map ? message['content'] : null;
-    // A truncated answer is not valid JSON we can trust.
-    if (content is! String ||
-        (first is Map && first['finish_reason'] == 'length')) {
-      throw const EnrichmentException(EnrichmentError.malformedResponse);
-    }
-    return content;
-  }
-
-  static double? _cost(Map<String, Object?> json) {
-    final usage = json['usage'];
-    return usage is Map && usage['cost'] is num
-        ? (usage['cost']! as num).toDouble()
-        : null;
+    await _cache?.store(fresh);
+    return outcomes.cast();
   }
 
   EnrichmentProposal _proposal(

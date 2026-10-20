@@ -238,5 +238,19 @@ String errorMessage(AppLocalizations l10n, Object error) => switch (error) {
       AppConfig.maxAnkiPackageBytes ~/ (1024 * 1024),
     ),
   },
+  BackupException(:final error) => switch (error) {
+    BackupError.notBackup => l10n.backupErrorNotBackup,
+    BackupError.unsupportedVersion => l10n.backupErrorUnsupportedVersion,
+    BackupError.newerSchema => l10n.backupErrorNewerSchema,
+    BackupError.corrupted => l10n.backupErrorCorrupted,
+    BackupError.missingField => l10n.backupErrorMissingField,
+    BackupError.invalidValue => l10n.backupErrorInvalidValue,
+    BackupError.duplicateId => l10n.backupErrorDuplicate,
+    BackupError.brokenReference => l10n.backupErrorBrokenReference,
+    BackupError.tooLarge => l10n.backupErrorTooLarge(
+      AppConfig.maxBackupBytes ~/ (1024 * 1024),
+    ),
+    BackupError.safetyCopyFailed => l10n.backupErrorSafetyCopy,
+  },
   _ => l10n.errorGeneric,
 };

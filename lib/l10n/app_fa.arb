@@ -1378,5 +1378,348 @@
   "enrichEditMeaning": "ویرایش معنی",
   "enrichEdited": "ویرایش‌شده توسط شما",
   "enrichBackToWords": "بازگشت به لغت‌ها",
-  "aiErrorBusy": "این لغت در اجرای دیگری در حال درخواست است. پس از پایان آن دوباره امتحان کنید."
+  "aiErrorBusy": "این لغت در اجرای دیگری در حال درخواست است. پس از پایان آن دوباره امتحان کنید.",
+  "aboutTitle": "درباره برنامه",
+  "aboutTileDescription": "نسخهٔ نصب‌شده و تغییرات هر نسخه",
+  "aboutTileVersion": "نسخهٔ {version} · ساخت {build}",
+  "@aboutTileVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutInstalledTitle": "نسخهٔ نصب‌شده روی این دستگاه",
+  "aboutVersion": "نسخه",
+  "aboutBuild": "شمارهٔ ساخت",
+  "aboutReleaseDate": "تاریخ انتشار",
+  "aboutInstalledNote": "این اطلاعات مربوط به همین نسخه‌ای است که الان روی دستگاه شما نصب و در حال اجراست، نه نسخهٔ جدیدتری که هنوز نصب نشده است. برنامه به‌روزرسانی‌ها را بررسی نمی‌کند.",
+  "aboutChangesTitle": "تغییرات این نسخه",
+  "aboutComparedWith": "در مقایسه با ساخت {build}",
+  "@aboutComparedWith": {
+    "placeholders": {
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutNoNotes": "برای این ساخت یادداشت انتشار ثبت نشده است.",
+  "aboutEarlierTitle": "نسخه‌های قبلی",
+  "aboutReleaseHeading": "نسخهٔ {version} · ساخت {build}",
+  "@aboutReleaseHeading": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsData": "داده‌ها",
+  "backupTitle": "پشتیبان‌گیری و بازگردانی",
+  "backupTileDescription": "یک فایل از همهٔ لغت‌ها و پیشرفت مرور شما",
+  "backupIntro": "فایل پشتیبان همهٔ داده‌های یادگیری شما را نگه می‌دارد تا بتوانید آن را روی همین دستگاه یا دستگاهی دیگر بازگردانید. فایل فقط روی دستگاه ساخته می‌شود و جایی فرستاده نمی‌شود؛ محل ذخیره را خودتان انتخاب می‌کنید.",
+  "backupSaveTitle": "ذخیرهٔ فایل پشتیبان",
+  "backupIncludes": "شامل: دسته‌ها، لغت‌ها با همهٔ معنی‌ها و جزئیات، برچسب‌ها، برنامهٔ مرور (FSRS) و تاریخ‌های مرور بعدی، سابقهٔ مرور و سابقهٔ تمرین جمله.",
+  "backupExcludes": "شامل نیست: کلید OpenRouter و تنظیمات (یادآور، جهت مرور، تنظیمات هوش مصنوعی). فایل رمزگذاری نشده است؛ آن را در جای امن نگه دارید.",
+  "backupSaveButton": "ذخیرهٔ فایل پشتیبان",
+  "backupSaved": "فایل پشتیبان ذخیره شد.",
+  "backupRestoreTitle": "بازگردانی از فایل پشتیبان",
+  "backupRestoreIntro": "فایل پیش از هر تغییری کامل بررسی می‌شود. سپس محتوای آن را می‌بینید و انتخاب می‌کنید که داده‌ها اضافه شوند یا جایگزین. تا آن لحظه چیزی تغییر نمی‌کند.",
+  "backupPickButton": "انتخاب فایل پشتیبان",
+  "backupSafetyCopyTitle": "نسخهٔ ایمنی پیش از آخرین بازگردانی",
+  "backupSafetyCopySaved": "ذخیره‌شده در {date}",
+  "@backupSafetyCopySaved": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backupBusySaving": "در حال ساخت فایل پشتیبان…",
+  "backupBusyReading": "در حال بررسی فایل…",
+  "backupBusyRestoring": "در حال بازگردانی… لطفاً برنامه را نبندید.",
+  "backupPreviewTitle": "محتوای فایل پشتیبان",
+  "backupPreviewExported": "ساخته‌شده در {date}",
+  "@backupPreviewExported": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewApp": "با نسخهٔ {version} (ساخت {build})",
+  "@backupPreviewApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewSafetyCopy": "این نسخهٔ ایمنی، داده‌های همین دستگاه پیش از یک بازگردانی است.",
+  "backupColumnFile": "در فایل",
+  "backupColumnDevice": "روی دستگاه",
+  "backupCountDecks": "دسته‌ها",
+  "backupCountWords": "لغت‌ها",
+  "backupCountCards": "کارت‌های زمان‌بندی‌شده (FSRS)",
+  "backupCountReviews": "سابقهٔ مرور",
+  "backupCountTags": "برچسب‌ها",
+  "backupCountSentences": "تمرین‌های جمله",
+  "backupChooseHow": "چطور بازگردانده شود؟",
+  "backupMergeTitle": "افزودن به داده‌های فعلی",
+  "backupMergeBody": "دسته‌ها، لغت‌ها، برچسب‌ها و سابقه‌ای که روی این دستگاه نیست اضافه می‌شود. هیچ چیزی روی دستگاه تغییر نمی‌کند یا حذف نمی‌شود. برای لغت‌هایی که از قبل روی دستگاه هست، برنامهٔ مرور همین دستگاه می‌ماند.",
+  "backupMergeButton": "افزودن",
+  "backupReplaceTitle": "جایگزینی همهٔ داده‌ها",
+  "backupReplaceBody": "همهٔ داده‌های یادگیری این دستگاه حذف و داده‌های فایل جای آن‌ها قرار می‌گیرد. پیش از آن یک نسخهٔ ایمنی روی دستگاه ذخیره می‌شود.",
+  "backupReplaceButton": "جایگزینی…",
+  "backupReplaceConfirmTitle": "همهٔ داده‌ها جایگزین شود؟",
+  "backupReplaceConfirmBody": "{words} لغت در {decks} دسته، همراه با برنامهٔ مرور، سابقهٔ مرور و سابقهٔ تمرین جمله، از این دستگاه حذف می‌شوند و داده‌های فایل پشتیبان ({date}) جای آن‌ها را می‌گیرند.\n\nپیش از آن یک نسخهٔ ایمنی از داده‌های فعلی روی همین دستگاه ذخیره می‌شود و از صفحهٔ پشتیبان‌گیری قابل بازگردانی است. تنظیمات و کلید OpenRouter تغییر نمی‌کنند.",
+  "@backupReplaceConfirmBody": {
+    "placeholders": {
+      "words": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "decks": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backupReplaceConfirm": "بله، همه را جایگزین کن",
+  "backupDoneMergeTitle": "داده‌های فایل اضافه شد",
+  "backupDoneReplaceTitle": "داده‌ها بازگردانده شد",
+  "backupResultWords": "{count} لغت اضافه شد",
+  "@backupResultWords": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "backupResultPresent": "{count} لغت از قبل روی دستگاه بود و دست نخورد",
+  "@backupResultPresent": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "backupResultDecks": "{count} دستهٔ تازه",
+  "@backupResultDecks": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "backupResultCards": "برنامهٔ مرور (FSRS) {count} کارت بازگردانده شد",
+  "@backupResultCards": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "backupResultCardsKept": "برای {count} کارت، برنامهٔ مرور همین دستگاه حفظ شد",
+  "@backupResultCardsKept": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "backupResultReviews": "{count} مورد سابقهٔ مرور",
+  "@backupResultReviews": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "backupResultSafety": "یک نسخهٔ ایمنی از داده‌های قبلی روی دستگاه ذخیره شد و از همین صفحه قابل بازگردانی است.",
+  "backupDone": "تمام",
+  "backupDismiss": "باشه",
+  "backupNothingChanged": "هیچ داده‌ای تغییر نکرد.",
+  "backupErrorLocation": "محل مشکل در فایل: {location}",
+  "@backupErrorLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "backupErrorNotBackup": "این فایل، فایل پشتیبان AI WortBox نیست یا ناقص است.",
+  "backupErrorUnsupportedVersion": "این فایل با قالب جدیدتری ساخته شده است. برنامه را به‌روز کنید و دوباره امتحان کنید.",
+  "backupErrorNewerSchema": "این فایل با نسخهٔ جدیدتری از برنامه ساخته شده است. برنامه را به‌روز کنید و دوباره امتحان کنید.",
+  "backupErrorCorrupted": "محتوای فایل تغییر کرده یا آسیب دیده است (کد بررسی مطابقت ندارد).",
+  "backupErrorMissingField": "اطلاعات لازم در فایل وجود ندارد.",
+  "backupErrorInvalidValue": "فایل مقدار نامعتبری دارد.",
+  "backupErrorDuplicate": "یک مورد در فایل دو بار آمده است.",
+  "backupErrorBrokenReference": "فایل به دسته، لغت یا برچسبی اشاره می‌کند که در آن نیست.",
+  "backupErrorTooLarge": "فایل بزرگ‌تر از {mb} مگابایت است.",
+  "@backupErrorTooLarge": {
+    "placeholders": {
+      "mb": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "backupErrorSafetyCopy": "نسخهٔ ایمنی داده‌های فعلی ذخیره نشد (شاید فضای دستگاه پر است)، بنابراین بازگردانی انجام نشد.",
+  "spTitle": "تمرین جمله با هوش مصنوعی",
+  "spTileDescription": "لغت‌هایتان را در جمله به کار ببرید و بازخورد بگیرید",
+  "spIntro": "هوش مصنوعی با لغت‌های ذخیره‌شدهٔ خودتان جمله‌های کوتاه می‌سازد. شما جمله را به آلمانی می‌نویسید یا معنی جملهٔ آلمانی را به فارسی، و بازخورد می‌گیرید.",
+  "spSeparateNote": "این تمرین جدا از مرور زمان‌بندی‌شده است: برنامهٔ مرور (FSRS)، تاریخ‌های مرور، سابقهٔ مرور و آمار تغییر نمی‌کنند. فقط ثبت می‌شود کدام لغت کی و با چه نتیجه‌ای تمرین شد (نه پاسخ‌ها و نه متن هوش مصنوعی).",
+  "spAiNote": "برای ساختن جمله‌های هر جلسه یک درخواست، و برای بررسی هر پاسخ یک درخواست به OpenRouter با کلید خودتان فرستاده می‌شود، با همان تنظیمات هوش مصنوعی (در حالت پیش‌فرض فقط مدل‌های رایگان). فقط لغت، معنی‌های ذخیره‌شده، جملهٔ تمرین و هنگام بررسی پاسخ شما فرستاده می‌شود.",
+  "spDirectionTitle": "نوع تمرین",
+  "spDirectionProduce": "ساختن جمله (فارسی ← آلمانی)",
+  "spDirectionProduceHint": "یک جملهٔ فارسی را با لغت هدف به آلمانی بنویسید.",
+  "spDirectionUnderstand": "فهمیدن جمله (آلمانی ← فارسی)",
+  "spDirectionUnderstandHint": "یک جملهٔ آلمانی را بخوانید و معنی آن را به فارسی بنویسید.",
+  "spLevelTitle": "سطح",
+  "spLevelA2": "آسان (A2)",
+  "spLevelB1": "متوسط (B1)",
+  "spLevelB2": "دشوارتر (B2)",
+  "spSizeTitle": "تعداد لغت در هر جلسه",
+  "spSizeWords": "{count} لغت",
+  "@spSizeWords": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spTagLabel": "برچسب",
+  "spAllTags": "همهٔ برچسب‌ها",
+  "spStart": "شروع تمرین",
+  "spNeedsKey": "برای این تمرین کلید OpenRouter لازم است.",
+  "spOpenAiSettings": "تنظیمات هوش مصنوعی",
+  "spHistoryCount": "{count} تمرین جمله ثبت شده است",
+  "@spHistoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spClearHistory": "پاک کردن سابقهٔ تمرین جمله",
+  "spClearConfirmTitle": "سابقهٔ تمرین جمله پاک شود؟",
+  "spClearConfirmBody": "فقط سابقهٔ تمرین جمله پاک می‌شود. لغت‌ها، برنامهٔ مرور (FSRS) و سابقهٔ مرور دست نمی‌خورند.",
+  "spClearConfirm": "پاک کن",
+  "spCleared": "سابقهٔ تمرین جمله پاک شد.",
+  "spGenerating": "در حال ساختن جمله با لغت‌های شما…",
+  "spNoWordsTitle": "لغتی برای تمرین نیست",
+  "spNoWordsBody": "برای تمرین جمله، لغت باید دست‌کم یک معنی ذخیره‌شده داشته باشد. دسته یا برچسب دیگری انتخاب کنید یا به لغت‌ها معنی اضافه کنید.",
+  "spGenerationFailedTitle": "جمله‌ها ساخته نشد",
+  "spGenerationFailedHint": "چیزی ذخیره یا تغییر نکرد. «تلاش دوباره» یک درخواست تازه می‌فرستد؛ اگر محدودیت درخواست‌ها رسیده است، کمی بعد امتحان کنید.",
+  "spProgress": "تمرین {current} از {total}",
+  "@spProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "format": "decimalPattern"
+      },
+      "total": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spRejected": "{count} لغت کنار گذاشته شد، چون جملهٔ معتبری برای آن ساخته نشد.",
+  "@spRejected": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spInstructionProduce": "این جمله را به آلمانی بنویسید و لغت هدف را به کار ببرید:",
+  "spInstructionUnderstand": "معنی این جمله را به فارسی بنویسید:",
+  "spTargetWord": "لغت هدف:",
+  "spAnswerLabelGerman": "پاسخ شما (آلمانی)",
+  "spAnswerLabelPersian": "پاسخ شما (فارسی)",
+  "spCheck": "بررسی پاسخ",
+  "spShowAnswer": "نمایش پاسخ نمونه",
+  "spSkip": "رد شدن",
+  "spNext": "بعدی",
+  "spFinish": "پایان",
+  "spCheckFailedKept": "پاسخ شما حفظ شد. می‌توانید دوباره «بررسی پاسخ» را بزنید.",
+  "spVerdictCorrect": "درست",
+  "spVerdictAcceptable": "درست، با بیانی دیگر",
+  "spVerdictMinor": "خطاهای کوچک",
+  "spVerdictIncorrect": "نادرست",
+  "spTargetCorrect": "لغت هدف: درست",
+  "spTargetIncorrect": "لغت هدف: نادرست به کار رفته یا فهمیده شده",
+  "spTargetMissing": "لغت هدف: در پاسخ نیست",
+  "spCorrectionsTitle": "اصلاح‌ها",
+  "spKindGrammar": "دستور زبان",
+  "spKindWordOrder": "ترتیب کلمات",
+  "spKindSpelling": "املا",
+  "spKindCapitalization": "حرف بزرگ",
+  "spKindVocabulary": "واژه",
+  "spKindMeaning": "معنی",
+  "spCorrectedAnswer": "پاسخ شما با اصلاح‌های لازم",
+  "spNaturalVersion": "شکل طبیعی",
+  "spModelAnswer": "پاسخ نمونه",
+  "spModelAnswerNote": "پاسخ شما لازم نیست دقیقاً همین باشد.",
+  "spDoneTitle": "تمرین تمام شد",
+  "spDoneCorrect": "{count} درست",
+  "@spDoneCorrect": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spDoneMinor": "{count} با خطای کوچک",
+  "@spDoneMinor": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spDoneIncorrect": "{count} نادرست",
+  "@spDoneIncorrect": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spDoneUnchecked": "{count} بدون بررسی",
+  "@spDoneUnchecked": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "spDoneFsrsNote": "برنامهٔ مرور (FSRS) و آمار مرور تغییر نکرد.",
+  "spPracticeAgain": "تمرین دوباره",
+  "spBackToToday": "بازگشت به مرور امروز"
 }

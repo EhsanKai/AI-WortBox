@@ -41,6 +41,64 @@ bundled by `package:sqlite3` (no device needed).
 `utf16le_bom.txt`, `persian_first.csv`, `sep_hint.csv`. `.gitattributes`
 marks them `-text` so Git never changes their bytes.
 
+## Build 3 results (1.0.0+3, 2026-10-20)
+
+- `dart format --output=none --set-exit-if-changed lib test`: 245 files,
+  0 changed
+- `flutter analyze`: no issues
+- `flutter test`: **773 passed, 3 skipped, 0 failed** (681 before Build 3;
+  the 3 skipped are the opt-in live OpenRouter tests, no key available)
+- `git diff --check`: clean
+- `flutter build ios --release`: built `build/ios/iphoneos/Runner.app`;
+  its `Info.plist` reads `CFBundleShortVersionString` 1.0.0,
+  `CFBundleVersion` 3, bundle id `com.aiwortbox.aiWortbox`, and
+  `assets/release_notes.json` is bundled.
+- Installed over build 2 on the iPhone 14 Pro Max with `devicectl`
+  (no uninstall); the device then reported version 1.0.0, build 3, and the
+  app launched and kept running. The new screens were **not** operated on
+  the phone by the developer; see the checklist below.
+- Not verified: any live OpenRouter request (sentence practice and
+  enrichment are tested only with mocked HTTP), the native file picker and
+  save dialog with a real backup file, Android.
+
+New suites:
+
+| File | Covers |
+| --- | --- |
+| `test/features/about/release_notes_test.dart` | Release gate: notes exist (fa + en) for the pubspec version/build and are newest; parsing, exact-build lookup, fallback, malformed files |
+| `test/widgets/about_flow_test.dart` | Settings → About: installed version/build from the platform source, notes of this build, "installed" note, RTL and English LTR, unknown build shows no notes |
+| `test/features/backup/backup_service_test.dart` | Round trip of every learning table, FSRS state and due queue preserved, review history incl. deleted words, file-backed reopen, settings and key never exported or overwritten, every validation error (not a backup, truncated, versions, checksum, missing fields, invalid values, duplicates, broken references, counts), off-isolate validation, replace with safety copy and undo, no change when the safety copy fails, rollback on a mid-restore failure, merge rules (empty, twice, local records and FSRS kept, deck/tag by name, duplicate words), safety copy rotation |
+| `test/widgets/backup_flow_test.dart` | Settings → Data, saving a file, preview without writes, merge, replace confirmation (cancel changes nothing), safety copy offered, invalid file error, failed safety copy, English LTR |
+| `test/drift/app_database/migration_test.dart` (extended) | v2 → v3 keeps every v2 table's rows unchanged and adds an empty sentence-practice table |
+| `test/features/sentence_practice/domain_test.dart` | Target-word matcher (forms, irregular, separable, expressions, rejections), word selection order, exercise validation (omitted word, wrong form, other word, ids, duplicates, scripts, German in the Persian prompt, lengths), feedback validation (contradictions, alternatives, caps) |
+| `test/features/sentence_practice/sentence_service_test.dart` | Request contents, free-only routing and zero price, paid answers blocked, free-only off, no key → no request, omitted target word, invalid/empty/cut-off JSON with free fallback, network, timeout, provider and platform 429, daily quota, invalid key, evaluation prompts and data |
+| `test/features/sentence_practice/sentence_repository_test.dart` | History recording, clear without touching words/FSRS/reviews, cascade on word delete |
+| `test/widgets/sentence_practice_flow_test.dart` | Full session from Today (answer hidden until checked/revealed, feedback, summary) with words/FSRS/review history unchanged and no answers stored; failed check keeps the answer; failed generation retry; unusable answers; no key; no words; clearing history; English understanding direction |
+
+## Manual checklist (Build 3, on the iPhone)
+
+1. Settings → About AI WortBox: version 1.0.0, build 3, "What's new in this
+   build" lists backup, About and sentence practice; earlier build 2 below.
+2. Your existing words, decks, due count and statistics are as before the
+   update.
+3. Settings → Backup and restore → Save backup file: save it to Files.
+   Then "Choose backup file" with that file: the preview
+   counts match "On device". Tap **Add**: the result says words were
+   already on the device; nothing changes.
+4. (Optional, only with a backup saved first) Replace: the confirmation
+   dialog explains what is deleted; cancel once and check nothing changed.
+5. Choose a non-backup file (e.g. a CSV): a clear error, "No data was
+   changed".
+6. Today → AI sentence practice: with your OpenRouter key, start a 3-word
+   B1 "Write" session; the German answer is hidden; write an answer and
+   check it; feedback appears; "Show model answer" on the next one; finish.
+   The due count on Today is unchanged.
+7. Repeat with "Understand" (German → Persian) and check that the answer
+   field is right-to-left.
+8. Turn on airplane mode and start a session: a clear error with "Try
+   again"; type an answer in a session and check it offline: the answer
+   stays.
+
 ## Phase 2 results (2026-10-15)
 
 - `dart format --set-exit-if-changed lib test`: 74 files, 0 changed

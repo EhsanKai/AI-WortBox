@@ -16,9 +16,11 @@ default, Persian → German or both).
 - **[Installation guide](docs/installation.md)**: build it onto your own
   iPhone with Xcode, distribute it through TestFlight, set up the optional
   OpenRouter key, and troubleshoot.
-- TestFlight status: **not yet available.** A release archive (1.0.0,
-  build 2) builds, but uploading needs a paid Apple Developer Program
-  account; see [the remaining steps](docs/installation.md#b-install-through-testflight).
+- Current release: **1.0.0, build 3** ([release notes](assets/release_notes.json),
+  [release process](docs/releases.md)). In the app: Settings → About AI
+  WortBox shows the installed version, build and its changes.
+- TestFlight status: **not yet available.** Uploading needs a paid Apple
+  Developer Program account; see [the remaining steps](docs/installation.md#b-install-through-testflight).
 
 ## Status
 
@@ -35,8 +37,10 @@ hidden until review, word selection directly on the page photo, reliable
 German pronunciation on iOS, and selecting/deleting several words
 (D42–D47).
 
-Not implemented: full backup/restore,
-images, and the other items recorded as **proposed — not approved** in the
+Build 3 (`1.0.0+3`, D54–D56): full backup and restore, the About screen
+with release notes, and AI sentence practice.
+
+Not implemented: images, and the other items recorded as **proposed — not approved** in the
 [roadmap](docs/implementation-plan.md#proposed-feature-register).
 
 See [docs/implementation-plan.md](docs/implementation-plan.md) and
@@ -135,14 +139,37 @@ See [docs/implementation-plan.md](docs/implementation-plan.md) and
 - **Anki import:** Add → Import from Anki (`.apkg`), through the same
   preview and duplicate handling as CSV.
 
+### Build 3 (1.0.0+3)
+
+- **Backup and restore** (Settings → Backup and restore): one JSON file
+  with all decks, words, meanings, tags, the FSRS review schedule, review
+  history and sentence-practice history. Restore checks the whole file
+  first, shows what it contains, then either **adds** what is missing
+  (nothing on the device is changed or deleted) or **replaces** everything
+  after an explicit confirmation. A safety copy of the current data is
+  saved first and the restore is all-or-nothing. Your OpenRouter key and
+  settings are never in a backup. Format: [docs/backup-format.md](docs/backup-format.md).
+- **About AI WortBox** (Settings): installed version, build number and the
+  changes in this build (Persian/English).
+- **AI sentence practice** (Today): write a Persian sentence in German with
+  a target word, or write the meaning of a German sentence in Persian;
+  levels A2–B2; 3, 5 or 8 of your own words (difficult, struggling and not
+  recently practised words first); feedback on the target word, grammar,
+  word order, spelling and capitalization, a natural version and a Persian
+  explanation; the model answer appears only after you answer or ask for
+  it. Uses your OpenRouter key with the same free-only rules as AI
+  suggestions. It never changes the FSRS schedule, review history or
+  statistics; only which word was practised, when and how it went is
+  saved.
+
 ### CSV export is not a backup
 
 The CSV file contains each word, its meanings, base form, part of speech,
 grammar, example and translation, notes and tags. It does **not** contain
 meaning explanations, sentence context, difficult marks, practice history and
 statistics, settings, or your API key (never exported). It is meant for
-spreadsheets, other apps and re-importing words; there is no full app backup
-yet.
+spreadsheets, other apps and re-importing words. For a full backup use
+Settings → Backup and restore.
 
 ## Platform build status
 
@@ -240,6 +267,8 @@ See [docs/testing.md](docs/testing.md) for what is covered.
 ## Documentation
 
 - [Installation and TestFlight](docs/installation.md)
+- [Releases: version, build and release notes](docs/releases.md)
+- [Backup file format](docs/backup-format.md)
 - [Implementation plan and roadmap](docs/implementation-plan.md)
 - [Phase working instructions](docs/claude-phase-instructions.md)
 - [Architecture](docs/architecture.md)
@@ -254,4 +283,6 @@ its sentence context and its existing meanings directly to OpenRouter, using
 your own key from the device's secure storage. No API key ships in the
 app. Phase 5 features (search, tags, practice, statistics, reminders,
 text-to-speech, export and Anki import) work entirely on the device;
-exported files contain no settings or keys.
+exported files and backups contain no settings or keys. AI sentence
+practice sends only the practised words, their saved meanings, the
+exercise sentence and (when you check it) your answer, only when you tap.

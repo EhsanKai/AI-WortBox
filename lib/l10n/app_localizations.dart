@@ -3373,6 +3373,882 @@ abstract class AppLocalizations {
   /// In fa, this message translates to:
   /// **'این لغت در اجرای دیگری در حال درخواست است. پس از پایان آن دوباره امتحان کنید.'**
   String get aiErrorBusy;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'درباره برنامه'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutTileDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخهٔ نصب‌شده و تغییرات هر نسخه'**
+  String get aboutTileDescription;
+
+  /// No description provided for @aboutTileVersion.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخهٔ {version} · ساخت {build}'**
+  String aboutTileVersion(String version, String build);
+
+  /// No description provided for @aboutInstalledTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخهٔ نصب‌شده روی این دستگاه'**
+  String get aboutInstalledTitle;
+
+  /// No description provided for @aboutVersion.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخه'**
+  String get aboutVersion;
+
+  /// No description provided for @aboutBuild.
+  ///
+  /// In fa, this message translates to:
+  /// **'شمارهٔ ساخت'**
+  String get aboutBuild;
+
+  /// No description provided for @aboutReleaseDate.
+  ///
+  /// In fa, this message translates to:
+  /// **'تاریخ انتشار'**
+  String get aboutReleaseDate;
+
+  /// No description provided for @aboutInstalledNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'این اطلاعات مربوط به همین نسخه‌ای است که الان روی دستگاه شما نصب و در حال اجراست، نه نسخهٔ جدیدتری که هنوز نصب نشده است. برنامه به‌روزرسانی‌ها را بررسی نمی‌کند.'**
+  String get aboutInstalledNote;
+
+  /// No description provided for @aboutChangesTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'تغییرات این نسخه'**
+  String get aboutChangesTitle;
+
+  /// No description provided for @aboutComparedWith.
+  ///
+  /// In fa, this message translates to:
+  /// **'در مقایسه با ساخت {build}'**
+  String aboutComparedWith(String build);
+
+  /// No description provided for @aboutNoNotes.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای این ساخت یادداشت انتشار ثبت نشده است.'**
+  String get aboutNoNotes;
+
+  /// No description provided for @aboutEarlierTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخه‌های قبلی'**
+  String get aboutEarlierTitle;
+
+  /// No description provided for @aboutReleaseHeading.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخهٔ {version} · ساخت {build}'**
+  String aboutReleaseHeading(String version, String build);
+
+  /// No description provided for @settingsData.
+  ///
+  /// In fa, this message translates to:
+  /// **'داده‌ها'**
+  String get settingsData;
+
+  /// No description provided for @backupTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'پشتیبان‌گیری و بازگردانی'**
+  String get backupTitle;
+
+  /// No description provided for @backupTileDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'یک فایل از همهٔ لغت‌ها و پیشرفت مرور شما'**
+  String get backupTileDescription;
+
+  /// No description provided for @backupIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل پشتیبان همهٔ داده‌های یادگیری شما را نگه می‌دارد تا بتوانید آن را روی همین دستگاه یا دستگاهی دیگر بازگردانید. فایل فقط روی دستگاه ساخته می‌شود و جایی فرستاده نمی‌شود؛ محل ذخیره را خودتان انتخاب می‌کنید.'**
+  String get backupIntro;
+
+  /// No description provided for @backupSaveTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیرهٔ فایل پشتیبان'**
+  String get backupSaveTitle;
+
+  /// No description provided for @backupIncludes.
+  ///
+  /// In fa, this message translates to:
+  /// **'شامل: دسته‌ها، لغت‌ها با همهٔ معنی‌ها و جزئیات، برچسب‌ها، برنامهٔ مرور (FSRS) و تاریخ‌های مرور بعدی، سابقهٔ مرور و سابقهٔ تمرین جمله.'**
+  String get backupIncludes;
+
+  /// No description provided for @backupExcludes.
+  ///
+  /// In fa, this message translates to:
+  /// **'شامل نیست: کلید OpenRouter و تنظیمات (یادآور، جهت مرور، تنظیمات هوش مصنوعی). فایل رمزگذاری نشده است؛ آن را در جای امن نگه دارید.'**
+  String get backupExcludes;
+
+  /// No description provided for @backupSaveButton.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیرهٔ فایل پشتیبان'**
+  String get backupSaveButton;
+
+  /// No description provided for @backupSaved.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل پشتیبان ذخیره شد.'**
+  String get backupSaved;
+
+  /// No description provided for @backupRestoreTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگردانی از فایل پشتیبان'**
+  String get backupRestoreTitle;
+
+  /// No description provided for @backupRestoreIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل پیش از هر تغییری کامل بررسی می‌شود. سپس محتوای آن را می‌بینید و انتخاب می‌کنید که داده‌ها اضافه شوند یا جایگزین. تا آن لحظه چیزی تغییر نمی‌کند.'**
+  String get backupRestoreIntro;
+
+  /// No description provided for @backupPickButton.
+  ///
+  /// In fa, this message translates to:
+  /// **'انتخاب فایل پشتیبان'**
+  String get backupPickButton;
+
+  /// No description provided for @backupSafetyCopyTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخهٔ ایمنی پیش از آخرین بازگردانی'**
+  String get backupSafetyCopyTitle;
+
+  /// No description provided for @backupSafetyCopySaved.
+  ///
+  /// In fa, this message translates to:
+  /// **'ذخیره‌شده در {date}'**
+  String backupSafetyCopySaved(String date);
+
+  /// No description provided for @backupBusySaving.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال ساخت فایل پشتیبان…'**
+  String get backupBusySaving;
+
+  /// No description provided for @backupBusyReading.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال بررسی فایل…'**
+  String get backupBusyReading;
+
+  /// No description provided for @backupBusyRestoring.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال بازگردانی… لطفاً برنامه را نبندید.'**
+  String get backupBusyRestoring;
+
+  /// No description provided for @backupPreviewTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'محتوای فایل پشتیبان'**
+  String get backupPreviewTitle;
+
+  /// No description provided for @backupPreviewExported.
+  ///
+  /// In fa, this message translates to:
+  /// **'ساخته‌شده در {date}'**
+  String backupPreviewExported(String date);
+
+  /// No description provided for @backupPreviewApp.
+  ///
+  /// In fa, this message translates to:
+  /// **'با نسخهٔ {version} (ساخت {build})'**
+  String backupPreviewApp(String version, String build);
+
+  /// No description provided for @backupPreviewSafetyCopy.
+  ///
+  /// In fa, this message translates to:
+  /// **'این نسخهٔ ایمنی، داده‌های همین دستگاه پیش از یک بازگردانی است.'**
+  String get backupPreviewSafetyCopy;
+
+  /// No description provided for @backupColumnFile.
+  ///
+  /// In fa, this message translates to:
+  /// **'در فایل'**
+  String get backupColumnFile;
+
+  /// No description provided for @backupColumnDevice.
+  ///
+  /// In fa, this message translates to:
+  /// **'روی دستگاه'**
+  String get backupColumnDevice;
+
+  /// No description provided for @backupCountDecks.
+  ///
+  /// In fa, this message translates to:
+  /// **'دسته‌ها'**
+  String get backupCountDecks;
+
+  /// No description provided for @backupCountWords.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌ها'**
+  String get backupCountWords;
+
+  /// No description provided for @backupCountCards.
+  ///
+  /// In fa, this message translates to:
+  /// **'کارت‌های زمان‌بندی‌شده (FSRS)'**
+  String get backupCountCards;
+
+  /// No description provided for @backupCountReviews.
+  ///
+  /// In fa, this message translates to:
+  /// **'سابقهٔ مرور'**
+  String get backupCountReviews;
+
+  /// No description provided for @backupCountTags.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب‌ها'**
+  String get backupCountTags;
+
+  /// No description provided for @backupCountSentences.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین‌های جمله'**
+  String get backupCountSentences;
+
+  /// No description provided for @backupChooseHow.
+  ///
+  /// In fa, this message translates to:
+  /// **'چطور بازگردانده شود؟'**
+  String get backupChooseHow;
+
+  /// No description provided for @backupMergeTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن به داده‌های فعلی'**
+  String get backupMergeTitle;
+
+  /// No description provided for @backupMergeBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'دسته‌ها، لغت‌ها، برچسب‌ها و سابقه‌ای که روی این دستگاه نیست اضافه می‌شود. هیچ چیزی روی دستگاه تغییر نمی‌کند یا حذف نمی‌شود. برای لغت‌هایی که از قبل روی دستگاه هست، برنامهٔ مرور همین دستگاه می‌ماند.'**
+  String get backupMergeBody;
+
+  /// No description provided for @backupMergeButton.
+  ///
+  /// In fa, this message translates to:
+  /// **'افزودن'**
+  String get backupMergeButton;
+
+  /// No description provided for @backupReplaceTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'جایگزینی همهٔ داده‌ها'**
+  String get backupReplaceTitle;
+
+  /// No description provided for @backupReplaceBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'همهٔ داده‌های یادگیری این دستگاه حذف و داده‌های فایل جای آن‌ها قرار می‌گیرد. پیش از آن یک نسخهٔ ایمنی روی دستگاه ذخیره می‌شود.'**
+  String get backupReplaceBody;
+
+  /// No description provided for @backupReplaceButton.
+  ///
+  /// In fa, this message translates to:
+  /// **'جایگزینی…'**
+  String get backupReplaceButton;
+
+  /// No description provided for @backupReplaceConfirmTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'همهٔ داده‌ها جایگزین شود؟'**
+  String get backupReplaceConfirmTitle;
+
+  /// No description provided for @backupReplaceConfirmBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'{words} لغت در {decks} دسته، همراه با برنامهٔ مرور، سابقهٔ مرور و سابقهٔ تمرین جمله، از این دستگاه حذف می‌شوند و داده‌های فایل پشتیبان ({date}) جای آن‌ها را می‌گیرند.\n\nپیش از آن یک نسخهٔ ایمنی از داده‌های فعلی روی همین دستگاه ذخیره می‌شود و از صفحهٔ پشتیبان‌گیری قابل بازگردانی است. تنظیمات و کلید OpenRouter تغییر نمی‌کنند.'**
+  String backupReplaceConfirmBody(int words, int decks, String date);
+
+  /// No description provided for @backupReplaceConfirm.
+  ///
+  /// In fa, this message translates to:
+  /// **'بله، همه را جایگزین کن'**
+  String get backupReplaceConfirm;
+
+  /// No description provided for @backupDoneMergeTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'داده‌های فایل اضافه شد'**
+  String get backupDoneMergeTitle;
+
+  /// No description provided for @backupDoneReplaceTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'داده‌ها بازگردانده شد'**
+  String get backupDoneReplaceTitle;
+
+  /// No description provided for @backupResultWords.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} لغت اضافه شد'**
+  String backupResultWords(int count);
+
+  /// No description provided for @backupResultPresent.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} لغت از قبل روی دستگاه بود و دست نخورد'**
+  String backupResultPresent(int count);
+
+  /// No description provided for @backupResultDecks.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} دستهٔ تازه'**
+  String backupResultDecks(int count);
+
+  /// No description provided for @backupResultCards.
+  ///
+  /// In fa, this message translates to:
+  /// **'برنامهٔ مرور (FSRS) {count} کارت بازگردانده شد'**
+  String backupResultCards(int count);
+
+  /// No description provided for @backupResultCardsKept.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای {count} کارت، برنامهٔ مرور همین دستگاه حفظ شد'**
+  String backupResultCardsKept(int count);
+
+  /// No description provided for @backupResultReviews.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} مورد سابقهٔ مرور'**
+  String backupResultReviews(int count);
+
+  /// No description provided for @backupResultSafety.
+  ///
+  /// In fa, this message translates to:
+  /// **'یک نسخهٔ ایمنی از داده‌های قبلی روی دستگاه ذخیره شد و از همین صفحه قابل بازگردانی است.'**
+  String get backupResultSafety;
+
+  /// No description provided for @backupDone.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمام'**
+  String get backupDone;
+
+  /// No description provided for @backupDismiss.
+  ///
+  /// In fa, this message translates to:
+  /// **'باشه'**
+  String get backupDismiss;
+
+  /// No description provided for @backupNothingChanged.
+  ///
+  /// In fa, this message translates to:
+  /// **'هیچ داده‌ای تغییر نکرد.'**
+  String get backupNothingChanged;
+
+  /// No description provided for @backupErrorLocation.
+  ///
+  /// In fa, this message translates to:
+  /// **'محل مشکل در فایل: {location}'**
+  String backupErrorLocation(String location);
+
+  /// No description provided for @backupErrorNotBackup.
+  ///
+  /// In fa, this message translates to:
+  /// **'این فایل، فایل پشتیبان AI WortBox نیست یا ناقص است.'**
+  String get backupErrorNotBackup;
+
+  /// No description provided for @backupErrorUnsupportedVersion.
+  ///
+  /// In fa, this message translates to:
+  /// **'این فایل با قالب جدیدتری ساخته شده است. برنامه را به‌روز کنید و دوباره امتحان کنید.'**
+  String get backupErrorUnsupportedVersion;
+
+  /// No description provided for @backupErrorNewerSchema.
+  ///
+  /// In fa, this message translates to:
+  /// **'این فایل با نسخهٔ جدیدتری از برنامه ساخته شده است. برنامه را به‌روز کنید و دوباره امتحان کنید.'**
+  String get backupErrorNewerSchema;
+
+  /// No description provided for @backupErrorCorrupted.
+  ///
+  /// In fa, this message translates to:
+  /// **'محتوای فایل تغییر کرده یا آسیب دیده است (کد بررسی مطابقت ندارد).'**
+  String get backupErrorCorrupted;
+
+  /// No description provided for @backupErrorMissingField.
+  ///
+  /// In fa, this message translates to:
+  /// **'اطلاعات لازم در فایل وجود ندارد.'**
+  String get backupErrorMissingField;
+
+  /// No description provided for @backupErrorInvalidValue.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل مقدار نامعتبری دارد.'**
+  String get backupErrorInvalidValue;
+
+  /// No description provided for @backupErrorDuplicate.
+  ///
+  /// In fa, this message translates to:
+  /// **'یک مورد در فایل دو بار آمده است.'**
+  String get backupErrorDuplicate;
+
+  /// No description provided for @backupErrorBrokenReference.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل به دسته، لغت یا برچسبی اشاره می‌کند که در آن نیست.'**
+  String get backupErrorBrokenReference;
+
+  /// No description provided for @backupErrorTooLarge.
+  ///
+  /// In fa, this message translates to:
+  /// **'فایل بزرگ‌تر از {mb} مگابایت است.'**
+  String backupErrorTooLarge(int mb);
+
+  /// No description provided for @backupErrorSafetyCopy.
+  ///
+  /// In fa, this message translates to:
+  /// **'نسخهٔ ایمنی داده‌های فعلی ذخیره نشد (شاید فضای دستگاه پر است)، بنابراین بازگردانی انجام نشد.'**
+  String get backupErrorSafetyCopy;
+
+  /// No description provided for @spTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین جمله با هوش مصنوعی'**
+  String get spTitle;
+
+  /// No description provided for @spTileDescription.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت‌هایتان را در جمله به کار ببرید و بازخورد بگیرید'**
+  String get spTileDescription;
+
+  /// No description provided for @spIntro.
+  ///
+  /// In fa, this message translates to:
+  /// **'هوش مصنوعی با لغت‌های ذخیره‌شدهٔ خودتان جمله‌های کوتاه می‌سازد. شما جمله را به آلمانی می‌نویسید یا معنی جملهٔ آلمانی را به فارسی، و بازخورد می‌گیرید.'**
+  String get spIntro;
+
+  /// No description provided for @spSeparateNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'این تمرین جدا از مرور زمان‌بندی‌شده است: برنامهٔ مرور (FSRS)، تاریخ‌های مرور، سابقهٔ مرور و آمار تغییر نمی‌کنند. فقط ثبت می‌شود کدام لغت کی و با چه نتیجه‌ای تمرین شد (نه پاسخ‌ها و نه متن هوش مصنوعی).'**
+  String get spSeparateNote;
+
+  /// No description provided for @spAiNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای ساختن جمله‌های هر جلسه یک درخواست، و برای بررسی هر پاسخ یک درخواست به OpenRouter با کلید خودتان فرستاده می‌شود، با همان تنظیمات هوش مصنوعی (در حالت پیش‌فرض فقط مدل‌های رایگان). فقط لغت، معنی‌های ذخیره‌شده، جملهٔ تمرین و هنگام بررسی پاسخ شما فرستاده می‌شود.'**
+  String get spAiNote;
+
+  /// No description provided for @spDirectionTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'نوع تمرین'**
+  String get spDirectionTitle;
+
+  /// No description provided for @spDirectionProduce.
+  ///
+  /// In fa, this message translates to:
+  /// **'ساختن جمله (فارسی ← آلمانی)'**
+  String get spDirectionProduce;
+
+  /// No description provided for @spDirectionProduceHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'یک جملهٔ فارسی را با لغت هدف به آلمانی بنویسید.'**
+  String get spDirectionProduceHint;
+
+  /// No description provided for @spDirectionUnderstand.
+  ///
+  /// In fa, this message translates to:
+  /// **'فهمیدن جمله (آلمانی ← فارسی)'**
+  String get spDirectionUnderstand;
+
+  /// No description provided for @spDirectionUnderstandHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'یک جملهٔ آلمانی را بخوانید و معنی آن را به فارسی بنویسید.'**
+  String get spDirectionUnderstandHint;
+
+  /// No description provided for @spLevelTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'سطح'**
+  String get spLevelTitle;
+
+  /// No description provided for @spLevelA2.
+  ///
+  /// In fa, this message translates to:
+  /// **'آسان (A2)'**
+  String get spLevelA2;
+
+  /// No description provided for @spLevelB1.
+  ///
+  /// In fa, this message translates to:
+  /// **'متوسط (B1)'**
+  String get spLevelB1;
+
+  /// No description provided for @spLevelB2.
+  ///
+  /// In fa, this message translates to:
+  /// **'دشوارتر (B2)'**
+  String get spLevelB2;
+
+  /// No description provided for @spSizeTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'تعداد لغت در هر جلسه'**
+  String get spSizeTitle;
+
+  /// No description provided for @spSizeWords.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} لغت'**
+  String spSizeWords(int count);
+
+  /// No description provided for @spTagLabel.
+  ///
+  /// In fa, this message translates to:
+  /// **'برچسب'**
+  String get spTagLabel;
+
+  /// No description provided for @spAllTags.
+  ///
+  /// In fa, this message translates to:
+  /// **'همهٔ برچسب‌ها'**
+  String get spAllTags;
+
+  /// No description provided for @spStart.
+  ///
+  /// In fa, this message translates to:
+  /// **'شروع تمرین'**
+  String get spStart;
+
+  /// No description provided for @spNeedsKey.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای این تمرین کلید OpenRouter لازم است.'**
+  String get spNeedsKey;
+
+  /// No description provided for @spOpenAiSettings.
+  ///
+  /// In fa, this message translates to:
+  /// **'تنظیمات هوش مصنوعی'**
+  String get spOpenAiSettings;
+
+  /// No description provided for @spHistoryCount.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} تمرین جمله ثبت شده است'**
+  String spHistoryCount(int count);
+
+  /// No description provided for @spClearHistory.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاک کردن سابقهٔ تمرین جمله'**
+  String get spClearHistory;
+
+  /// No description provided for @spClearConfirmTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'سابقهٔ تمرین جمله پاک شود؟'**
+  String get spClearConfirmTitle;
+
+  /// No description provided for @spClearConfirmBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'فقط سابقهٔ تمرین جمله پاک می‌شود. لغت‌ها، برنامهٔ مرور (FSRS) و سابقهٔ مرور دست نمی‌خورند.'**
+  String get spClearConfirmBody;
+
+  /// No description provided for @spClearConfirm.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاک کن'**
+  String get spClearConfirm;
+
+  /// No description provided for @spCleared.
+  ///
+  /// In fa, this message translates to:
+  /// **'سابقهٔ تمرین جمله پاک شد.'**
+  String get spCleared;
+
+  /// No description provided for @spGenerating.
+  ///
+  /// In fa, this message translates to:
+  /// **'در حال ساختن جمله با لغت‌های شما…'**
+  String get spGenerating;
+
+  /// No description provided for @spNoWordsTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغتی برای تمرین نیست'**
+  String get spNoWordsTitle;
+
+  /// No description provided for @spNoWordsBody.
+  ///
+  /// In fa, this message translates to:
+  /// **'برای تمرین جمله، لغت باید دست‌کم یک معنی ذخیره‌شده داشته باشد. دسته یا برچسب دیگری انتخاب کنید یا به لغت‌ها معنی اضافه کنید.'**
+  String get spNoWordsBody;
+
+  /// No description provided for @spGenerationFailedTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'جمله‌ها ساخته نشد'**
+  String get spGenerationFailedTitle;
+
+  /// No description provided for @spGenerationFailedHint.
+  ///
+  /// In fa, this message translates to:
+  /// **'چیزی ذخیره یا تغییر نکرد. «تلاش دوباره» یک درخواست تازه می‌فرستد؛ اگر محدودیت درخواست‌ها رسیده است، کمی بعد امتحان کنید.'**
+  String get spGenerationFailedHint;
+
+  /// No description provided for @spProgress.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین {current} از {total}'**
+  String spProgress(int current, int total);
+
+  /// No description provided for @spRejected.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} لغت کنار گذاشته شد، چون جملهٔ معتبری برای آن ساخته نشد.'**
+  String spRejected(int count);
+
+  /// No description provided for @spInstructionProduce.
+  ///
+  /// In fa, this message translates to:
+  /// **'این جمله را به آلمانی بنویسید و لغت هدف را به کار ببرید:'**
+  String get spInstructionProduce;
+
+  /// No description provided for @spInstructionUnderstand.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی این جمله را به فارسی بنویسید:'**
+  String get spInstructionUnderstand;
+
+  /// No description provided for @spTargetWord.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت هدف:'**
+  String get spTargetWord;
+
+  /// No description provided for @spAnswerLabelGerman.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ شما (آلمانی)'**
+  String get spAnswerLabelGerman;
+
+  /// No description provided for @spAnswerLabelPersian.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ شما (فارسی)'**
+  String get spAnswerLabelPersian;
+
+  /// No description provided for @spCheck.
+  ///
+  /// In fa, this message translates to:
+  /// **'بررسی پاسخ'**
+  String get spCheck;
+
+  /// No description provided for @spShowAnswer.
+  ///
+  /// In fa, this message translates to:
+  /// **'نمایش پاسخ نمونه'**
+  String get spShowAnswer;
+
+  /// No description provided for @spSkip.
+  ///
+  /// In fa, this message translates to:
+  /// **'رد شدن'**
+  String get spSkip;
+
+  /// No description provided for @spNext.
+  ///
+  /// In fa, this message translates to:
+  /// **'بعدی'**
+  String get spNext;
+
+  /// No description provided for @spFinish.
+  ///
+  /// In fa, this message translates to:
+  /// **'پایان'**
+  String get spFinish;
+
+  /// No description provided for @spCheckFailedKept.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ شما حفظ شد. می‌توانید دوباره «بررسی پاسخ» را بزنید.'**
+  String get spCheckFailedKept;
+
+  /// No description provided for @spVerdictCorrect.
+  ///
+  /// In fa, this message translates to:
+  /// **'درست'**
+  String get spVerdictCorrect;
+
+  /// No description provided for @spVerdictAcceptable.
+  ///
+  /// In fa, this message translates to:
+  /// **'درست، با بیانی دیگر'**
+  String get spVerdictAcceptable;
+
+  /// No description provided for @spVerdictMinor.
+  ///
+  /// In fa, this message translates to:
+  /// **'خطاهای کوچک'**
+  String get spVerdictMinor;
+
+  /// No description provided for @spVerdictIncorrect.
+  ///
+  /// In fa, this message translates to:
+  /// **'نادرست'**
+  String get spVerdictIncorrect;
+
+  /// No description provided for @spTargetCorrect.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت هدف: درست'**
+  String get spTargetCorrect;
+
+  /// No description provided for @spTargetIncorrect.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت هدف: نادرست به کار رفته یا فهمیده شده'**
+  String get spTargetIncorrect;
+
+  /// No description provided for @spTargetMissing.
+  ///
+  /// In fa, this message translates to:
+  /// **'لغت هدف: در پاسخ نیست'**
+  String get spTargetMissing;
+
+  /// No description provided for @spCorrectionsTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'اصلاح‌ها'**
+  String get spCorrectionsTitle;
+
+  /// No description provided for @spKindGrammar.
+  ///
+  /// In fa, this message translates to:
+  /// **'دستور زبان'**
+  String get spKindGrammar;
+
+  /// No description provided for @spKindWordOrder.
+  ///
+  /// In fa, this message translates to:
+  /// **'ترتیب کلمات'**
+  String get spKindWordOrder;
+
+  /// No description provided for @spKindSpelling.
+  ///
+  /// In fa, this message translates to:
+  /// **'املا'**
+  String get spKindSpelling;
+
+  /// No description provided for @spKindCapitalization.
+  ///
+  /// In fa, this message translates to:
+  /// **'حرف بزرگ'**
+  String get spKindCapitalization;
+
+  /// No description provided for @spKindVocabulary.
+  ///
+  /// In fa, this message translates to:
+  /// **'واژه'**
+  String get spKindVocabulary;
+
+  /// No description provided for @spKindMeaning.
+  ///
+  /// In fa, this message translates to:
+  /// **'معنی'**
+  String get spKindMeaning;
+
+  /// No description provided for @spCorrectedAnswer.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ شما با اصلاح‌های لازم'**
+  String get spCorrectedAnswer;
+
+  /// No description provided for @spNaturalVersion.
+  ///
+  /// In fa, this message translates to:
+  /// **'شکل طبیعی'**
+  String get spNaturalVersion;
+
+  /// No description provided for @spModelAnswer.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ نمونه'**
+  String get spModelAnswer;
+
+  /// No description provided for @spModelAnswerNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'پاسخ شما لازم نیست دقیقاً همین باشد.'**
+  String get spModelAnswerNote;
+
+  /// No description provided for @spDoneTitle.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین تمام شد'**
+  String get spDoneTitle;
+
+  /// No description provided for @spDoneCorrect.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} درست'**
+  String spDoneCorrect(int count);
+
+  /// No description provided for @spDoneMinor.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} با خطای کوچک'**
+  String spDoneMinor(int count);
+
+  /// No description provided for @spDoneIncorrect.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} نادرست'**
+  String spDoneIncorrect(int count);
+
+  /// No description provided for @spDoneUnchecked.
+  ///
+  /// In fa, this message translates to:
+  /// **'{count} بدون بررسی'**
+  String spDoneUnchecked(int count);
+
+  /// No description provided for @spDoneFsrsNote.
+  ///
+  /// In fa, this message translates to:
+  /// **'برنامهٔ مرور (FSRS) و آمار مرور تغییر نکرد.'**
+  String get spDoneFsrsNote;
+
+  /// No description provided for @spPracticeAgain.
+  ///
+  /// In fa, this message translates to:
+  /// **'تمرین دوباره'**
+  String get spPracticeAgain;
+
+  /// No description provided for @spBackToToday.
+  ///
+  /// In fa, this message translates to:
+  /// **'بازگشت به مرور امروز'**
+  String get spBackToToday;
 }
 
 class _AppLocalizationsDelegate

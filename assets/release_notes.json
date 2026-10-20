@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "releases": [
+    {
+      "version": "1.0.0",
+      "build": 3,
+      "date": "2026-10-20",
+      "changes": {
+        "fa": [
+          "پشتیبان‌گیری کامل و بازگردانی: همهٔ دسته‌ها، لغت‌ها، معنی‌ها، برچسب‌ها، برنامهٔ مرور (FSRS) و سابقهٔ مرور در یک فایل ذخیره می‌شوند. بازگردانی به دو صورت ممکن است: «افزودن به داده‌های فعلی» (چیزی حذف نمی‌شود) یا «جایگزینی همه» (با تأیید صریح و یک نسخهٔ ایمنی خودکار). کلید OpenRouter هرگز در فایل پشتیبان نیست.",
+          "صفحهٔ «درباره برنامه» در تنظیمات: نسخه و شمارهٔ ساخت نصب‌شده و تغییرات هر نسخه.",
+          "تمرین جمله با هوش مصنوعی (از «مرور امروز»): با لغت‌های خودتان جمله بفهمید یا جمله بسازید و بازخورد دستوری بگیرید. فقط مدل‌های رایگان (مثل قبل) و جدا از برنامهٔ مرور؛ زمان‌بندی FSRS تغییر نمی‌کند."
+        ],
+        "en": [
+          "Full backup and restore: all decks, words, meanings, tags, review schedule (FSRS) and review history in one file. Restore either adds to your current data (nothing is deleted) or replaces everything (explicit confirmation and an automatic safety copy). Your OpenRouter key is never in a backup.",
+          "About screen in Settings: the installed version, build number and the changes in each release.",
+          "AI sentence practice (from Today): understand or write German sentences with your own words and get grammar feedback. Free models only (as before) and separate from scheduled review; FSRS scheduling is not changed."
+        ]
+      }
+    },
+    {
+      "version": "1.0.0",
+      "build": 2,
+      "date": null,
+      "changes": {
+        "fa": [
+          "فیلتر «بدون معنی» در فهرست لغت‌ها، قابل ترکیب با جست‌وجو، برچسب، دسته و لغت‌های دشوار.",
+          "«معنی با هوش مصنوعی برای انتخاب‌شده‌ها»: فقط لغت‌های انتخاب‌شدهٔ بدون معنی، چند لغت در هر درخواست، با امکان ویرایش، پذیرش یا رد هر پیشنهاد پیش از ذخیره."
+        ],
+        "en": [
+          "\"Missing meaning\" filter in word lists, combinable with search, tags, decks and difficult words.",
+          "\"AI meanings for selected\": only selected words without a meaning, several per request; edit, accept or reject each suggestion before saving."
+        ]
+      }
+    }
+  ]
+}

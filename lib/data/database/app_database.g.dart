@@ -4298,6 +4298,456 @@ class AppSettingsCompanion extends UpdateCompanion<AppSettingRow> {
   }
 }
 
+class $SentencePracticeEventsTable extends SentencePracticeEvents
+    with TableInfo<$SentencePracticeEventsTable, SentencePracticeEventRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SentencePracticeEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _entryIdMeta = const VerificationMeta(
+    'entryId',
+  );
+  @override
+  late final GeneratedColumn<String> entryId = GeneratedColumn<String>(
+    'entry_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES vocabulary_entries (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SentencePracticeDirection, String>
+  direction =
+      GeneratedColumn<String>(
+        'direction',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<SentencePracticeDirection>(
+        $SentencePracticeEventsTable.$converterdirection,
+      );
+  @override
+  late final GeneratedColumnWithTypeConverter<SentenceLevel, String> level =
+      GeneratedColumn<String>(
+        'level',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<SentenceLevel>(
+        $SentencePracticeEventsTable.$converterlevel,
+      );
+  @override
+  late final GeneratedColumnWithTypeConverter<SentencePracticeOutcome, String>
+  outcome =
+      GeneratedColumn<String>(
+        'outcome',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<SentencePracticeOutcome>(
+        $SentencePracticeEventsTable.$converteroutcome,
+      );
+  static const VerificationMeta _practicedAtMeta = const VerificationMeta(
+    'practicedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> practicedAt = GeneratedColumn<DateTime>(
+    'practiced_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    entryId,
+    direction,
+    level,
+    outcome,
+    practicedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sentence_practice_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SentencePracticeEventRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('entry_id')) {
+      context.handle(
+        _entryIdMeta,
+        entryId.isAcceptableOrUnknown(data['entry_id']!, _entryIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entryIdMeta);
+    }
+    if (data.containsKey('practiced_at')) {
+      context.handle(
+        _practicedAtMeta,
+        practicedAt.isAcceptableOrUnknown(
+          data['practiced_at']!,
+          _practicedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_practicedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SentencePracticeEventRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SentencePracticeEventRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      entryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entry_id'],
+      )!,
+      direction: $SentencePracticeEventsTable.$converterdirection.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}direction'],
+        )!,
+      ),
+      level: $SentencePracticeEventsTable.$converterlevel.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}level'],
+        )!,
+      ),
+      outcome: $SentencePracticeEventsTable.$converteroutcome.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}outcome'],
+        )!,
+      ),
+      practicedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}practiced_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SentencePracticeEventsTable createAlias(String alias) {
+    return $SentencePracticeEventsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SentencePracticeDirection, String, String>
+  $converterdirection = const EnumNameConverter<SentencePracticeDirection>(
+    SentencePracticeDirection.values,
+  );
+  static JsonTypeConverter2<SentenceLevel, String, String> $converterlevel =
+      const EnumNameConverter<SentenceLevel>(SentenceLevel.values);
+  static JsonTypeConverter2<SentencePracticeOutcome, String, String>
+  $converteroutcome = const EnumNameConverter<SentencePracticeOutcome>(
+    SentencePracticeOutcome.values,
+  );
+}
+
+class SentencePracticeEventRow extends DataClass
+    implements Insertable<SentencePracticeEventRow> {
+  final String id;
+  final String entryId;
+  final SentencePracticeDirection direction;
+  final SentenceLevel level;
+  final SentencePracticeOutcome outcome;
+  final DateTime practicedAt;
+  const SentencePracticeEventRow({
+    required this.id,
+    required this.entryId,
+    required this.direction,
+    required this.level,
+    required this.outcome,
+    required this.practicedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['entry_id'] = Variable<String>(entryId);
+    {
+      map['direction'] = Variable<String>(
+        $SentencePracticeEventsTable.$converterdirection.toSql(direction),
+      );
+    }
+    {
+      map['level'] = Variable<String>(
+        $SentencePracticeEventsTable.$converterlevel.toSql(level),
+      );
+    }
+    {
+      map['outcome'] = Variable<String>(
+        $SentencePracticeEventsTable.$converteroutcome.toSql(outcome),
+      );
+    }
+    map['practiced_at'] = Variable<DateTime>(practicedAt);
+    return map;
+  }
+
+  SentencePracticeEventsCompanion toCompanion(bool nullToAbsent) {
+    return SentencePracticeEventsCompanion(
+      id: Value(id),
+      entryId: Value(entryId),
+      direction: Value(direction),
+      level: Value(level),
+      outcome: Value(outcome),
+      practicedAt: Value(practicedAt),
+    );
+  }
+
+  factory SentencePracticeEventRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SentencePracticeEventRow(
+      id: serializer.fromJson<String>(json['id']),
+      entryId: serializer.fromJson<String>(json['entryId']),
+      direction: $SentencePracticeEventsTable.$converterdirection.fromJson(
+        serializer.fromJson<String>(json['direction']),
+      ),
+      level: $SentencePracticeEventsTable.$converterlevel.fromJson(
+        serializer.fromJson<String>(json['level']),
+      ),
+      outcome: $SentencePracticeEventsTable.$converteroutcome.fromJson(
+        serializer.fromJson<String>(json['outcome']),
+      ),
+      practicedAt: serializer.fromJson<DateTime>(json['practicedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'entryId': serializer.toJson<String>(entryId),
+      'direction': serializer.toJson<String>(
+        $SentencePracticeEventsTable.$converterdirection.toJson(direction),
+      ),
+      'level': serializer.toJson<String>(
+        $SentencePracticeEventsTable.$converterlevel.toJson(level),
+      ),
+      'outcome': serializer.toJson<String>(
+        $SentencePracticeEventsTable.$converteroutcome.toJson(outcome),
+      ),
+      'practicedAt': serializer.toJson<DateTime>(practicedAt),
+    };
+  }
+
+  SentencePracticeEventRow copyWith({
+    String? id,
+    String? entryId,
+    SentencePracticeDirection? direction,
+    SentenceLevel? level,
+    SentencePracticeOutcome? outcome,
+    DateTime? practicedAt,
+  }) => SentencePracticeEventRow(
+    id: id ?? this.id,
+    entryId: entryId ?? this.entryId,
+    direction: direction ?? this.direction,
+    level: level ?? this.level,
+    outcome: outcome ?? this.outcome,
+    practicedAt: practicedAt ?? this.practicedAt,
+  );
+  SentencePracticeEventRow copyWithCompanion(
+    SentencePracticeEventsCompanion data,
+  ) {
+    return SentencePracticeEventRow(
+      id: data.id.present ? data.id.value : this.id,
+      entryId: data.entryId.present ? data.entryId.value : this.entryId,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      level: data.level.present ? data.level.value : this.level,
+      outcome: data.outcome.present ? data.outcome.value : this.outcome,
+      practicedAt: data.practicedAt.present
+          ? data.practicedAt.value
+          : this.practicedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SentencePracticeEventRow(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('direction: $direction, ')
+          ..write('level: $level, ')
+          ..write('outcome: $outcome, ')
+          ..write('practicedAt: $practicedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, entryId, direction, level, outcome, practicedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SentencePracticeEventRow &&
+          other.id == this.id &&
+          other.entryId == this.entryId &&
+          other.direction == this.direction &&
+          other.level == this.level &&
+          other.outcome == this.outcome &&
+          other.practicedAt == this.practicedAt);
+}
+
+class SentencePracticeEventsCompanion
+    extends UpdateCompanion<SentencePracticeEventRow> {
+  final Value<String> id;
+  final Value<String> entryId;
+  final Value<SentencePracticeDirection> direction;
+  final Value<SentenceLevel> level;
+  final Value<SentencePracticeOutcome> outcome;
+  final Value<DateTime> practicedAt;
+  final Value<int> rowid;
+  const SentencePracticeEventsCompanion({
+    this.id = const Value.absent(),
+    this.entryId = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.level = const Value.absent(),
+    this.outcome = const Value.absent(),
+    this.practicedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SentencePracticeEventsCompanion.insert({
+    required String id,
+    required String entryId,
+    required SentencePracticeDirection direction,
+    required SentenceLevel level,
+    required SentencePracticeOutcome outcome,
+    required DateTime practicedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       entryId = Value(entryId),
+       direction = Value(direction),
+       level = Value(level),
+       outcome = Value(outcome),
+       practicedAt = Value(practicedAt);
+  static Insertable<SentencePracticeEventRow> custom({
+    Expression<String>? id,
+    Expression<String>? entryId,
+    Expression<String>? direction,
+    Expression<String>? level,
+    Expression<String>? outcome,
+    Expression<DateTime>? practicedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entryId != null) 'entry_id': entryId,
+      if (direction != null) 'direction': direction,
+      if (level != null) 'level': level,
+      if (outcome != null) 'outcome': outcome,
+      if (practicedAt != null) 'practiced_at': practicedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SentencePracticeEventsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? entryId,
+    Value<SentencePracticeDirection>? direction,
+    Value<SentenceLevel>? level,
+    Value<SentencePracticeOutcome>? outcome,
+    Value<DateTime>? practicedAt,
+    Value<int>? rowid,
+  }) {
+    return SentencePracticeEventsCompanion(
+      id: id ?? this.id,
+      entryId: entryId ?? this.entryId,
+      direction: direction ?? this.direction,
+      level: level ?? this.level,
+      outcome: outcome ?? this.outcome,
+      practicedAt: practicedAt ?? this.practicedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (entryId.present) {
+      map['entry_id'] = Variable<String>(entryId.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<String>(
+        $SentencePracticeEventsTable.$converterdirection.toSql(direction.value),
+      );
+    }
+    if (level.present) {
+      map['level'] = Variable<String>(
+        $SentencePracticeEventsTable.$converterlevel.toSql(level.value),
+      );
+    }
+    if (outcome.present) {
+      map['outcome'] = Variable<String>(
+        $SentencePracticeEventsTable.$converteroutcome.toSql(outcome.value),
+      );
+    }
+    if (practicedAt.present) {
+      map['practiced_at'] = Variable<DateTime>(practicedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SentencePracticeEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('entryId: $entryId, ')
+          ..write('direction: $direction, ')
+          ..write('level: $level, ')
+          ..write('outcome: $outcome, ')
+          ..write('practicedAt: $practicedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4311,6 +4761,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $EntryTagsTable entryTags = $EntryTagsTable(this);
   late final $ReviewEventsTable reviewEvents = $ReviewEventsTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $SentencePracticeEventsTable sentencePracticeEvents =
+      $SentencePracticeEventsTable(this);
   late final Index idxEntriesDeckNormalized = Index(
     'idx_entries_deck_normalized',
     'CREATE INDEX idx_entries_deck_normalized ON vocabulary_entries (deck_id, normalized)',
@@ -4327,6 +4779,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_review_events_day',
     'CREATE INDEX idx_review_events_day ON review_events (local_day)',
   );
+  late final Index idxSentencePracticeEntry = Index(
+    'idx_sentence_practice_entry',
+    'CREATE INDEX idx_sentence_practice_entry ON sentence_practice_events (entry_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4340,10 +4796,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     entryTags,
     reviewEvents,
     appSettings,
+    sentencePracticeEvents,
     idxEntriesDeckNormalized,
     idxFlashcardsDue,
     idxEntryTagsTag,
     idxReviewEventsDay,
+    idxSentencePracticeEntry,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -4388,6 +4846,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('review_events', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'vocabulary_entries',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('sentence_practice_events', kind: UpdateKind.delete),
+      ],
     ),
   ]);
   @override
@@ -4900,6 +5367,31 @@ final class $$VocabularyEntriesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $SentencePracticeEventsTable,
+    List<SentencePracticeEventRow>
+  >
+  _sentencePracticeEventsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.sentencePracticeEvents,
+        aliasName: 'vocabulary_entries__id__sentence_practice_events__entry_id',
+      );
+
+  $$SentencePracticeEventsTableProcessedTableManager
+  get sentencePracticeEventsRefs {
+    final manager = $$SentencePracticeEventsTableTableManager(
+      $_db,
+      $_db.sentencePracticeEvents,
+    ).filter((f) => f.entryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _sentencePracticeEventsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$VocabularyEntriesTableFilterComposer
@@ -5137,6 +5629,32 @@ class $$VocabularyEntriesTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> sentencePracticeEventsRefs(
+    Expression<bool> Function($$SentencePracticeEventsTableFilterComposer f) f,
+  ) {
+    final $$SentencePracticeEventsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.sentencePracticeEvents,
+          getReferencedColumn: (t) => t.entryId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$SentencePracticeEventsTableFilterComposer(
+                $db: $db,
+                $table: $db.sentencePracticeEvents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -5494,6 +6012,32 @@ class $$VocabularyEntriesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> sentencePracticeEventsRefs<T extends Object>(
+    Expression<T> Function($$SentencePracticeEventsTableAnnotationComposer a) f,
+  ) {
+    final $$SentencePracticeEventsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.sentencePracticeEvents,
+          getReferencedColumn: (t) => t.entryId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$SentencePracticeEventsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.sentencePracticeEvents,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$VocabularyEntriesTableTableManager
@@ -5515,6 +6059,7 @@ class $$VocabularyEntriesTableTableManager
             bool flashcardsRefs,
             bool entryTagsRefs,
             bool reviewEventsRefs,
+            bool sentencePracticeEventsRefs,
           })
         > {
   $$VocabularyEntriesTableTableManager(
@@ -5646,6 +6191,7 @@ class $$VocabularyEntriesTableTableManager
                 flashcardsRefs = false,
                 entryTagsRefs = false,
                 reviewEventsRefs = false,
+                sentencePracticeEventsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -5654,6 +6200,7 @@ class $$VocabularyEntriesTableTableManager
                     if (flashcardsRefs) db.flashcards,
                     if (entryTagsRefs) db.entryTags,
                     if (reviewEventsRefs) db.reviewEvents,
+                    if (sentencePracticeEventsRefs) db.sentencePracticeEvents,
                   ],
                   addJoins:
                       <
@@ -5771,6 +6318,27 @@ class $$VocabularyEntriesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (sentencePracticeEventsRefs)
+                        await $_getPrefetchedData<
+                          VocabularyEntryRow,
+                          $VocabularyEntriesTable,
+                          SentencePracticeEventRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$VocabularyEntriesTableReferences
+                              ._sentencePracticeEventsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$VocabularyEntriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).sentencePracticeEventsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.entryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5797,6 +6365,7 @@ typedef $$VocabularyEntriesTableProcessedTableManager =
         bool flashcardsRefs,
         bool entryTagsRefs,
         bool reviewEventsRefs,
+        bool sentencePracticeEventsRefs,
       })
     >;
 typedef $$VocabularyMeaningsTableCreateCompanionBuilder =
@@ -7789,6 +8358,383 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSettingRow,
       PrefetchHooks Function()
     >;
+typedef $$SentencePracticeEventsTableCreateCompanionBuilder =
+    SentencePracticeEventsCompanion Function({
+      required String id,
+      required String entryId,
+      required SentencePracticeDirection direction,
+      required SentenceLevel level,
+      required SentencePracticeOutcome outcome,
+      required DateTime practicedAt,
+      Value<int> rowid,
+    });
+typedef $$SentencePracticeEventsTableUpdateCompanionBuilder =
+    SentencePracticeEventsCompanion Function({
+      Value<String> id,
+      Value<String> entryId,
+      Value<SentencePracticeDirection> direction,
+      Value<SentenceLevel> level,
+      Value<SentencePracticeOutcome> outcome,
+      Value<DateTime> practicedAt,
+      Value<int> rowid,
+    });
+
+final class $$SentencePracticeEventsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $SentencePracticeEventsTable,
+          SentencePracticeEventRow
+        > {
+  $$SentencePracticeEventsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $VocabularyEntriesTable _entryIdTable(_$AppDatabase db) =>
+      db.vocabularyEntries.createAlias(
+        'sentence_practice_events__entry_id__vocabulary_entries__id',
+      );
+
+  $$VocabularyEntriesTableProcessedTableManager get entryId {
+    final $_column = $_itemColumn<String>('entry_id')!;
+
+    final manager = $$VocabularyEntriesTableTableManager(
+      $_db,
+      $_db.vocabularyEntries,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_entryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$SentencePracticeEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $SentencePracticeEventsTable> {
+  $$SentencePracticeEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    SentencePracticeDirection,
+    SentencePracticeDirection,
+    String
+  >
+  get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SentenceLevel, SentenceLevel, String>
+  get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    SentencePracticeOutcome,
+    SentencePracticeOutcome,
+    String
+  >
+  get outcome => $composableBuilder(
+    column: $table.outcome,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get practicedAt => $composableBuilder(
+    column: $table.practicedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$VocabularyEntriesTableFilterComposer get entryId {
+    final $$VocabularyEntriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableFilterComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SentencePracticeEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SentencePracticeEventsTable> {
+  $$SentencePracticeEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get outcome => $composableBuilder(
+    column: $table.outcome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get practicedAt => $composableBuilder(
+    column: $table.practicedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$VocabularyEntriesTableOrderingComposer get entryId {
+    final $$VocabularyEntriesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.entryId,
+      referencedTable: $db.vocabularyEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VocabularyEntriesTableOrderingComposer(
+            $db: $db,
+            $table: $db.vocabularyEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SentencePracticeEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SentencePracticeEventsTable> {
+  $$SentencePracticeEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SentencePracticeDirection, String>
+  get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SentenceLevel, String> get level =>
+      $composableBuilder(column: $table.level, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SentencePracticeOutcome, String>
+  get outcome =>
+      $composableBuilder(column: $table.outcome, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get practicedAt => $composableBuilder(
+    column: $table.practicedAt,
+    builder: (column) => column,
+  );
+
+  $$VocabularyEntriesTableAnnotationComposer get entryId {
+    final $$VocabularyEntriesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.entryId,
+          referencedTable: $db.vocabularyEntries,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$VocabularyEntriesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.vocabularyEntries,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$SentencePracticeEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SentencePracticeEventsTable,
+          SentencePracticeEventRow,
+          $$SentencePracticeEventsTableFilterComposer,
+          $$SentencePracticeEventsTableOrderingComposer,
+          $$SentencePracticeEventsTableAnnotationComposer,
+          $$SentencePracticeEventsTableCreateCompanionBuilder,
+          $$SentencePracticeEventsTableUpdateCompanionBuilder,
+          (SentencePracticeEventRow, $$SentencePracticeEventsTableReferences),
+          SentencePracticeEventRow,
+          PrefetchHooks Function({bool entryId})
+        > {
+  $$SentencePracticeEventsTableTableManager(
+    _$AppDatabase db,
+    $SentencePracticeEventsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SentencePracticeEventsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$SentencePracticeEventsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$SentencePracticeEventsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> entryId = const Value.absent(),
+                Value<SentencePracticeDirection> direction =
+                    const Value.absent(),
+                Value<SentenceLevel> level = const Value.absent(),
+                Value<SentencePracticeOutcome> outcome = const Value.absent(),
+                Value<DateTime> practicedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SentencePracticeEventsCompanion(
+                id: id,
+                entryId: entryId,
+                direction: direction,
+                level: level,
+                outcome: outcome,
+                practicedAt: practicedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String entryId,
+                required SentencePracticeDirection direction,
+                required SentenceLevel level,
+                required SentencePracticeOutcome outcome,
+                required DateTime practicedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SentencePracticeEventsCompanion.insert(
+                id: id,
+                entryId: entryId,
+                direction: direction,
+                level: level,
+                outcome: outcome,
+                practicedAt: practicedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $SentencePracticeEventsTable,
+                    SentencePracticeEventRow
+                  >(table),
+                  $$SentencePracticeEventsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({entryId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (entryId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.entryId,
+                        referencedTable: $$SentencePracticeEventsTableReferences
+                            ._entryIdTable(db),
+                        referencedColumn:
+                            $$SentencePracticeEventsTableReferences
+                                ._entryIdTable(db)
+                                .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$SentencePracticeEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SentencePracticeEventsTable,
+      SentencePracticeEventRow,
+      $$SentencePracticeEventsTableFilterComposer,
+      $$SentencePracticeEventsTableOrderingComposer,
+      $$SentencePracticeEventsTableAnnotationComposer,
+      $$SentencePracticeEventsTableCreateCompanionBuilder,
+      $$SentencePracticeEventsTableUpdateCompanionBuilder,
+      (SentencePracticeEventRow, $$SentencePracticeEventsTableReferences),
+      SentencePracticeEventRow,
+      PrefetchHooks Function({bool entryId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7808,4 +8754,9 @@ class $AppDatabaseManager {
       $$ReviewEventsTableTableManager(_db, _db.reviewEvents);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$SentencePracticeEventsTableTableManager get sentencePracticeEvents =>
+      $$SentencePracticeEventsTableTableManager(
+        _db,
+        _db.sentencePracticeEvents,
+      );
 }

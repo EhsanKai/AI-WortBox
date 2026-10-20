@@ -314,3 +314,50 @@ final class AnkiImportException extends AppException {
   @override
   String toString() => 'AnkiImportException($error)';
 }
+
+/// Why a backup could not be created, read or restored.
+enum BackupError {
+  /// Not an AI WortBox backup file (not JSON, or another kind of file).
+  notBackup,
+
+  /// Written by a newer backup format than this app version understands.
+  unsupportedVersion,
+
+  /// Written by an app with a newer database schema.
+  newerSchema,
+
+  /// The content does not match its checksum (changed or damaged).
+  corrupted,
+
+  /// A required field is missing.
+  missingField,
+
+  /// A field has an invalid value (type, range, enum, date).
+  invalidValue,
+
+  /// The same id (or unique value) appears twice in the file.
+  duplicateId,
+
+  /// A record refers to a deck, word or tag that is not in the file.
+  brokenReference,
+
+  /// The file is larger than the backup limit.
+  tooLarge,
+
+  /// The current data could not be saved as a safety copy, so nothing was
+  /// restored.
+  safetyCopyFailed,
+}
+
+final class BackupException extends AppException {
+  const BackupException(this.error, {this.location});
+
+  final BackupError error;
+
+  /// Where in the file the problem is, e.g. `entries[3].deckId`. Contains
+  /// field names and positions only, never vocabulary content.
+  final String? location;
+
+  @override
+  String toString() => 'BackupException($error, $location)';
+}

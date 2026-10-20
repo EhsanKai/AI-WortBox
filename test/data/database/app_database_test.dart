@@ -64,8 +64,8 @@ void main() {
         ),
       );
 
-  test('creates schema version 2 with all tables', () async {
-    expect(db.schemaVersion, 2);
+  test('creates schema version 3 with all tables', () async {
+    expect(db.schemaVersion, 3);
     final tables = await db
         .customSelect(
           "SELECT name FROM sqlite_master WHERE type = 'table' "
@@ -79,6 +79,7 @@ void main() {
       'entry_tags',
       'flashcards',
       'review_events',
+      'sentence_practice_events',
       'tags',
       'vocabulary_entries',
       'vocabulary_meanings',

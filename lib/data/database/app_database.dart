@@ -4,6 +4,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import '../../core/config/app_config.dart';
 import '../../features/review/domain/flashcard.dart';
 import '../../features/review/domain/review_event.dart';
+import '../../features/sentence_practice/domain/sentence_practice.dart';
 import '../../features/vocabulary/domain/vocabulary_entry.dart';
 import '../../features/vocabulary/domain/vocabulary_search.dart';
 import 'app_database.steps.dart';
@@ -21,6 +22,7 @@ part 'app_database.g.dart';
     EntryTags,
     ReviewEvents,
     AppSettings,
+    SentencePracticeEvents,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -34,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   // `dart run drift_dev make-migrations` to export the schema and generate
   // migration tests. See docs/architecture.md.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,6 +60,12 @@ class AppDatabase extends _$AppDatabase {
         await m.createIndex(schema.idxEntryTagsTag);
         await m.createIndex(schema.idxReviewEventsDay);
         await _backfillSearchKeys();
+      },
+      from2To3: (m, schema) async {
+        // v3: sentence-practice history. Purely additive: a new table and
+        // its index; no existing row or column is touched.
+        await m.createTable(schema.sentencePracticeEvents);
+        await m.createIndex(schema.idxSentencePracticeEntry);
       },
     ),
     beforeOpen: (details) async {

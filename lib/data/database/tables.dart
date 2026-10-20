@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../features/review/domain/flashcard.dart';
 import '../../features/review/domain/review_event.dart';
+import '../../features/sentence_practice/domain/sentence_practice.dart';
 import '../../features/vocabulary/domain/vocabulary_entry.dart';
 
 // Schema conventions:
@@ -184,4 +185,23 @@ class AppSettings extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {key};
+}
+
+/// Sentence-practice history (schema v3): which word was practised, when,
+/// how and with what result. No answers or AI text are stored. Separate
+/// from `review_events`, so it never affects FSRS, statistics or streaks;
+/// deleting a word deletes its sentence-practice history.
+@DataClassName('SentencePracticeEventRow')
+@TableIndex(name: 'idx_sentence_practice_entry', columns: {#entryId})
+class SentencePracticeEvents extends Table {
+  TextColumn get id => text()();
+  TextColumn get entryId =>
+      text().references(VocabularyEntries, #id, onDelete: KeyAction.cascade)();
+  TextColumn get direction => textEnum<SentencePracticeDirection>()();
+  TextColumn get level => textEnum<SentenceLevel>()();
+  TextColumn get outcome => textEnum<SentencePracticeOutcome>()();
+  DateTimeColumn get practicedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
 }

@@ -55,6 +55,25 @@ abstract final class AppConfig {
   /// though media is not imported).
   static const int maxAnkiPackageBytes = 50 * 1024 * 1024;
 
+  // Full backup (docs/decisions.md, D54).
+  /// Largest backup file accepted for restore.
+  static const int maxBackupBytes = 100 * 1024 * 1024;
+
+  /// Safety copies of the data kept before restores (newest first).
+  static const int safetyBackupsKept = 3;
+
+  // Sentence practice (D55).
+  /// Target words per session: the choices and the default.
+  static const List<int> sentencePracticeSizes = [3, 5, 8];
+  static const int sentencePracticeDefaultSize = 5;
+
+  /// A word practised more recently than this is chosen only when fewer
+  /// other words are available.
+  static const Duration sentencePracticeRecent = Duration(days: 3);
+
+  /// Longest answer the learner can submit, in characters.
+  static const int sentenceAnswerMaxLength = 400;
+
   // Page scanning limits.
   /// Largest image file accepted for OCR (after the picker's downscaling).
   static const int maxScanImageBytes = 20 * 1024 * 1024;

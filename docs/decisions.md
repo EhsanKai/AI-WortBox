@@ -775,3 +775,103 @@ provider, backend or paid default.
   so no fixed saving is claimed.
 - The "Clear filters" chip now comes first in the chip row so it stays
   visible on narrow screens.
+
+## D54 — Full backup and restore (2026-10-20)
+
+Status: accepted (product owner request for Build 3; approves P3's backup
+part and follows D19).
+
+- Format: one versioned UTF-8 JSON file (`docs/backup-format.md`), not a
+  copy of the SQLite file: it is validated field by field, independent of
+  the schema version and readable by a person. `formatVersion` 1, the
+  schema version, app version/build, export time, counts and a SHA-256
+  checksum of the data. No ZIP: there are no media files yet.
+- Contents: every learning table with ids (decks, entries, meanings,
+  flashcards with the full FSRS state, tags, tag assignments, review
+  events incl. those of deleted words, sentence-practice history).
+  Excluded: the API key (never in the database) and all of `app_settings`
+  — restoring AI preferences could silently turn free-only mode off, and
+  reminders/review direction are device settings.
+- Validation before any write (`BackupCodec.decode`): types, enums, UTC
+  dates, ranges, unique ids and unique values, references, counts,
+  checksum, format and schema version. Background isolate above 256 KB.
+- Two modes, chosen after a preview of file vs. device counts: **merge**
+  (adds only; matched by id, deck/tag by name, words by the existing
+  duplicate rule; a word already present keeps its own FSRS state) and
+  **replace** (explicit confirmation dialog stating what is deleted).
+- Safety: a safety copy of the current data is written first (newest three
+  kept in the app support directory, restorable from the same screen); if
+  it cannot be written nothing is restored. The restore itself is one
+  transaction, so a failure leaves the database unchanged (tested with a
+  forced foreign-key failure).
+- Saving uses the existing export save dialog; choosing a file uses
+  `file_picker` (100 MB limit). No new dependency; `crypto` was already
+  used.
+- Not done: encryption, automatic periodic backups, cloud upload.
+
+## D55 — AI sentence practice (2026-10-20)
+
+Status: accepted (product owner request for Build 3).
+
+- Separate from scheduled review: it never reads or writes `flashcards`
+  or `review_events`, so FSRS state, due dates, statistics and streaks are
+  unaffected (widget test compares those tables before and after a
+  session). It never creates or edits vocabulary.
+- Words: entries with at least one non-blank meaning, optionally limited
+  to a deck and/or tag. Order (`selectPracticeWords`): words practised in
+  sentences within 3 days last; before them words marked difficult or
+  flagged by the Memory Coach rule (D52); then never practised, then the
+  longest ago; ties shuffled.
+- Directions: *write* (a Persian sentence is shown with the German target
+  word; the learner writes German) and *understand* (a German sentence is
+  shown; the learner writes its Persian meaning). Levels A2/B1/B2; 3, 5
+  or 8 words per session.
+- Requests: one request generates the whole session (words with base
+  form, word class and saved meanings only); one request checks one answer
+  (word, meanings, the sentence shown, the model answer, the learner's
+  answer). Both only on an explicit tap. Model answers stay hidden until the
+  learner checks an answer or taps "Show model answer".
+- AI policy: the free-only request loop (plan attempts, zero `max_price`,
+  zero-cost check of every answer, free-only fallback, shared retry budget)
+  moved unchanged from `OpenRouterEnrichmentService` into `OpenRouterChat`,
+  which both features use with the same client (pacing, rate limits, daily
+  quota, D32), key store and preferences. No new key storage, model list or
+  configuration; the existing enrichment tests pass unchanged.
+- Validation: strict JSON Schema where supported; every item is matched by
+  id and echoed word; the German sentence must contain the reported form
+  and `TargetWordMatcher` must recognise it as the word (case/umlaut-
+  insensitive stems, separable prefixes, the curated irregular forms of
+  D25); the Persian text must be Persian and contain no German words.
+  Invalid items are left out and reported; an unusable answer is malformed
+  (fallback per D41). Feedback must have a known verdict and target-word
+  status, a Persian explanation, and must not call an answer correct when
+  the target word is missing or misused. "acceptable" (a valid alternative)
+  is never an error.
+- Failures: generation errors show a recoverable state ("Try again" sends
+  a new request); a failed check keeps the typed answer.
+- History: schema v3 adds `sentence_practice_events` (id, entry, direction,
+  level, outcome, time; cascade on word delete). No answers or AI text are
+  stored. It can be cleared alone (confirmation) and is included in
+  backups. Additive migration, tested from real v2 data.
+- Limitations: the target-word check is heuristic (an unrecognised
+  irregular form drops that exercise; a word that merely contains the stem
+  may pass); feedback quality depends on the free model; no live OpenRouter
+  call has been made from this project.
+
+## D56 — Installed version and release notes in the app (2026-10-20)
+
+Status: accepted (product owner requirement for every release).
+
+- Settings → About AI WortBox shows the installed version and build read
+  from the platform with `package_info_plus` 10.2.2 (fluttercommunity.dev,
+  Flutter Favorite, iOS and Android; 150/160 pub points on 2026-10-20). It
+  replaces nothing; no hard-coded version in the UI.
+- Release notes live in `assets/release_notes.json` (Persian and English,
+  per build, optional accurate date), process in `docs/releases.md`. The
+  screen shows only the installed build's notes ("no notes recorded"
+  otherwise) and states that it describes the installed build; the app
+  does not check for updates.
+- A test ties `pubspec.yaml`'s version/build to the notes, so a release
+  without notes fails the test suite.
+- `AiWortBoxApp` takes an optional locale (default Persian) so tests
+  verify the English LTR layout; the shipped UI stays Persian (D8).

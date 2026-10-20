@@ -2430,4 +2430,586 @@ class AppLocalizationsFa extends AppLocalizations {
   @override
   String get aiErrorBusy =>
       'این لغت در اجرای دیگری در حال درخواست است. پس از پایان آن دوباره امتحان کنید.';
+
+  @override
+  String get aboutTitle => 'درباره برنامه';
+
+  @override
+  String get aboutTileDescription => 'نسخهٔ نصب‌شده و تغییرات هر نسخه';
+
+  @override
+  String aboutTileVersion(String version, String build) {
+    return 'نسخهٔ $version · ساخت $build';
+  }
+
+  @override
+  String get aboutInstalledTitle => 'نسخهٔ نصب‌شده روی این دستگاه';
+
+  @override
+  String get aboutVersion => 'نسخه';
+
+  @override
+  String get aboutBuild => 'شمارهٔ ساخت';
+
+  @override
+  String get aboutReleaseDate => 'تاریخ انتشار';
+
+  @override
+  String get aboutInstalledNote =>
+      'این اطلاعات مربوط به همین نسخه‌ای است که الان روی دستگاه شما نصب و در حال اجراست، نه نسخهٔ جدیدتری که هنوز نصب نشده است. برنامه به‌روزرسانی‌ها را بررسی نمی‌کند.';
+
+  @override
+  String get aboutChangesTitle => 'تغییرات این نسخه';
+
+  @override
+  String aboutComparedWith(String build) {
+    return 'در مقایسه با ساخت $build';
+  }
+
+  @override
+  String get aboutNoNotes => 'برای این ساخت یادداشت انتشار ثبت نشده است.';
+
+  @override
+  String get aboutEarlierTitle => 'نسخه‌های قبلی';
+
+  @override
+  String aboutReleaseHeading(String version, String build) {
+    return 'نسخهٔ $version · ساخت $build';
+  }
+
+  @override
+  String get settingsData => 'داده‌ها';
+
+  @override
+  String get backupTitle => 'پشتیبان‌گیری و بازگردانی';
+
+  @override
+  String get backupTileDescription =>
+      'یک فایل از همهٔ لغت‌ها و پیشرفت مرور شما';
+
+  @override
+  String get backupIntro =>
+      'فایل پشتیبان همهٔ داده‌های یادگیری شما را نگه می‌دارد تا بتوانید آن را روی همین دستگاه یا دستگاهی دیگر بازگردانید. فایل فقط روی دستگاه ساخته می‌شود و جایی فرستاده نمی‌شود؛ محل ذخیره را خودتان انتخاب می‌کنید.';
+
+  @override
+  String get backupSaveTitle => 'ذخیرهٔ فایل پشتیبان';
+
+  @override
+  String get backupIncludes =>
+      'شامل: دسته‌ها، لغت‌ها با همهٔ معنی‌ها و جزئیات، برچسب‌ها، برنامهٔ مرور (FSRS) و تاریخ‌های مرور بعدی، سابقهٔ مرور و سابقهٔ تمرین جمله.';
+
+  @override
+  String get backupExcludes =>
+      'شامل نیست: کلید OpenRouter و تنظیمات (یادآور، جهت مرور، تنظیمات هوش مصنوعی). فایل رمزگذاری نشده است؛ آن را در جای امن نگه دارید.';
+
+  @override
+  String get backupSaveButton => 'ذخیرهٔ فایل پشتیبان';
+
+  @override
+  String get backupSaved => 'فایل پشتیبان ذخیره شد.';
+
+  @override
+  String get backupRestoreTitle => 'بازگردانی از فایل پشتیبان';
+
+  @override
+  String get backupRestoreIntro =>
+      'فایل پیش از هر تغییری کامل بررسی می‌شود. سپس محتوای آن را می‌بینید و انتخاب می‌کنید که داده‌ها اضافه شوند یا جایگزین. تا آن لحظه چیزی تغییر نمی‌کند.';
+
+  @override
+  String get backupPickButton => 'انتخاب فایل پشتیبان';
+
+  @override
+  String get backupSafetyCopyTitle => 'نسخهٔ ایمنی پیش از آخرین بازگردانی';
+
+  @override
+  String backupSafetyCopySaved(String date) {
+    return 'ذخیره‌شده در $date';
+  }
+
+  @override
+  String get backupBusySaving => 'در حال ساخت فایل پشتیبان…';
+
+  @override
+  String get backupBusyReading => 'در حال بررسی فایل…';
+
+  @override
+  String get backupBusyRestoring => 'در حال بازگردانی… لطفاً برنامه را نبندید.';
+
+  @override
+  String get backupPreviewTitle => 'محتوای فایل پشتیبان';
+
+  @override
+  String backupPreviewExported(String date) {
+    return 'ساخته‌شده در $date';
+  }
+
+  @override
+  String backupPreviewApp(String version, String build) {
+    return 'با نسخهٔ $version (ساخت $build)';
+  }
+
+  @override
+  String get backupPreviewSafetyCopy =>
+      'این نسخهٔ ایمنی، داده‌های همین دستگاه پیش از یک بازگردانی است.';
+
+  @override
+  String get backupColumnFile => 'در فایل';
+
+  @override
+  String get backupColumnDevice => 'روی دستگاه';
+
+  @override
+  String get backupCountDecks => 'دسته‌ها';
+
+  @override
+  String get backupCountWords => 'لغت‌ها';
+
+  @override
+  String get backupCountCards => 'کارت‌های زمان‌بندی‌شده (FSRS)';
+
+  @override
+  String get backupCountReviews => 'سابقهٔ مرور';
+
+  @override
+  String get backupCountTags => 'برچسب‌ها';
+
+  @override
+  String get backupCountSentences => 'تمرین‌های جمله';
+
+  @override
+  String get backupChooseHow => 'چطور بازگردانده شود؟';
+
+  @override
+  String get backupMergeTitle => 'افزودن به داده‌های فعلی';
+
+  @override
+  String get backupMergeBody =>
+      'دسته‌ها، لغت‌ها، برچسب‌ها و سابقه‌ای که روی این دستگاه نیست اضافه می‌شود. هیچ چیزی روی دستگاه تغییر نمی‌کند یا حذف نمی‌شود. برای لغت‌هایی که از قبل روی دستگاه هست، برنامهٔ مرور همین دستگاه می‌ماند.';
+
+  @override
+  String get backupMergeButton => 'افزودن';
+
+  @override
+  String get backupReplaceTitle => 'جایگزینی همهٔ داده‌ها';
+
+  @override
+  String get backupReplaceBody =>
+      'همهٔ داده‌های یادگیری این دستگاه حذف و داده‌های فایل جای آن‌ها قرار می‌گیرد. پیش از آن یک نسخهٔ ایمنی روی دستگاه ذخیره می‌شود.';
+
+  @override
+  String get backupReplaceButton => 'جایگزینی…';
+
+  @override
+  String get backupReplaceConfirmTitle => 'همهٔ داده‌ها جایگزین شود؟';
+
+  @override
+  String backupReplaceConfirmBody(int words, int decks, String date) {
+    final intl.NumberFormat wordsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String wordsString = wordsNumberFormat.format(words);
+    final intl.NumberFormat decksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String decksString = decksNumberFormat.format(decks);
+
+    return '$wordsString لغت در $decksString دسته، همراه با برنامهٔ مرور، سابقهٔ مرور و سابقهٔ تمرین جمله، از این دستگاه حذف می‌شوند و داده‌های فایل پشتیبان ($date) جای آن‌ها را می‌گیرند.\n\nپیش از آن یک نسخهٔ ایمنی از داده‌های فعلی روی همین دستگاه ذخیره می‌شود و از صفحهٔ پشتیبان‌گیری قابل بازگردانی است. تنظیمات و کلید OpenRouter تغییر نمی‌کنند.';
+  }
+
+  @override
+  String get backupReplaceConfirm => 'بله، همه را جایگزین کن';
+
+  @override
+  String get backupDoneMergeTitle => 'داده‌های فایل اضافه شد';
+
+  @override
+  String get backupDoneReplaceTitle => 'داده‌ها بازگردانده شد';
+
+  @override
+  String backupResultWords(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString لغت اضافه شد';
+  }
+
+  @override
+  String backupResultPresent(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString لغت از قبل روی دستگاه بود و دست نخورد';
+  }
+
+  @override
+  String backupResultDecks(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString دستهٔ تازه';
+  }
+
+  @override
+  String backupResultCards(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'برنامهٔ مرور (FSRS) $countString کارت بازگردانده شد';
+  }
+
+  @override
+  String backupResultCardsKept(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'برای $countString کارت، برنامهٔ مرور همین دستگاه حفظ شد';
+  }
+
+  @override
+  String backupResultReviews(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString مورد سابقهٔ مرور';
+  }
+
+  @override
+  String get backupResultSafety =>
+      'یک نسخهٔ ایمنی از داده‌های قبلی روی دستگاه ذخیره شد و از همین صفحه قابل بازگردانی است.';
+
+  @override
+  String get backupDone => 'تمام';
+
+  @override
+  String get backupDismiss => 'باشه';
+
+  @override
+  String get backupNothingChanged => 'هیچ داده‌ای تغییر نکرد.';
+
+  @override
+  String backupErrorLocation(String location) {
+    return 'محل مشکل در فایل: $location';
+  }
+
+  @override
+  String get backupErrorNotBackup =>
+      'این فایل، فایل پشتیبان AI WortBox نیست یا ناقص است.';
+
+  @override
+  String get backupErrorUnsupportedVersion =>
+      'این فایل با قالب جدیدتری ساخته شده است. برنامه را به‌روز کنید و دوباره امتحان کنید.';
+
+  @override
+  String get backupErrorNewerSchema =>
+      'این فایل با نسخهٔ جدیدتری از برنامه ساخته شده است. برنامه را به‌روز کنید و دوباره امتحان کنید.';
+
+  @override
+  String get backupErrorCorrupted =>
+      'محتوای فایل تغییر کرده یا آسیب دیده است (کد بررسی مطابقت ندارد).';
+
+  @override
+  String get backupErrorMissingField => 'اطلاعات لازم در فایل وجود ندارد.';
+
+  @override
+  String get backupErrorInvalidValue => 'فایل مقدار نامعتبری دارد.';
+
+  @override
+  String get backupErrorDuplicate => 'یک مورد در فایل دو بار آمده است.';
+
+  @override
+  String get backupErrorBrokenReference =>
+      'فایل به دسته، لغت یا برچسبی اشاره می‌کند که در آن نیست.';
+
+  @override
+  String backupErrorTooLarge(int mb) {
+    final intl.NumberFormat mbNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String mbString = mbNumberFormat.format(mb);
+
+    return 'فایل بزرگ‌تر از $mbString مگابایت است.';
+  }
+
+  @override
+  String get backupErrorSafetyCopy =>
+      'نسخهٔ ایمنی داده‌های فعلی ذخیره نشد (شاید فضای دستگاه پر است)، بنابراین بازگردانی انجام نشد.';
+
+  @override
+  String get spTitle => 'تمرین جمله با هوش مصنوعی';
+
+  @override
+  String get spTileDescription =>
+      'لغت‌هایتان را در جمله به کار ببرید و بازخورد بگیرید';
+
+  @override
+  String get spIntro =>
+      'هوش مصنوعی با لغت‌های ذخیره‌شدهٔ خودتان جمله‌های کوتاه می‌سازد. شما جمله را به آلمانی می‌نویسید یا معنی جملهٔ آلمانی را به فارسی، و بازخورد می‌گیرید.';
+
+  @override
+  String get spSeparateNote =>
+      'این تمرین جدا از مرور زمان‌بندی‌شده است: برنامهٔ مرور (FSRS)، تاریخ‌های مرور، سابقهٔ مرور و آمار تغییر نمی‌کنند. فقط ثبت می‌شود کدام لغت کی و با چه نتیجه‌ای تمرین شد (نه پاسخ‌ها و نه متن هوش مصنوعی).';
+
+  @override
+  String get spAiNote =>
+      'برای ساختن جمله‌های هر جلسه یک درخواست، و برای بررسی هر پاسخ یک درخواست به OpenRouter با کلید خودتان فرستاده می‌شود، با همان تنظیمات هوش مصنوعی (در حالت پیش‌فرض فقط مدل‌های رایگان). فقط لغت، معنی‌های ذخیره‌شده، جملهٔ تمرین و هنگام بررسی پاسخ شما فرستاده می‌شود.';
+
+  @override
+  String get spDirectionTitle => 'نوع تمرین';
+
+  @override
+  String get spDirectionProduce => 'ساختن جمله (فارسی ← آلمانی)';
+
+  @override
+  String get spDirectionProduceHint =>
+      'یک جملهٔ فارسی را با لغت هدف به آلمانی بنویسید.';
+
+  @override
+  String get spDirectionUnderstand => 'فهمیدن جمله (آلمانی ← فارسی)';
+
+  @override
+  String get spDirectionUnderstandHint =>
+      'یک جملهٔ آلمانی را بخوانید و معنی آن را به فارسی بنویسید.';
+
+  @override
+  String get spLevelTitle => 'سطح';
+
+  @override
+  String get spLevelA2 => 'آسان (A2)';
+
+  @override
+  String get spLevelB1 => 'متوسط (B1)';
+
+  @override
+  String get spLevelB2 => 'دشوارتر (B2)';
+
+  @override
+  String get spSizeTitle => 'تعداد لغت در هر جلسه';
+
+  @override
+  String spSizeWords(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString لغت';
+  }
+
+  @override
+  String get spTagLabel => 'برچسب';
+
+  @override
+  String get spAllTags => 'همهٔ برچسب‌ها';
+
+  @override
+  String get spStart => 'شروع تمرین';
+
+  @override
+  String get spNeedsKey => 'برای این تمرین کلید OpenRouter لازم است.';
+
+  @override
+  String get spOpenAiSettings => 'تنظیمات هوش مصنوعی';
+
+  @override
+  String spHistoryCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString تمرین جمله ثبت شده است';
+  }
+
+  @override
+  String get spClearHistory => 'پاک کردن سابقهٔ تمرین جمله';
+
+  @override
+  String get spClearConfirmTitle => 'سابقهٔ تمرین جمله پاک شود؟';
+
+  @override
+  String get spClearConfirmBody =>
+      'فقط سابقهٔ تمرین جمله پاک می‌شود. لغت‌ها، برنامهٔ مرور (FSRS) و سابقهٔ مرور دست نمی‌خورند.';
+
+  @override
+  String get spClearConfirm => 'پاک کن';
+
+  @override
+  String get spCleared => 'سابقهٔ تمرین جمله پاک شد.';
+
+  @override
+  String get spGenerating => 'در حال ساختن جمله با لغت‌های شما…';
+
+  @override
+  String get spNoWordsTitle => 'لغتی برای تمرین نیست';
+
+  @override
+  String get spNoWordsBody =>
+      'برای تمرین جمله، لغت باید دست‌کم یک معنی ذخیره‌شده داشته باشد. دسته یا برچسب دیگری انتخاب کنید یا به لغت‌ها معنی اضافه کنید.';
+
+  @override
+  String get spGenerationFailedTitle => 'جمله‌ها ساخته نشد';
+
+  @override
+  String get spGenerationFailedHint =>
+      'چیزی ذخیره یا تغییر نکرد. «تلاش دوباره» یک درخواست تازه می‌فرستد؛ اگر محدودیت درخواست‌ها رسیده است، کمی بعد امتحان کنید.';
+
+  @override
+  String spProgress(int current, int total) {
+    final intl.NumberFormat currentNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String currentString = currentNumberFormat.format(current);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return 'تمرین $currentString از $totalString';
+  }
+
+  @override
+  String spRejected(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString لغت کنار گذاشته شد، چون جملهٔ معتبری برای آن ساخته نشد.';
+  }
+
+  @override
+  String get spInstructionProduce =>
+      'این جمله را به آلمانی بنویسید و لغت هدف را به کار ببرید:';
+
+  @override
+  String get spInstructionUnderstand => 'معنی این جمله را به فارسی بنویسید:';
+
+  @override
+  String get spTargetWord => 'لغت هدف:';
+
+  @override
+  String get spAnswerLabelGerman => 'پاسخ شما (آلمانی)';
+
+  @override
+  String get spAnswerLabelPersian => 'پاسخ شما (فارسی)';
+
+  @override
+  String get spCheck => 'بررسی پاسخ';
+
+  @override
+  String get spShowAnswer => 'نمایش پاسخ نمونه';
+
+  @override
+  String get spSkip => 'رد شدن';
+
+  @override
+  String get spNext => 'بعدی';
+
+  @override
+  String get spFinish => 'پایان';
+
+  @override
+  String get spCheckFailedKept =>
+      'پاسخ شما حفظ شد. می‌توانید دوباره «بررسی پاسخ» را بزنید.';
+
+  @override
+  String get spVerdictCorrect => 'درست';
+
+  @override
+  String get spVerdictAcceptable => 'درست، با بیانی دیگر';
+
+  @override
+  String get spVerdictMinor => 'خطاهای کوچک';
+
+  @override
+  String get spVerdictIncorrect => 'نادرست';
+
+  @override
+  String get spTargetCorrect => 'لغت هدف: درست';
+
+  @override
+  String get spTargetIncorrect => 'لغت هدف: نادرست به کار رفته یا فهمیده شده';
+
+  @override
+  String get spTargetMissing => 'لغت هدف: در پاسخ نیست';
+
+  @override
+  String get spCorrectionsTitle => 'اصلاح‌ها';
+
+  @override
+  String get spKindGrammar => 'دستور زبان';
+
+  @override
+  String get spKindWordOrder => 'ترتیب کلمات';
+
+  @override
+  String get spKindSpelling => 'املا';
+
+  @override
+  String get spKindCapitalization => 'حرف بزرگ';
+
+  @override
+  String get spKindVocabulary => 'واژه';
+
+  @override
+  String get spKindMeaning => 'معنی';
+
+  @override
+  String get spCorrectedAnswer => 'پاسخ شما با اصلاح‌های لازم';
+
+  @override
+  String get spNaturalVersion => 'شکل طبیعی';
+
+  @override
+  String get spModelAnswer => 'پاسخ نمونه';
+
+  @override
+  String get spModelAnswerNote => 'پاسخ شما لازم نیست دقیقاً همین باشد.';
+
+  @override
+  String get spDoneTitle => 'تمرین تمام شد';
+
+  @override
+  String spDoneCorrect(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString درست';
+  }
+
+  @override
+  String spDoneMinor(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString با خطای کوچک';
+  }
+
+  @override
+  String spDoneIncorrect(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString نادرست';
+  }
+
+  @override
+  String spDoneUnchecked(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString بدون بررسی';
+  }
+
+  @override
+  String get spDoneFsrsNote => 'برنامهٔ مرور (FSRS) و آمار مرور تغییر نکرد.';
+
+  @override
+  String get spPracticeAgain => 'تمرین دوباره';
+
+  @override
+  String get spBackToToday => 'بازگشت به مرور امروز';
 }

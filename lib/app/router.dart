@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/config/app_config.dart';
+import '../features/about/presentation/about_screen.dart';
 import '../features/add_vocabulary/presentation/add_vocabulary_screen.dart';
+import '../features/backup/presentation/backup_screen.dart';
 import '../features/csv_import/presentation/csv_import_screen.dart';
 import '../features/dashboard/presentation/today_screen.dart';
 import '../features/decks/presentation/deck_detail_screen.dart';
@@ -13,6 +16,10 @@ import '../features/review/presentation/memory_coach_screen.dart';
 import '../features/review/presentation/practice_controller.dart';
 import '../features/review/presentation/practice_screen.dart';
 import '../features/scan/presentation/scan_screen.dart';
+import '../features/sentence_practice/domain/sentence_practice.dart';
+import '../features/sentence_practice/presentation/sentence_practice_controller.dart';
+import '../features/sentence_practice/presentation/sentence_practice_session_screen.dart';
+import '../features/sentence_practice/presentation/sentence_practice_setup_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/statistics/presentation/statistics_screen.dart';
 import '../features/tags/presentation/tags_screen.dart';
@@ -33,6 +40,8 @@ abstract final class AppRoutes {
   static const scan = '$add/scan';
   static const aiSettings = '$settings/ai';
   static const reminders = '$settings/reminder';
+  static const about = '$settings/about';
+  static const backup = '$settings/backup';
   static const ankiImport = '$add/anki';
   static const search = '$words/search';
   static const tags = '$words/tags';
@@ -40,6 +49,42 @@ abstract final class AppRoutes {
 
   /// The Memory Coach: words that need practice.
   static const memoryCoach = '$today/coach';
+
+  /// AI sentence practice (not scheduled review).
+  static const sentencePractice = '$today/sentences';
+
+  static String sentenceSession(SentenceSessionConfig c) => Uri(
+    path: '$sentencePractice/session',
+    queryParameters: {
+      'direction': c.direction.name,
+      'level': c.level.name,
+      'size': '${c.size}',
+      'deckId': ?c.deckId,
+      'tagId': ?c.tagId,
+    },
+  ).toString();
+
+  /// Reads [sentenceSession]'s parameters; unknown values fall back to the
+  /// defaults.
+  static SentenceSessionConfig sentenceConfigFrom(Map<String, String> q) {
+    const defaults = SentenceSessionConfig();
+    T byName<T extends Enum>(List<T> values, String? name, T fallback) =>
+        values.where((v) => v.name == name).firstOrNull ?? fallback;
+    final size = int.tryParse(q['size'] ?? '');
+    return SentenceSessionConfig(
+      direction: byName(
+        SentencePracticeDirection.values,
+        q['direction'],
+        defaults.direction,
+      ),
+      level: byName(SentenceLevel.values, q['level'], defaults.level),
+      size: AppConfig.sentencePracticeSizes.contains(size)
+          ? size!
+          : defaults.size,
+      deckId: q['deckId'],
+      tagId: q['tagId'],
+    );
+  }
 
   /// A scheduled (FSRS) review session, or free practice with [free],
   /// [difficultOnly] or [coach] (the Memory Coach's words).
@@ -115,6 +160,20 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                 GoRoute(
                   path: 'coach',
                   builder: (_, _) => const MemoryCoachScreen(),
+                ),
+                GoRoute(
+                  path: 'sentences',
+                  builder: (_, _) => const SentencePracticeSetupScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'session',
+                      builder: (_, state) => SentencePracticeSessionScreen(
+                        config: AppRoutes.sentenceConfigFrom(
+                          state.uri.queryParameters,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -255,6 +314,11 @@ GoRouter createRouter({String initialLocation = AppRoutes.today}) => GoRouter(
                 GoRoute(
                   path: 'reminder',
                   builder: (_, _) => const ReminderScreen(),
+                ),
+                GoRoute(path: 'about', builder: (_, _) => const AboutScreen()),
+                GoRoute(
+                  path: 'backup',
+                  builder: (_, _) => const BackupScreen(),
                 ),
               ],
             ),

@@ -404,6 +404,10 @@ abstract final class EnrichmentParser {
     return (pos: p, grammar: g, lemma: l);
   }
 
+  /// Decodes a model's JSON answer (also inside a Markdown code fence).
+  /// Throws `malformedResponse` when it is not a JSON object or array.
+  static Object? decodeJson(String content) => _decode(content);
+
   static Object? _decode(String content) {
     var text = content.trim();
     // Some models wrap JSON in a Markdown code fence despite the schema.

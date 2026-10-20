@@ -2470,4 +2470,641 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiErrorBusy =>
       'This word is already being requested in another run. Try again when it has finished.';
+
+  @override
+  String get aboutTitle => 'About AI WortBox';
+
+  @override
+  String get aboutTileDescription => 'Installed version and what changed';
+
+  @override
+  String aboutTileVersion(String version, String build) {
+    return 'Version $version · build $build';
+  }
+
+  @override
+  String get aboutInstalledTitle => 'Installed on this device';
+
+  @override
+  String get aboutVersion => 'Version';
+
+  @override
+  String get aboutBuild => 'Build number';
+
+  @override
+  String get aboutReleaseDate => 'Release date';
+
+  @override
+  String get aboutInstalledNote =>
+      'This describes the version installed and running on this device right now, not a newer version that has not been installed. The app does not check for updates.';
+
+  @override
+  String get aboutChangesTitle => 'What\'s new in this build';
+
+  @override
+  String aboutComparedWith(String build) {
+    return 'Compared with build $build';
+  }
+
+  @override
+  String get aboutNoNotes => 'No release notes are recorded for this build.';
+
+  @override
+  String get aboutEarlierTitle => 'Earlier builds';
+
+  @override
+  String aboutReleaseHeading(String version, String build) {
+    return 'Version $version · build $build';
+  }
+
+  @override
+  String get settingsData => 'Data';
+
+  @override
+  String get backupTitle => 'Backup and restore';
+
+  @override
+  String get backupTileDescription =>
+      'One file with all your words and review progress';
+
+  @override
+  String get backupIntro =>
+      'A backup file keeps all your learning data so you can restore it on this or another device. It is created on the device and not uploaded anywhere; you choose where it is saved.';
+
+  @override
+  String get backupSaveTitle => 'Save a backup';
+
+  @override
+  String get backupIncludes =>
+      'Includes: decks, words with all meanings and details, tags, the review schedule (FSRS) and due dates, review history and sentence-practice history.';
+
+  @override
+  String get backupExcludes =>
+      'Not included: your OpenRouter key and settings (reminder, review direction, AI settings). The file is not encrypted; keep it somewhere safe.';
+
+  @override
+  String get backupSaveButton => 'Save backup file';
+
+  @override
+  String get backupSaved => 'Backup saved.';
+
+  @override
+  String get backupRestoreTitle => 'Restore from a backup';
+
+  @override
+  String get backupRestoreIntro =>
+      'The file is checked completely before anything changes. You then see what it contains and choose whether to add or replace data. Nothing changes until then.';
+
+  @override
+  String get backupPickButton => 'Choose backup file';
+
+  @override
+  String get backupSafetyCopyTitle =>
+      'Safety copy from before the last restore';
+
+  @override
+  String backupSafetyCopySaved(String date) {
+    return 'Saved $date';
+  }
+
+  @override
+  String get backupBusySaving => 'Creating the backup…';
+
+  @override
+  String get backupBusyReading => 'Checking the file…';
+
+  @override
+  String get backupBusyRestoring => 'Restoring… please keep the app open.';
+
+  @override
+  String get backupPreviewTitle => 'What the backup contains';
+
+  @override
+  String backupPreviewExported(String date) {
+    return 'Created $date';
+  }
+
+  @override
+  String backupPreviewApp(String version, String build) {
+    return 'With version $version (build $build)';
+  }
+
+  @override
+  String get backupPreviewSafetyCopy =>
+      'This safety copy holds this device\'s data from before a restore.';
+
+  @override
+  String get backupColumnFile => 'In file';
+
+  @override
+  String get backupColumnDevice => 'On device';
+
+  @override
+  String get backupCountDecks => 'Decks';
+
+  @override
+  String get backupCountWords => 'Words';
+
+  @override
+  String get backupCountCards => 'Scheduled cards (FSRS)';
+
+  @override
+  String get backupCountReviews => 'Review history';
+
+  @override
+  String get backupCountTags => 'Tags';
+
+  @override
+  String get backupCountSentences => 'Sentence exercises';
+
+  @override
+  String get backupChooseHow => 'How should it be restored?';
+
+  @override
+  String get backupMergeTitle => 'Add to my current data';
+
+  @override
+  String get backupMergeBody =>
+      'Decks, words, tags and history that are not on this device are added. Nothing on the device is changed or deleted. Words already on the device keep this device\'s review schedule.';
+
+  @override
+  String get backupMergeButton => 'Add';
+
+  @override
+  String get backupReplaceTitle => 'Replace all my data';
+
+  @override
+  String get backupReplaceBody =>
+      'All learning data on this device is deleted and replaced by the file\'s data. A safety copy is saved on the device first.';
+
+  @override
+  String get backupReplaceButton => 'Replace…';
+
+  @override
+  String get backupReplaceConfirmTitle => 'Replace all data?';
+
+  @override
+  String backupReplaceConfirmBody(int words, int decks, String date) {
+    final intl.NumberFormat wordsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String wordsString = wordsNumberFormat.format(words);
+    final intl.NumberFormat decksNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String decksString = decksNumberFormat.format(decks);
+
+    return '$wordsString words in $decksString decks, with their review schedule, review history and sentence-practice history, will be deleted from this device and replaced by the backup\'s data ($date).\n\nA safety copy of the current data is saved on this device first and can be restored from the backup screen. Settings and your OpenRouter key are not changed.';
+  }
+
+  @override
+  String get backupReplaceConfirm => 'Yes, replace everything';
+
+  @override
+  String get backupDoneMergeTitle => 'Backup data added';
+
+  @override
+  String get backupDoneReplaceTitle => 'Data restored';
+
+  @override
+  String backupResultWords(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString words added',
+      one: '1 word added',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupResultPresent(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$countString words were already on the device and were left as is',
+      one: '1 word was already on the device and was left as is',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupResultDecks(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString new decks',
+      one: '1 new deck',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupResultCards(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Review schedule (FSRS) restored for $countString cards',
+      one: 'Review schedule (FSRS) restored for 1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupResultCardsKept(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString cards kept this device\'s review schedule',
+      one: '1 card kept this device\'s review schedule',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupResultReviews(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString review history records',
+      one: '1 review history record',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get backupResultSafety =>
+      'A safety copy of the previous data was saved on this device and can be restored from this screen.';
+
+  @override
+  String get backupDone => 'Done';
+
+  @override
+  String get backupDismiss => 'OK';
+
+  @override
+  String get backupNothingChanged => 'No data was changed.';
+
+  @override
+  String backupErrorLocation(String location) {
+    return 'Problem in the file at: $location';
+  }
+
+  @override
+  String get backupErrorNotBackup =>
+      'This is not an AI WortBox backup file, or it is incomplete.';
+
+  @override
+  String get backupErrorUnsupportedVersion =>
+      'This file uses a newer backup format. Update the app and try again.';
+
+  @override
+  String get backupErrorNewerSchema =>
+      'This file was made by a newer version of the app. Update the app and try again.';
+
+  @override
+  String get backupErrorCorrupted =>
+      'The file\'s content was changed or damaged (its checksum does not match).';
+
+  @override
+  String get backupErrorMissingField =>
+      'Required information is missing from the file.';
+
+  @override
+  String get backupErrorInvalidValue => 'The file contains an invalid value.';
+
+  @override
+  String get backupErrorDuplicate => 'A record appears twice in the file.';
+
+  @override
+  String get backupErrorBrokenReference =>
+      'The file refers to a deck, word or tag that it does not contain.';
+
+  @override
+  String backupErrorTooLarge(int mb) {
+    final intl.NumberFormat mbNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String mbString = mbNumberFormat.format(mb);
+
+    return 'The file is larger than $mbString MB.';
+  }
+
+  @override
+  String get backupErrorSafetyCopy =>
+      'The safety copy of the current data could not be saved (the device may be full), so nothing was restored.';
+
+  @override
+  String get spTitle => 'AI sentence practice';
+
+  @override
+  String get spTileDescription =>
+      'Use your words in sentences and get feedback';
+
+  @override
+  String get spIntro =>
+      'AI writes short sentences with your own saved words. You write the sentence in German, or the meaning of a German sentence in Persian, and get feedback.';
+
+  @override
+  String get spSeparateNote =>
+      'This is separate from scheduled review: the review schedule (FSRS), due dates, review history and statistics do not change. Only which word was practised, when and with what result is saved (not your answers or the AI\'s text).';
+
+  @override
+  String get spAiNote =>
+      'One request to OpenRouter with your own key writes a session\'s sentences, and one request checks each answer, with your current AI settings (free models only by default). Only the word, its saved meanings, the exercise sentence and, when checking, your answer are sent.';
+
+  @override
+  String get spDirectionTitle => 'Exercise';
+
+  @override
+  String get spDirectionProduce => 'Write (Persian → German)';
+
+  @override
+  String get spDirectionProduceHint =>
+      'Write a Persian sentence in German using the target word.';
+
+  @override
+  String get spDirectionUnderstand => 'Understand (German → Persian)';
+
+  @override
+  String get spDirectionUnderstandHint =>
+      'Read a German sentence and write its meaning in Persian.';
+
+  @override
+  String get spLevelTitle => 'Level';
+
+  @override
+  String get spLevelA2 => 'Easy (A2)';
+
+  @override
+  String get spLevelB1 => 'Medium (B1)';
+
+  @override
+  String get spLevelB2 => 'Harder (B2)';
+
+  @override
+  String get spSizeTitle => 'Words per session';
+
+  @override
+  String spSizeWords(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString words';
+  }
+
+  @override
+  String get spTagLabel => 'Tag';
+
+  @override
+  String get spAllTags => 'All tags';
+
+  @override
+  String get spStart => 'Start practice';
+
+  @override
+  String get spNeedsKey => 'This practice needs your OpenRouter key.';
+
+  @override
+  String get spOpenAiSettings => 'AI settings';
+
+  @override
+  String spHistoryCount(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString sentence exercises recorded',
+      one: '1 sentence exercise recorded',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get spClearHistory => 'Clear sentence-practice history';
+
+  @override
+  String get spClearConfirmTitle => 'Clear sentence-practice history?';
+
+  @override
+  String get spClearConfirmBody =>
+      'Only the sentence-practice history is deleted. Words, the review schedule (FSRS) and review history are not touched.';
+
+  @override
+  String get spClearConfirm => 'Clear';
+
+  @override
+  String get spCleared => 'Sentence-practice history cleared.';
+
+  @override
+  String get spGenerating => 'Writing sentences with your words…';
+
+  @override
+  String get spNoWordsTitle => 'No words to practise';
+
+  @override
+  String get spNoWordsBody =>
+      'Sentence practice needs words with at least one saved meaning. Choose another deck or tag, or add meanings to your words.';
+
+  @override
+  String get spGenerationFailedTitle => 'The sentences could not be created';
+
+  @override
+  String get spGenerationFailedHint =>
+      'Nothing was saved or changed. \"Try again\" sends a new request; if a request limit was reached, try again a little later.';
+
+  @override
+  String spProgress(int current, int total) {
+    final intl.NumberFormat currentNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String currentString = currentNumberFormat.format(current);
+    final intl.NumberFormat totalNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String totalString = totalNumberFormat.format(total);
+
+    return 'Exercise $currentString of $totalString';
+  }
+
+  @override
+  String spRejected(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$countString words were left out because no valid sentence was created for them.',
+      one: '1 word was left out because no valid sentence was created for it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get spInstructionProduce =>
+      'Write this sentence in German using the target word:';
+
+  @override
+  String get spInstructionUnderstand =>
+      'Write what this sentence means in Persian:';
+
+  @override
+  String get spTargetWord => 'Target word:';
+
+  @override
+  String get spAnswerLabelGerman => 'Your answer (German)';
+
+  @override
+  String get spAnswerLabelPersian => 'Your answer (Persian)';
+
+  @override
+  String get spCheck => 'Check answer';
+
+  @override
+  String get spShowAnswer => 'Show model answer';
+
+  @override
+  String get spSkip => 'Skip';
+
+  @override
+  String get spNext => 'Next';
+
+  @override
+  String get spFinish => 'Finish';
+
+  @override
+  String get spCheckFailedKept =>
+      'Your answer was kept. You can tap \"Check answer\" again.';
+
+  @override
+  String get spVerdictCorrect => 'Correct';
+
+  @override
+  String get spVerdictAcceptable => 'Correct, phrased differently';
+
+  @override
+  String get spVerdictMinor => 'Small mistakes';
+
+  @override
+  String get spVerdictIncorrect => 'Not correct';
+
+  @override
+  String get spTargetCorrect => 'Target word: correct';
+
+  @override
+  String get spTargetIncorrect => 'Target word: used or understood incorrectly';
+
+  @override
+  String get spTargetMissing => 'Target word: missing';
+
+  @override
+  String get spCorrectionsTitle => 'Corrections';
+
+  @override
+  String get spKindGrammar => 'Grammar';
+
+  @override
+  String get spKindWordOrder => 'Word order';
+
+  @override
+  String get spKindSpelling => 'Spelling';
+
+  @override
+  String get spKindCapitalization => 'Capitalization';
+
+  @override
+  String get spKindVocabulary => 'Vocabulary';
+
+  @override
+  String get spKindMeaning => 'Meaning';
+
+  @override
+  String get spCorrectedAnswer => 'Your answer, corrected';
+
+  @override
+  String get spNaturalVersion => 'A natural way to say it';
+
+  @override
+  String get spModelAnswer => 'Model answer';
+
+  @override
+  String get spModelAnswerNote =>
+      'Your answer does not have to match it exactly.';
+
+  @override
+  String get spDoneTitle => 'Practice finished';
+
+  @override
+  String spDoneCorrect(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString correct';
+  }
+
+  @override
+  String spDoneMinor(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString with small mistakes';
+  }
+
+  @override
+  String spDoneIncorrect(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString not correct';
+  }
+
+  @override
+  String spDoneUnchecked(int count) {
+    final intl.NumberFormat countNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return '$countString not checked';
+  }
+
+  @override
+  String get spDoneFsrsNote =>
+      'Your review schedule (FSRS) and review statistics did not change.';
+
+  @override
+  String get spPracticeAgain => 'Practise again';
+
+  @override
+  String get spBackToToday => 'Back to Today';
 }

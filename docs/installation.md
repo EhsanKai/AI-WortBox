@@ -16,8 +16,10 @@ Facts about this project that the steps below rely on:
 
 - Bundle identifier: `com.aiwortbox.aiWortbox`
 - Minimum iOS version: 15.5 (`ios/Podfile`, Xcode project)
-- Version: `version:` in `pubspec.yaml` (`1.0.0+2` means version 1.0.0,
-  build 2). Every upload to App Store Connect needs a higher build number.
+- Version: `version:` in `pubspec.yaml` (`1.0.0+3` means version 1.0.0,
+  build 3). Every new build needs a higher build number and release notes
+  ([releases](releases.md)). The installed version, build and its changes
+  are shown in the app under Settings → About AI WortBox (درباره برنامه).
 - All data (words, reviews, settings) lives in a local SQLite database on the
   phone. There is no account and no server.
 
@@ -115,9 +117,11 @@ same team) keeps all words, review history and settings. Do **not** delete
 the app from the phone first: deleting it deletes its database.
 
 Before risky changes (a different team or bundle identifier, a new phone),
-export your decks (deck → Export, CSV or Anki). Note that CSV export is not a
-full backup: it does not contain review history, statistics, settings or the
-API key.
+save a full backup: Settings → Backup and restore → Save backup file. It
+contains all decks, words, tags, the review schedule (FSRS) and review
+history, but not settings or the API key (enter the key again after a
+restore). Restore it on the new installation from the same screen. CSV and
+Anki exports are not backups (no review state).
 
 ### A7. Limits of development signing
 
@@ -151,7 +155,8 @@ a Mac or a cable.
 
 **Current state of this project (2026-10-20):** the Apple account used so far
 is a free Personal Team. A release archive (`1.0.0`, build `2`) builds and
-was checked locally, but exporting an App Store IPA fails with "Team … does
+was checked locally (build `3` was built with `flutter build ios --release`
+for the development-signed install, not archived), but exporting an App Store IPA fails with "Team … does
 not have permission to create 'iOS App Store' provisioning profiles". **No
 build has been uploaded to App Store Connect and nothing is in TestFlight.**
 The steps below are what remains.
@@ -179,8 +184,8 @@ The steps below are what remains.
 
 ### B3. Build, archive and upload
 
-1. Raise the build number in `pubspec.yaml` (e.g. `1.0.0+2` → `1.0.0+3`)
-   for every upload. The version (`1.0.0`) may stay the same within one
+1. Raise the build number in `pubspec.yaml` (e.g. `1.0.0+3` → `1.0.0+4`)
+   and add release notes for it ([releases](releases.md)) for every upload. The version (`1.0.0`) may stay the same within one
    beta.
 2. Build the archive and IPA:
 
@@ -310,8 +315,10 @@ tables: `dart run build_runner build`.
 
 ### Release checklist
 
-1. Raise the build number in `pubspec.yaml`.
-2. Run format, analyze and tests (all must pass).
+1. Raise the build number in `pubspec.yaml` and add the build's Persian and
+   English notes to `assets/release_notes.json` ([releases](releases.md)).
+2. Run format, analyze and tests (all must pass; the release-notes test
+   fails without notes for the new build).
 3. `flutter build ipa --release`; read the output for IPA export errors.
 4. Upload (B3), wait for processing, answer export compliance.
 5. Add the build to the tester groups (B4).

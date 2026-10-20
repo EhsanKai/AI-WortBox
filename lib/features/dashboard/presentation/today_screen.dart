@@ -151,6 +151,14 @@ class _Dashboard extends ConsumerWidget {
             ),
             onTap: () => context.go(AppRoutes.memoryCoach),
           ),
+          const SizedBox(height: AppSpace.sm),
+          ActionTile(
+            key: const Key('today.sentences'),
+            icon: Icons.edit_note,
+            title: l10n.spTitle,
+            description: l10n.spTileDescription,
+            onTap: () => context.go(AppRoutes.sentencePractice),
+          ),
           const SizedBox(height: AppSpace.xl),
           SectionHeader(l10n.dashboardYourDecks),
           for (final summary in summaries.take(5)) ...[

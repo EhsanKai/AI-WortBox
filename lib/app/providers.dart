@@ -9,6 +9,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/id/id_generator.dart';
 import '../core/time/clock.dart';
 import '../data/database/app_database.dart';
+import '../features/backup/data/backup_file_source.dart';
+import '../features/backup/data/backup_service.dart';
+import '../features/backup/data/safety_backup_store.dart';
 import '../features/csv_import/data/csv_file_source.dart';
 import '../features/decks/data/drift_deck_repository.dart';
 import '../features/decks/domain/deck_repository.dart';
@@ -31,6 +34,8 @@ import '../features/review/domain/study_repository.dart';
 import '../features/scan/data/image_cropper.dart';
 import '../features/scan/data/scan_image_source.dart';
 import '../features/scan/data/text_recognition_engine.dart';
+import '../features/sentence_practice/data/drift_sentence_practice_repository.dart';
+import '../features/sentence_practice/domain/sentence_practice.dart';
 import '../features/settings/data/settings_store.dart';
 import '../features/speech/data/flutter_tts_speech_service.dart';
 import '../features/speech/domain/speech_service.dart';
@@ -91,6 +96,35 @@ final studyRepositoryProvider = Provider<StudyRepository>(
     ref.watch(appDatabaseProvider),
     clock: ref.watch(clockProvider),
     ids: ref.watch(idGeneratorProvider),
+  ),
+);
+
+/// Sentence-practice history (never FSRS state or review history).
+final sentencePracticeRepositoryProvider = Provider<SentencePracticeRepository>(
+  (ref) => DriftSentencePracticeRepository(
+    ref.watch(appDatabaseProvider),
+    clock: ref.watch(clockProvider),
+    ids: ref.watch(idGeneratorProvider),
+  ),
+);
+
+/// Safety copies made before a restore. Tests override this.
+final safetyBackupStoreProvider = Provider<SafetyBackupStore>(
+  (ref) => FileSafetyBackupStore(),
+);
+
+/// Choosing a backup file to restore. Tests override this.
+final backupFileSourceProvider = Provider<BackupFileSource>(
+  (ref) => const FilePickerBackupFileSource(),
+);
+
+/// Full backup and restore of the learning data.
+final backupServiceProvider = Provider<BackupService>(
+  (ref) => BackupService(
+    ref.watch(appDatabaseProvider),
+    clock: ref.watch(clockProvider),
+    ids: ref.watch(idGeneratorProvider),
+    safety: ref.watch(safetyBackupStoreProvider),
   ),
 );
 

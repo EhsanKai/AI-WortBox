@@ -12,9 +12,16 @@ import 'theme.dart';
 const appLocale = Locale('fa');
 
 class AiWortBoxApp extends StatefulWidget {
-  const AiWortBoxApp({super.key, this.initialLocation = AppRoutes.today});
+  const AiWortBoxApp({
+    super.key,
+    this.initialLocation = AppRoutes.today,
+    this.locale = appLocale,
+  });
 
   final String initialLocation;
+
+  /// The UI locale; tests also run the English (LTR) strings.
+  final Locale locale;
 
   @override
   State<AiWortBoxApp> createState() => _AiWortBoxAppState();
@@ -38,7 +45,7 @@ class _AiWortBoxAppState extends State<AiWortBoxApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      locale: appLocale,
+      locale: widget.locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,

@@ -61,10 +61,14 @@ keeps its own navigation stack.
 | `/words/search`, `/words/tags` | Search all words, manage tags (Phase 5) |
 | `/add/anki?deckId=` | Import from Anki (the import flow in Anki mode) |
 | `/settings/reminder` | Study reminder (Phase 5) |
+| `/settings/backup` | Backup and restore (D54) |
+| `/settings/about` | Installed version, build and release notes (D56) |
+| `/today/sentences`, `/today/sentences/session?direction=&level=&size=&deckId=&tagId=` | AI sentence practice setup and session (D55) |
 
 ## Database
 
-Drift, schema version **2** (v1 → v2 in Phase 5, D33). DateTimes are
+Drift, schema version **3** (v1 → v2 in Phase 5, D33; v2 → v3 in Build 3,
+D55). DateTimes are
 stored as ISO-8601 text and always written in UTC, so text comparisons on
 due dates are correct. Enum columns
 store the enum value's `name`. Foreign keys are enabled in `beforeOpen`.
@@ -79,6 +83,7 @@ store the enum value's `name`. Foreign keys are enabled in `beforeOpen`.
 | `entry_tags` (v2) | Tag assignments | PK `(entry_id, tag_id)`; FK → entries and tags (cascade); index `tag_id` |
 | `review_events` (v2) | Recorded practice answers: session, direction, outcome, UTC time, local day | FK → entries (**set null**: history is kept); index `local_day` |
 | `app_settings` (v2) | Non-secret key-value settings (study reminder) | PK `key` |
+| `sentence_practice_events` (v3) | Sentence-practice history: word, direction, level, outcome, UTC time; no answers or AI text | FK → entries (cascade); index `entry_id` |
 
 `vocabulary_entries` gained `marked_difficult_at` (manual mark, not content:
 it does not change `updated_at`) and `search_key` (derived, D34) in v2.
@@ -96,9 +101,10 @@ never writes to `flashcards`, so progress is never reset by a definition edit
    `app_database.steps.dart` and migration tests under `test/drift/`.
 4. Implement `onUpgrade` with `stepByStep(...)`, run tests.
 
-Exported schemas (v1, v2) are checked by
+Exported schemas (v1–v3) are checked by
 `test/drift/app_database/schema_test.dart`; `migration_test.dart` migrates
-every version step and checks v1 data survives v1 → v2 unchanged.
+every version step and checks that v1 data survives v1 → v2 and v2 data
+(every table) survives v2 → v3 unchanged.
 
 ## Vocabulary
 
@@ -339,6 +345,38 @@ CsvImportController ─ AnkiPackageReader (ZIP signature) or CsvParser ─▶ Cs
   `reminderSchedulerProvider`, `exportFileSinkProvider`) and the practice
   order (`randomProvider`).
 
+## Build 3 features (D54–D56)
+
+```
+BackupScreen ─ BackupController ─ BackupService ─ BackupCodec (encode/validate)
+                                     │              └ SafetyBackupStore (files)
+                                     └ one transaction (merge | replace)
+AboutScreen ─ installedVersionProvider (AppInfoSource: package_info_plus)
+            └ releaseNotesProvider (assets/release_notes.json)
+SentencePracticeSession ─ SentencePracticeController
+   ├ selectPracticeWords (pure) ← VocabularyRepository.search, Memory Coach rule,
+   │                              SentencePracticeRepository.lastPracticedByEntry
+   ├ SentencePracticeAi ─ OpenRouterSentencePracticeService ─ OpenRouterChat
+   │                         └ SentencePracticeParser + TargetWordMatcher
+   └ SentencePracticeRepository.record (sentence_practice_events only)
+OpenRouterEnrichmentService ─ OpenRouterChat ─ OpenRouterClient (shared)
+```
+
+- **Backup** (`features/backup`): `BackupCodec` serializes every learning
+  table explicitly (not Drift's `toJson`) and validates a file completely
+  before returning a `ValidatedBackup`. `BackupService.restore` writes the
+  safety copy and applies merge or replace inside one transaction. Format:
+  `docs/backup-format.md`.
+- **About** (`features/about`): `ReleaseNotes.forInstalled` returns only the
+  exact build's notes. Process: `docs/releases.md`.
+- **Sentence practice** (`features/sentence_practice`): the domain
+  (exercise and feedback types, parser, matcher, word selection) is pure
+  Dart. `OpenRouterChat` (`features/enrichment/data`) holds the free-only
+  request loop shared with enrichment: key check, preferences, attempt
+  plan, zero-cost check, free fallback and retry budget.
+- Tests override `appInfoSourceProvider`, `safetyBackupStoreProvider`,
+  `backupFileSourceProvider` and use mocked HTTP for sentence practice.
+
 ## Security
 
 - No API key in the source, assets, build configuration or the app bundle.
@@ -384,11 +422,9 @@ and every answer is a `review_events` row (direction, outcome, time).
 
 ### Backup format boundary (P3)
 
-A `BackupService` in the data layer would export and import a versioned
-archive. Restore would run in four steps — read → validate → preview →
-transactional apply — with an automatic safety backup of the current data.
-It would never send data to a network service. The backup format version is
-independent of the database schema version; the manifest records both.
+Implemented in Build 3 (D54): see "Build 3 features" above and
+`docs/backup-format.md`. Media files (P13) would require a new format
+version (an archive with files).
 
 ### Images boundary (P13)
 

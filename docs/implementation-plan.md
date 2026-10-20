@@ -27,7 +27,8 @@ to formatting, static analysis and host-side automated tests.
 | 2 | Vocabulary management and CSV import | **Complete** (`bbc9877`) |
 | 3 | Photo/gallery input, German OCR, word and expression selection | **Complete** (`77287d7`) |
 | 4 | AI enrichment with the user's own OpenRouter key (BYOK) | **Complete** (`eaa0278`); live OpenRouter and real-device/platform verification outstanding |
-| 5 | Search, tags, export, Anki, TTS, reminders, practice and statistics (scope selected by the product owner) | **Implemented — awaiting commit**; platform builds and real-device checks outstanding |
+| 5 | Search, tags, export, Anki, TTS, reminders, practice and statistics (scope selected by the product owner) | **Complete** (`0402972`, follow-ups `aae5d5e`, `721ae7b`) |
+| Build 3 | Release `1.0.0+3`: full backup/restore, About screen with release notes, AI sentence practice (product owner request, D54–D56) | **Complete** (see below) |
 
 ## Phase 1 — Foundation and local persistence — Complete (`73fa370`)
 
@@ -157,10 +158,23 @@ FSRS-scheduled review with a daily due queue and lazily created cards
 (fulfilling D16), the review-direction setting, answers hidden in decks,
 word selection on the page photo, the iOS speech fix and bulk delete.
 
-Still **not implemented**: full backup/restore (P3 backup part); automatic difficult-word
-detection; media in Anki import/export. iOS/Android builds and real-device
+Still **not implemented**: automatic difficult-word detection; media in
+Anki import/export. (Full backup/restore followed in Build 3.) iOS/Android builds and real-device
 checks remain outstanding (no Android SDK or full Xcode on the development
 machine).
+
+## Build 3 — release 1.0.0+3 (product owner request)
+
+Approved and implemented together (decisions D54–D56):
+
+| Feature | What is implemented |
+| --- | --- |
+| A — Full backup and restore | Versioned, checksummed JSON file with all learning data incl. FSRS state and review history (not the API key or settings); complete validation before any write; preview; merge (adds only) or replace (explicit confirmation); safety copy first; one transaction. `docs/backup-format.md`. |
+| B — Installed version and release notes | Settings → About AI WortBox: version and build from the installed app, release notes (Persian/English) per build from `assets/release_notes.json`; a test requires notes for the pubspec build. `docs/releases.md`. |
+| C — AI sentence practice | Today → AI sentence practice: write (Persian → German) or understand (German → Persian), levels A2–B2, 3/5/8 words, deck/tag filter; one request per session and one per checked answer through the shared free-only OpenRouter policy; validated exercises and feedback; history in schema v3, never touching FSRS or review history. |
+
+Schema **v3** (one additive table). One dependency: `package_info_plus`.
+Live OpenRouter calls are still unverified (mocked HTTP only).
 
 ## Proposed feature register
 
@@ -173,7 +187,7 @@ that specific feature. The phase column is the intended placement.
 | --- | --- | --- | --- |
 | P1 | Search and filters (German/Persian, deck, learning status) | 5 | Implemented in Phase 5 (text, deck, tag, difficult; no learning-status filter — there is no scheduler) |
 | P2 | Tags and categories | 5 | Implemented in Phase 5 (flat tags) |
-| P3 | CSV export and full local backup/restore | 5 | CSV export implemented in Phase 5; **backup/restore not approved** |
+| P3 | CSV export and full local backup/restore | 5 | CSV export implemented in Phase 5; backup/restore implemented in Build 3 (D54) |
 | P4 | Lemma / inflected-form duplicate detection | 4 (local hints from 3) | Proposed — not approved |
 | P5 | Extended preservation of book sentences and source | 3 (metadata part) | Proposed — not approved |
 | P6 | German text-to-speech | 5 | Implemented in Phase 5 (system TTS) |
@@ -419,8 +433,8 @@ Evaluated and implemented in Phase 5 (product owner selection), D39–D40.
 
 ## Schema change and migration policy
 
-The current schema is **v2** (Phase 5, D33); Phases 2–4 made no schema
-changes.
+The current schema is **v3** (Build 3, D55: `sentence_practice_events`);
+v2 came with Phase 5 (D33); Phases 2–4 made no schema changes.
 Before any schema change:
 
 1. Confirm the change is needed for an approved feature (no speculative
@@ -430,7 +444,9 @@ Before any schema change:
 3. Bump `schemaVersion`, run `dart run drift_dev make-migrations`, implement
    `stepByStep` upgrades, and add migration tests that start from real v1
    data.
-4. Keep backup compatibility in mind once a backup format exists.
+4. Keep backup compatibility: a new table or column must be added to
+   `BackupCodec` (and, if old files cannot be read, a new backup format
+   version, D54).
 
 Schema v2 (Phase 5) added `tags`, `entry_tags`, `review_events`,
 `app_settings` and the entry columns `marked_difficult_at` and `search_key`.
